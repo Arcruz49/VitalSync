@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using VitalSyncAPI.Domain.Exceptions;
 
 namespace VitalSyncAPI.Domain.ValueObjects
 {
@@ -11,10 +12,10 @@ namespace VitalSyncAPI.Domain.ValueObjects
         public Email(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email é obrigatório.");
+                throw new ValidationException("Email é obrigatório.");
 
             if (!EmailRegex.IsMatch(email))
-                throw new ArgumentException("Email inválido.");
+                throw new ValidationException("Email inválido.");
 
             Value = email.ToLowerInvariant();
         }

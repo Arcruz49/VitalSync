@@ -1,3 +1,5 @@
+using VitalSyncAPI.Domain.Exceptions;
+
 namespace VitalSyncAPI.Domain.ValueObjects
 {
     public class Password
@@ -7,10 +9,10 @@ namespace VitalSyncAPI.Domain.ValueObjects
         public Password(string password)
         {
             if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Senha é obrigatória.");
+                throw new ValidationException("Senha é obrigatória.");
 
             if(password.Length < 6)
-                throw new ArgumentException("A senha deve ter pelo menos 6 caractéres");
+                throw new ValidationException("A senha deve ter pelo menos 6 caracteres.");
 
             
             Value = password;

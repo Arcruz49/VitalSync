@@ -28,11 +28,10 @@ public class AuthenticateUseCase : IAuthenticateUseCase{
     public async Task<UserDto> ExecuteAsync(LoginRequest request)
     {
         var email = new Email(request.Email);
-        var password = new Password(request.Password);
 
         var user = await _userRepository.GetUserByEmail(email.Value) ?? throw new NotFoundException("Email ou senha incorretos");
 
-        var result = _passwordHasher.VerifyHashedPassword(user, user.Password, password.Value);
+        var result = _passwordHasher.VerifyHashedPassword(user, user.Password, request.Password);
 
         if (result == PasswordVerificationResult.Failed)
         {
