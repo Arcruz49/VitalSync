@@ -1,0 +1,540 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+// ── TOKENS ───────────────────────────────────────────────────────────
+:host {
+  --teal:      #0D9488;
+  --teal-dark: #0F766E;
+  --navy:      #0F172A;
+  --slate:     #475569;
+  --muted:     #94A3B8;
+  --surface:   #F8FAFC;
+  --white:     #FFFFFF;
+  --border:    #E2E8F0;
+  --radius:    14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  display: block;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+// ── PAGE LAYOUT — DESKTOP ────────────────────────────────────────────
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+}
+
+// ── HERO PANEL ───────────────────────────────────────────────────────
+.hero-panel {
+  flex: 1 1 60%;
+  background: #fdfdfd;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 56px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+// ── BRAND ────────────────────────────────────────────────────────────
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--teal);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -.01em;
+  margin-bottom: 40px;
+}
+
+.brand-logo { flex-shrink: 0; }
+
+// ── HERO TEXT ────────────────────────────────────────────────────────
+.hero-text {
+  margin-bottom: 0;
+  max-width: 560px;
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 2.8vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--navy);
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--slate);
+    font-weight: 300;
+  }
+}
+
+// ── HERO IMAGE ───────────────────────────────────────────────────────
+.hero-image-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+  min-height: 0;
+}
+
+.hero-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 560px;
+  max-height: 560px;
+  object-fit: contain;
+}
+
+// ── FORM PANEL ───────────────────────────────────────────────────────
+.form-panel {
+  flex: 0 0 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  background: var(--white);
+  border-left: 1px solid var(--border);
+}
+
+.form-container {
+  width: 100%;
+  max-width: 340px;
+}
+
+// mobile brand — hidden on desktop
+.mobile-brand {
+  display: none;
+}
+
+// ── FORM HEADER ──────────────────────────────────────────────────────
+.form-header {
+  margin-bottom: 28px;
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.85rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+
+  p {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+}
+
+// ── FORM ─────────────────────────────────────────────────────────────
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--slate);
+  }
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-icon {
+    position: absolute;
+    left: 13px;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    height: 46px;
+    padding: 0 42px 0 40px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--navy);
+    background: var(--surface);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+
+    &::placeholder { color: var(--muted); }
+
+    &:focus {
+      border-color: var(--teal);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.13);
+    }
+  }
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color .2s;
+
+  &:hover { color: var(--teal); }
+}
+
+// ── FORM OPTIONS ─────────────────────────────────────────────────────
+.form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -2px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--slate);
+  cursor: pointer;
+  user-select: none;
+
+  input[type="checkbox"] { display: none; }
+
+  .checkmark {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all .2s;
+  }
+
+  input:checked + .checkmark {
+    background: var(--teal);
+    border-color: var(--teal);
+
+    &::after {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 7px;
+      border: 1.5px solid white;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+  }
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: var(--teal);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover { color: var(--teal-dark); }
+}
+
+// ── BUTTONS ──────────────────────────────────────────────────────────
+.btn-primary {
+  width: 100%;
+  height: 48px;
+  background: var(--teal);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  transition: background .2s, box-shadow .2s;
+
+  &:hover:not(.loading) {
+    background: var(--teal-dark);
+    box-shadow: 0 6px 24px rgba(13,148,136,.28);
+  }
+
+  &.loading { opacity: .8; cursor: not-allowed; }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn-google {
+  width: 100%;
+  height: 46px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+
+  &:hover {
+    border-color: #CBD5E1;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+}
+
+.signup-link {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+
+  a {
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover { color: var(--teal-dark); }
+  }
+}
+
+// ── ENTRANCE ANIMATIONS ──────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-28px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(28px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+.hero-panel          { animation: slideInLeft  0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.form-panel          { animation: slideInRight 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both; }
+.brand               { animation: fadeUp 0.45s ease-out 0.28s both; }
+.hero-text           { animation: fadeUp 0.5s  ease-out 0.40s both; }
+.hero-image-wrapper  { animation: fadeUp 0.55s ease-out 0.50s both; }
+.mobile-brand        { animation: fadeUp 0.4s  ease-out 0.18s both; }
+.form-header         { animation: fadeUp 0.45s ease-out 0.33s both; }
+
+.auth-form {
+  > :nth-child(1) { animation: fadeUp 0.4s ease-out 0.43s both; }
+  > :nth-child(2) { animation: fadeUp 0.4s ease-out 0.52s both; }
+  > :nth-child(3) { animation: fadeUp 0.4s ease-out 0.60s both; }
+  > :nth-child(4) { animation: fadeUp 0.4s ease-out 0.67s both; }
+  > :nth-child(5) { animation: fadeUp 0.4s ease-out 0.73s both; }
+  > :nth-child(6) { animation: fadeUp 0.4s ease-out 0.78s both; }
+  > :nth-child(7) { animation: fadeUp 0.4s ease-out 0.83s both; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-panel, .form-panel, .brand, .hero-text,
+  .hero-image-wrapper, .mobile-brand, .form-header,
+  .auth-form > * { animation: none !important; }
+}
+
+// ── MOBILE ───────────────────────────────────────────────────────────
+// Tudo dentro da tela, sem scroll, imagem maior, texto centralizado
+@media (max-width: 900px) {
+  .login-page {
+    flex-direction: column;
+    min-height: 100svh;  // safe viewport height — respeita barra do browser
+  }
+
+  // ── HERO: topo da tela, fundo claro, imagem centralizada
+  .hero-panel {
+    flex: none;
+    padding: 20px 24px 0;
+    background: #fdfdfd;
+    align-items: center;
+  }
+
+  .hero-content {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  // Esconde brand lateral — a mobile-brand aparece no topo
+  .brand { display: none; }
+
+  // Esconde texto descritivo no mobile (igual ao protótipo)
+  .hero-text { display: none; }
+
+  // Brand centralizado no topo do hero
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--teal);
+    font-weight: 700;
+    font-size: 18px;     // maior que antes
+    letter-spacing: -.01em;
+    margin-bottom: 12px;
+    width: 100%;
+
+    svg {
+      width: 28px;       // logo maior
+      height: 28px;
+    }
+  }
+
+  // Imagem maior, ocupa bem o espaço
+  .hero-image-wrapper {
+    margin-top: 0;
+    flex: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-image {
+    width: 100%;
+    max-width: 300px;   // maior que os 260px anteriores
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  // ── FORM: parte de baixo, sem border-top aparente
+  .form-panel {
+    flex: none;
+    border-left: none;
+    border-top: none;
+    background: var(--white);
+    padding: 20px 24px 24px;
+    align-items: flex-start;
+    box-shadow: 0 -4px 20px rgba(0,0,0,.06);
+    border-radius: 20px 20px 0 0;
+    // deslocar levemente sobre o hero
+    margin-top: -16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .form-container {
+    max-width: 100%;
+  }
+
+  // Título e subtítulo centralizados
+  .form-header {
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+  }
+
+  // Inputs levemente menores para caber tudo
+  .input-wrapper input {
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .auth-form { gap: 12px; }
+
+  .btn-primary {
+    height: 46px;
+    border-radius: 12px;
+  }
+
+  .btn-google {
+    height: 44px;
+  }
+
+  .signup-link {
+    font-size: 13px;
+  }
+
+  .divider {
+    font-size: 11px;
+  }
+}
+
+// ── TELAS MUITO PEQUENAS (< 390px) ───────────────────────────────────
+@media (max-width: 390px) {
+  .hero-image { max-width: 240px; }
+
+  .mobile-brand {
+    font-size: 16px;
+    svg { width: 24px; height: 24px; }
+  }
+
+  .form-header h2 { font-size: 1.4rem; }
+
+  .auth-form { gap: 10px; }
+
+  .form-panel { padding: 16px 20px 20px; }
+}

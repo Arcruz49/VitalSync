@@ -1,0 +1,18 @@
+# Claude
+.claude/
+CLAUDE.md
+
+# Secrets
+.env
+
+# .NET build artifacts
+bin/
+obj/
+
+# .NET settings with potential secrets
+appsettings.json
+
+# Frontend dependencies & build output
+node_modules/
+dist/
+.angular/
