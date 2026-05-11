@@ -1,0 +1,36 @@
+<div style="padding: 2rem; font-family: sans-serif; max-width: 800px; margin: 0 auto;">
+  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+    <button (click)="goBack()" style="padding: 0.4rem 1rem; cursor: pointer;">← Voltar</button>
+    <h1 style="margin: 0;">Tipos de Métricas</h1>
+  </div>
+
+  <p *ngIf="isLoading()">Carregando...</p>
+  <p *ngIf="errorMessage()" style="color: red;">{{ errorMessage() }}</p>
+
+  <table *ngIf="!isLoading() && !errorMessage()" style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="background: #f0f0f0; text-align: left;">
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">ID</th>
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">Nome</th>
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">Unidade</th>
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">Mín. Normal</th>
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">Máx. Normal</th>
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">Ícone</th>
+        <th style="padding: 0.75rem; border: 1px solid #ddd;">Ordem</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of metrics()" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.id }}</td>
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.name }}</td>
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.unit }}</td>
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.minNormal ?? '—' }}</td>
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.maxNormal ?? '—' }}</td>
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.icon }}</td>
+        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.sortOrder }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!isLoading() && !errorMessage() && metrics().length === 0">Nenhuma métrica encontrada.</p>
+</div>

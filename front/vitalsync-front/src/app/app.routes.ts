@@ -19,4 +19,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/Dashboard.component').then(m => m.DashboardComponent)
   },
+  {
+    path: 'metric-types',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/metric-types/MetricTypes.component').then(m => m.MetricTypesComponent)
+  },
 ];

@@ -7,72 +7,23 @@ using VitalSyncAPI.Application.Interfaces;
 namespace VitalSyncAPI.Controllers;
 
 [ApiController]
-[Route("auth")]
+[Authorize]
+[Route("metrics")]
 public class MetricTypesController : ControllerBase
 {
-    private readonly IAuthenticateUseCase _authenticateUseCase;
-    private readonly IRegisterUserUseCase _registerUserUseCase;
+    private readonly IGetMetricTypes _getMetricTypes;
 
-    public MetricTypesController(IAuthenticateUseCase authenticateUseCase, IRegisterUserUseCase registerUserUseCase)
+    public MetricTypesController(IGetMetricTypes getMetricTypes)
     {
-        _authenticateUseCase = authenticateUseCase;
-        _registerUserUseCase = registerUserUseCase;
+        _getMetricTypes = getMetricTypes;
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [HttpGet]
+    public async Task<IActionResult> GetMetricTypes()
     {
-        var result = await _authenticateUseCase.ExecuteAsync(request);
-
-        var isHttps = Request.IsHttps;
-        Response.Cookies.Append("vitalsync_token", result.token, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = isHttps,
-            SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTime.UtcNow.AddMinutes(60)
-        });
+        var result = await _getMetricTypes.ExecuteAsync();
         return Ok(result);
     }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserRequest request)
-    {
-        var result = await _registerUserUseCase.ExecuteAsync(request);
 
-        var isHttps = Request.IsHttps;
-        Response.Cookies.Append("vitalsync_token", result.token, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = isHttps,
-            SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTime.UtcNow.AddMinutes(60)
-        });
-        return Ok(result);
-    }
-
-    [Authorize]
-    [HttpGet("me")]
-    public IActionResult Me()
-    {
-        var name = User.FindFirstValue(ClaimTypes.Name);
-        var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return Ok(new { id, name });
-    }
-
-    [Authorize]
-    [HttpPost("logout")]
-    public IActionResult Logout()
-    {
-        var isHttps = Request.IsHttps;
-        Response.Cookies.Append("vitalsync_token", "", new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = isHttps,
-            SameSite = isHttps ? SameSiteMode.None : SameSiteMode.Lax,
-            Expires = DateTime.UtcNow.AddDays(-1)
-        });
-
-        return Ok();
-    }
 }

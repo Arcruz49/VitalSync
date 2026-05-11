@@ -2,5 +2,9 @@
   "/auth": {
     "target": "http://api:8080",
     "changeOrigin": true
+  },
+  "/metrics": {
+    "target": "http://api:8080",
+    "changeOrigin": true
   }
 }
