@@ -8,12 +8,12 @@ namespace VitalSyncAPI.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController : ControllerBase
+public class MetricTypesController : ControllerBase
 {
     private readonly IAuthenticateUseCase _authenticateUseCase;
     private readonly IRegisterUserUseCase _registerUserUseCase;
 
-    public AuthController(IAuthenticateUseCase authenticateUseCase, IRegisterUserUseCase registerUserUseCase)
+    public MetricTypesController(IAuthenticateUseCase authenticateUseCase, IRegisterUserUseCase registerUserUseCase)
     {
         _authenticateUseCase = authenticateUseCase;
         _registerUserUseCase = registerUserUseCase;

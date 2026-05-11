@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VitalSyncAPI.Infrastructure.Data;
@@ -11,9 +12,11 @@ using VitalSyncAPI.Infrastructure.Data;
 namespace VitalSyncAPI.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20260510234936_AddHealthEntities")]
+    partial class AddHealthEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,6 +82,51 @@ namespace VitalSyncAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("display_name");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("health_profiles");
+                });
+
+            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthProfileCondition", b =>
+                {
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("profile_id");
+
+                    b.Property<int>("ConditionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("condition_id");
+
+                    b.HasKey("ProfileId", "ConditionId");
+
+                    b.HasIndex("ConditionId");
+
+                    b.ToTable("health_profile_conditions");
+                });
+
             modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -103,9 +151,9 @@ namespace VitalSyncAPI.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("notes");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("ProfileId")
                         .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                        .HasColumnName("profile_id");
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(8,2)")
@@ -115,7 +163,7 @@ namespace VitalSyncAPI.Migrations
 
                     b.HasIndex("MetricTypeId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ProfileId");
 
                     b.ToTable("health_records");
                 });
@@ -279,21 +327,34 @@ namespace VitalSyncAPI.Migrations
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.UserCondition", b =>
+            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthProfile", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
+                    b.HasOne("VitalSyncAPI.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("ConditionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("condition_id");
+                    b.Navigation("User");
+                });
 
-                    b.HasKey("UserId", "ConditionId");
+            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthProfileCondition", b =>
+                {
+                    b.HasOne("VitalSyncAPI.Domain.Entities.HealthCondition", "Condition")
+                        .WithMany()
+                        .HasForeignKey("ConditionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasIndex("ConditionId");
+                    b.HasOne("VitalSyncAPI.Domain.Entities.HealthProfile", "Profile")
+                        .WithMany("ProfileConditions")
+                        .HasForeignKey("ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.ToTable("user_conditions");
+                    b.Navigation("Condition");
+
+                    b.Navigation("Profile");
                 });
 
             modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthRecord", b =>
@@ -304,34 +365,22 @@ namespace VitalSyncAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VitalSyncAPI.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("VitalSyncAPI.Domain.Entities.HealthProfile", "Profile")
+                        .WithMany("Records")
+                        .HasForeignKey("ProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("MetricType");
 
-                    b.Navigation("User");
+                    b.Navigation("Profile");
                 });
 
-            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.UserCondition", b =>
+            modelBuilder.Entity("VitalSyncAPI.Domain.Entities.HealthProfile", b =>
                 {
-                    b.HasOne("VitalSyncAPI.Domain.Entities.HealthCondition", "Condition")
-                        .WithMany()
-                        .HasForeignKey("ConditionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("ProfileConditions");
 
-                    b.HasOne("VitalSyncAPI.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Condition");
-
-                    b.Navigation("User");
+                    b.Navigation("Records");
                 });
 #pragma warning restore 612, 618
         }

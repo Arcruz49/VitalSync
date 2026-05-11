@@ -176,9 +176,11 @@
           <span>Concordo com os <a href="#" class="terms-link">Termos de Uso</a> e a <a href="#" class="terms-link">Política de Privacidade</a></span>
         </label>
 
-        <button type="submit" class="btn-primary" [class.loading]="isLoading" [disabled]="!acceptTerms">
-          <span *ngIf="!isLoading">Criar conta</span>
-          <span *ngIf="isLoading" class="spinner"></span>
+        <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+        <button type="submit" class="btn-primary" [class.loading]="isLoading()" [disabled]="!acceptTerms || isLoading()">
+          <span *ngIf="!isLoading()">Criar conta</span>
+          <span *ngIf="isLoading()" class="spinner"></span>
         </button>
 
         <div class="divider">

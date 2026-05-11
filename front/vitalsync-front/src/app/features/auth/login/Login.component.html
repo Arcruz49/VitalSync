@@ -103,9 +103,11 @@
           <a href="#" class="forgot-link">Esqueci minha senha</a>
         </div>
 
-        <button type="submit" class="btn-primary" [class.loading]="isLoading">
-          <span *ngIf="!isLoading">Entrar</span>
-          <span *ngIf="isLoading" class="spinner"></span>
+        <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+        <button type="submit" class="btn-primary" [class.loading]="isLoading()" [disabled]="isLoading()">
+          <span *ngIf="!isLoading()">Entrar</span>
+          <span *ngIf="isLoading()" class="spinner"></span>
         </button>
 
         <div class="divider">

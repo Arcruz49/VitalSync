@@ -1,7 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -18,10 +19,12 @@ export class RegisterComponent {
   birthDate = '';
   acceptTerms = false;
   showPassword = false;
-  isLoading = false;
+  isLoading = signal(false);
+  errorMessage = signal('');
 
-  // Data máxima = hoje (não pode ser nascido no futuro)
   maxDate = new Date().toISOString().split('T')[0];
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   togglePassword() {
     this.showPassword = !this.showPassword;
@@ -59,10 +62,22 @@ export class RegisterComponent {
 
   onSubmit() {
     if (!this.name || !this.email || !this.password || !this.gender || !this.birthDate || !this.acceptTerms) return;
-    this.isLoading = true;
-    // TODO: chamar AuthService.register()
-    setTimeout(() => {
-      this.isLoading = false;
-    }, 1500);
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.authService.register({
+      name: this.name,
+      email: this.email,
+      password: this.password,
+      gender: this.gender,
+      birthDate: this.birthDate,
+    }).subscribe({
+      next: () => this.router.navigateByUrl('/dashboard'),
+      error: (err) => {
+        this.errorMessage.set(err.error?.message ?? 'Erro ao criar conta. Tente novamente.');
+        this.isLoading.set(false);
+      }
+    });
   }
 }
