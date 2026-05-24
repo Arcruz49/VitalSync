@@ -1,36 +1,70 @@
-<div style="padding: 2rem; font-family: sans-serif; max-width: 800px; margin: 0 auto;">
-  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-    <button (click)="goBack()" style="padding: 0.4rem 1rem; cursor: pointer;">← Voltar</button>
-    <h1 style="margin: 0;">Tipos de Métricas</h1>
-  </div>
+<div class="page">
 
-  <p *ngIf="isLoading()">Carregando...</p>
-  <p *ngIf="errorMessage()" style="color: red;">{{ errorMessage() }}</p>
+  <header class="topbar">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 64 64" fill="none">
+        <path d="M32 56 C32 56 8 40 8 24 C8 15 15 8 23 8 C27 8 31 10 32 14 C33 10 37 8 41 8 C49 8 56 15 56 24 C56 40 32 56 32 56 Z"
+              stroke="#0D9488" stroke-width="3.5" stroke-linejoin="round" fill="none"/>
+        <polyline points="14,30 22,30 26,22 32,38 36,26 42,30 50,30"
+                  stroke="#0D9488" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span>VitalSync</span>
+    </div>
+    <a routerLink="/dashboard" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Dashboard
+    </a>
+  </header>
 
-  <table *ngIf="!isLoading() && !errorMessage()" style="width: 100%; border-collapse: collapse;">
-    <thead>
-      <tr style="background: #f0f0f0; text-align: left;">
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">ID</th>
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">Nome</th>
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">Unidade</th>
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">Mín. Normal</th>
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">Máx. Normal</th>
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">Ícone</th>
-        <th style="padding: 0.75rem; border: 1px solid #ddd;">Ordem</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let m of metrics()" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.id }}</td>
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.name }}</td>
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.unit }}</td>
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.minNormal ?? '—' }}</td>
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.maxNormal ?? '—' }}</td>
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.icon }}</td>
-        <td style="padding: 0.75rem; border: 1px solid #ddd;">{{ m.sortOrder }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <main class="content">
+    <div class="page-title">
+      <h1>Tipos de Métricas</h1>
+      <p>Métricas disponíveis para monitoramento e seus valores de referência</p>
+    </div>
 
-  <p *ngIf="!isLoading() && !errorMessage() && metrics().length === 0">Nenhuma métrica encontrada.</p>
+    @if (isLoading()) {
+      <div class="empty-state">
+        <div class="spinner"></div>
+        <p>Carregando métricas...</p>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="empty-state">
+        <p class="error-msg">{{ errorMessage() }}</p>
+      </div>
+    } @else if (metrics().length === 0) {
+      <div class="empty-state">
+        <p>Nenhuma métrica encontrada.</p>
+      </div>
+    } @else {
+      <div class="metrics-grid">
+        @for (m of metrics(); track m.id) {
+          <div class="metric-card">
+            <div class="metric-card__header">
+              <span class="metric-icon">{{ m.icon }}</span>
+              <div class="metric-info">
+                <h2>{{ m.name }}</h2>
+                <span class="metric-unit">{{ m.unit }}</span>
+              </div>
+            </div>
+
+            @if (m.minNormal !== null || m.maxNormal !== null) {
+              <div class="metric-card__range">
+                <span class="range-label">Intervalo normal</span>
+                <span class="range-value">
+                  {{ m.minNormal ?? '—' }} – {{ m.maxNormal ?? '—' }} {{ m.unit }}
+                </span>
+              </div>
+            } @else {
+              <div class="metric-card__range">
+                <span class="range-label">Intervalo normal</span>
+                <span class="range-value range-value--none">Não definido</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </main>
 </div>

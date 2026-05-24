@@ -6,5 +6,9 @@
   "/metrics": {
     "target": "http://api:8080",
     "changeOrigin": true
+  },
+  "/health-record": {
+    "target": "http://api:8080",
+    "changeOrigin": true
   }
 }

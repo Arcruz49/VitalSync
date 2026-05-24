@@ -25,4 +25,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/metric-types/MetricTypes.component').then(m => m.MetricTypesComponent)
   },
+  {
+    path: 'health-records',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/health-records/HealthRecords.component').then(m => m.HealthRecordsComponent)
+  },
 ];

@@ -23,6 +23,7 @@ builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<IMetricTypesRepository, MetricTypesRepository>();
 builder.Services.AddScoped<IGetMetricTypes, GetMetricTypes>();
 builder.Services.AddScoped<IHealthRecordsRepository, HealthRecordsRepository>();
+builder.Services.AddScoped<IAlertRepository, AlertRepository>();
 builder.Services.AddScoped<ICreateHealthRecordUseCase, CreateHealthRecordUseCase>();
 builder.Services.AddScoped<IEditHealthRecordUseCase, EditHealthRecordUseCase>();
 builder.Services.AddScoped<IGetHealthRecordById, GetHealthRecordById>();
