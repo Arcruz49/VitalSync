@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Docker Attach (API)",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickRemoteProcess}",
+            "pipeTransport": {
+                "pipeProgram": "${workspaceFolder}/.vscode/docker-debug.sh",
+                "pipeArgs": [],
+                "debuggerPath": "/vsdbg/vsdbg",
+                "pipeCwd": "${workspaceFolder}"
+            },
+            "sourceFileMap": {
+                "/src": "${workspaceFolder}/api/VitalSyncAPI"
+            }
+        }
+    ]
+}

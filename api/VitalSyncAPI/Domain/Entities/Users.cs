@@ -27,6 +27,6 @@ public class User
     public DateTime BirthDate { get; set; }
 
     [Column("creation_date")]
-    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreationDate { get; set; }
 
 }

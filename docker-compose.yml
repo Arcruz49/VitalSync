@@ -5,6 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:8080"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=vitalsync;Username=${DB_USER};Password=${DB_PASSWORD}

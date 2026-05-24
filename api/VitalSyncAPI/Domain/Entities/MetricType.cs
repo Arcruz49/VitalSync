@@ -26,5 +26,5 @@ public class MetricType
     [Column("sort_order")]
     public int SortOrder { get; set; }
 
-    // public ICollection<HealthRecord> Records { get; set; } = [];
+    public ICollection<HealthRecord> Records { get; set; } = [];
 }

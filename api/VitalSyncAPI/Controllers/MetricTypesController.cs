@@ -25,5 +25,6 @@ public class MetricTypesController : ControllerBase
         return Ok(result);
     }
 
+    
 
 }
