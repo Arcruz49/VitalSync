@@ -22,6 +22,12 @@ builder.Services.AddScoped<IAuthenticateUseCase, AuthenticateUseCase>();
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<IMetricTypesRepository, MetricTypesRepository>();
 builder.Services.AddScoped<IGetMetricTypes, GetMetricTypes>();
+builder.Services.AddScoped<IHealthRecordsRepository, HealthRecordsRepository>();
+builder.Services.AddScoped<ICreateHealthRecordUseCase, CreateHealthRecordUseCase>();
+builder.Services.AddScoped<IEditHealthRecordUseCase, EditHealthRecordUseCase>();
+builder.Services.AddScoped<IGetHealthRecordById, GetHealthRecordById>();
+builder.Services.AddScoped<IGetHealthRecordByUser, GetHealthRecordByUser>();
+builder.Services.AddScoped<IDeleteHealthRecord, DeleteHealthRecord>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]

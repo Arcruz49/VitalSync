@@ -7,11 +7,11 @@ public class Context : DbContext
 {
     public Context(DbContextOptions<Context> options) : base(options) { }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<MetricType> MetricTypes { get; set; }
-    public DbSet<HealthCondition> HealthConditions { get; set; }
-    public DbSet<UserCondition> UserConditions { get; set; }
-    public DbSet<HealthRecord> HealthRecords { get; set; }
+    public DbSet<User> Users => Set<User>();
+    public DbSet<MetricType> MetricTypes => Set<MetricType>();
+    public DbSet<HealthCondition> HealthConditions => Set<HealthCondition>();
+    public DbSet<UserCondition> UserConditions => Set<UserCondition>();
+    public DbSet<HealthRecord> HealthRecords => Set<HealthRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
