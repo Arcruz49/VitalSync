@@ -5,15 +5,17 @@ using VitalSyncAPI.Application.DTOs.Request;
 using VitalSyncAPI.Application.Interfaces;
 
 namespace VitalSyncAPI.Controllers;
-
 [ApiController]
 [Authorize]
 [Route("health-record")]
-public class HealthRecordController(ICreateHealthRecordUseCase createHealthRecordUseCase, IDeleteHealthRecord deleteHealthRecord,
-        IEditHealthRecordUseCase editHealthRecordUseCase, IGetHealthRecordById getHealthRecordById, IGetHealthRecordByUser getHealthRecordByUser) : BaseController
+public class HealthRecordController(
+    ICreateHealthRecordUseCase createHealthRecordUseCase,
+    IDeleteHealthRecord deleteHealthRecord,
+    IEditHealthRecordUseCase editHealthRecordUseCase,
+    IGetHealthRecordById getHealthRecordById,
+    IGetHealthRecordByUser getHealthRecordByUser) : BaseController
 {
-
-    [HttpGet]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetHealthRecordById(Guid id)
     {
         var result = await getHealthRecordById.ExecuteAsync(id);
@@ -30,22 +32,21 @@ public class HealthRecordController(ICreateHealthRecordUseCase createHealthRecor
     [HttpPost]
     public async Task<IActionResult> CreateHealthRecord(HealthRecordRequest request)
     {
-        await createHealthRecordUseCase.ExecuteAsync(UserId, request);
-        return Ok();
+        var result = await createHealthRecordUseCase.ExecuteAsync(UserId, request);
+        return CreatedAtAction(nameof(GetHealthRecordById), new { id = result.Id }, result);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateHealthRecord(Guid id, HealthRecordRequest request)
     {
-        await editHealthRecordUseCase.ExecuteAsync(id, request);
-        return Ok();
+        await editHealthRecordUseCase.ExecuteAsync(UserId, id, request);
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteHealthRecord(Guid id)
     {
-        await deleteHealthRecord.ExecuteAsync(id);
+        await deleteHealthRecord.ExecuteAsync(UserId, id);
         return NoContent();
     }
-
 }

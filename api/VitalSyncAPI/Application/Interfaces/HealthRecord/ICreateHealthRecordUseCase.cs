@@ -5,5 +5,5 @@ namespace VitalSyncAPI.Application.Interfaces;
 
 public interface ICreateHealthRecordUseCase
 {
-    Task ExecuteAsync(Guid userId, HealthRecordRequest request);
+    Task<HealthRecordResponse> ExecuteAsync(Guid userId, HealthRecordRequest request);
 }
