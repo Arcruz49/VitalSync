@@ -13,6 +13,8 @@ public class Context : DbContext
     public DbSet<UserCondition> UserConditions => Set<UserCondition>();
     public DbSet<HealthRecord> HealthRecords => Set<HealthRecord>();
     public DbSet<Alert> Alerts => Set<Alert>();
+    public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
+    public DbSet<BodyMetrics> BodyMetrics => Set<BodyMetrics>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

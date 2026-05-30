@@ -16,7 +16,6 @@ public class BodyMetrics
     [Column("weight_kg", TypeName = "decimal(5,2)")]
     public decimal WeightKg { get; set; }
 
-    // Calculados automaticamente
     [Column("bmi", TypeName = "decimal(4,2)")]
     public decimal BMI { get; set; }
 
@@ -27,13 +26,13 @@ public class BodyMetrics
     public decimal IdealWeightMaxKg { get; set; }
 
     [Column("bmr", TypeName = "decimal(7,2)")]
-    public decimal BMR { get; set; } // Taxa Metabólica Basal
+    public decimal BMR { get; set; } 
 
     [Column("tdee", TypeName = "decimal(7,2)")]
-    public decimal TDEE { get; set; } // Gasto energético total
+    public decimal TDEE { get; set; }
 
     [Column("calorie_goal", TypeName = "decimal(7,2)")]
-    public decimal CalorieGoal { get; set; } // TDEE ± ajuste por objetivo
+    public decimal CalorieGoal { get; set; }
 
     [Column("protein_goal_g", TypeName = "decimal(6,2)")]
     public decimal ProteinGoalG { get; set; }

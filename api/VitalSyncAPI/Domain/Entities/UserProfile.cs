@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VitalSyncAPI.Domain.Enums;
 
 namespace VitalSyncAPI.Domain.Entities;
 
@@ -13,7 +14,6 @@ public class UserProfile
     [Column("user_id")]
     public Guid UserId { get; set; }
 
-    // Dados físicos
     [Column("height_cm")]
     public decimal HeightCm { get; set; }
 
@@ -48,10 +48,10 @@ public class UserProfile
     public int SleepQuality { get; set; } // 1–5
 
     [Column("created_at")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
 
     [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; }
 
     [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;
