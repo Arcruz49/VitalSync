@@ -6,7 +6,7 @@ using VitalSyncAPI.Domain.Exceptions;
 
 namespace VitalSyncAPI.Infrastructure.Repositories;
 
-public class UserConditionRepository(Context db) : BaseRepository<UserCondition>(db), IUserConditionRepository
+public class UserMedicationRespository(Context db) : BaseRepository<UserCondition>(db), IUserMedicationRespository
 {
     public async Task<List<UserCondition>> GetByUserId(Guid userId)
     {

@@ -9,4 +9,5 @@ public interface IUserConditionRepository
     Task<UserCondition?> GetByUserIdAndConditionId(Guid userId, int conditionId);
     Task AddCondition(UserCondition userCondition);
     Task RemoveCondition(Guid userId, int conditionId);
+    Task RemoveAllByUserId(Guid userId);
 }
