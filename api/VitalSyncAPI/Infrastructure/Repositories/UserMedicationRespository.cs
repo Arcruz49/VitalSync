@@ -3,44 +3,45 @@ using VitalSyncAPI.Infrastructure.Data;
 using VitalSyncAPI.Domain.Entities;
 using VitalSyncAPI.Domain.Interfaces;
 using VitalSyncAPI.Domain.Exceptions;
+using VitalSyncAPI.Domain.Enums;
 
 namespace VitalSyncAPI.Infrastructure.Repositories;
 
-public class UserMedicationRespository(Context db) : BaseRepository<UserCondition>(db), IUserMedicationRespository
+public class UserMedicationRepository(Context db) : BaseRepository<UserMedication>(db), IUserMedicationRepository
 {
-    public async Task<List<UserCondition>> GetByUserId(Guid userId)
+    public async Task<List<UserMedication>> GetByUserId(Guid userId)
     {
         return await Query()
-            .Include(x => x.Condition)
             .Where(x => x.UserId == userId)
             .ToListAsync();
     }
 
-    public async Task<UserCondition?> GetByUserIdAndConditionId(Guid userId, int conditionId)
+    public async Task<UserMedication?> GetByUserIdAndMedicationId(Guid userId, MedicationClass medicationClass)
     {
         return await Query()
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.ConditionId == conditionId);
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.MedicationClass == medicationClass);
     }
 
-    public async Task AddCondition(UserCondition userCondition)
+    public async Task AddMedication(UserMedication userMedication)
     {
-        await AddAsync(userCondition);
+        await AddAsync(userMedication);
     }
 
-    public async Task RemoveCondition(Guid userId, int conditionId)
+    public async Task RemoveMedication(Guid userId, MedicationClass medicationClass)
     {
-        var condition = await _db.UserConditions
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.ConditionId == conditionId)
-            ?? throw new NotFoundException("Condição não encontrada.");
+        var medication = await _db.UserMedications
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.MedicationClass == medicationClass)
+            ?? throw new NotFoundException("Medicamento não encontrado.");
 
-        _db.UserConditions.Remove(condition);
+        _db.UserMedications.Remove(medication);
     }
+
     public async Task RemoveAllByUserId(Guid userId)
     {
-        var conditions = await _db.UserConditions
+        var medications = await _db.UserMedications
             .Where(x => x.UserId == userId)
             .ToListAsync();
 
-        _db.UserConditions.RemoveRange(conditions);
+        _db.UserMedications.RemoveRange(medications);
     }
 }

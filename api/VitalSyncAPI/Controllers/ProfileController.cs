@@ -13,7 +13,9 @@ public class ProfileController(
     IGetUserProfileUseCase getUserProfileUseCase,
     IGetAllUserProfileUseCase getAllUserProfileUseCase,
     IGetUserConditionUseCase getUserConditionUseCase,
-    IAddUserConditionUseCase addUserConditionUseCase
+    IAddUserConditionUseCase addUserConditionUseCase,
+    IAddUserMedicationUseCase addUserMedicationUseCase,
+    IGetUserMedicationUseCase getUserMedicationUseCase
     ) : BaseController
 {
 
@@ -58,14 +60,14 @@ public class ProfileController(
     [HttpGet("medications")]
     public async Task<IActionResult> GetMedications()
     {
-        var result = await getUserConditionUseCase.ExecuteAsync(UserId);
+        var result = await getUserMedicationUseCase.ExecuteAsync(UserId);
         return Ok(result);
     }
 
     [HttpPost("medications")]
-    public async Task<IActionResult> AddMedications([FromBody] List<UserConditionRequest> request)
+    public async Task<IActionResult> AddMedications([FromBody] List<UserMedicationRequest> request)
     {
-        await addUserConditionUseCase.ExecuteAsync(UserId, request);
+        await addUserMedicationUseCase.ExecuteAsync(UserId, request);
         return NoContent();
     }
 }

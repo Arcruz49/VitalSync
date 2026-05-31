@@ -35,6 +35,11 @@ builder.Services.AddScoped<ISaveProfileUseCase, SaveProfileUseCase>();
 builder.Services.AddScoped<IGetUserProfileUseCase, GetUserProfileUseCase>();
 builder.Services.AddScoped<IGetAllUserProfileUseCase, GetAllUserProfileUseCase>();
 builder.Services.AddScoped<IUserConditionRepository, UserConditionRepository>();
+builder.Services.AddScoped<IGetUserConditionUseCase, GetUserConditionUseCase>();
+builder.Services.AddScoped<IAddUserConditionUseCase, AddUserConditionUseCase>();
+builder.Services.AddScoped<IUserMedicationRepository, UserMedicationRepository>();
+builder.Services.AddScoped<IAddUserMedicationUseCase, AddUserMedicationUseCase>();
+builder.Services.AddScoped<IGetUserMedicationUseCase, GetUserMedicationUseCase>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]

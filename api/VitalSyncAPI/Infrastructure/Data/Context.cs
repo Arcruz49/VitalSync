@@ -11,7 +11,7 @@ public class Context : DbContext
     public DbSet<MetricType> MetricTypes => Set<MetricType>();
     public DbSet<HealthCondition> HealthConditions => Set<HealthCondition>();
     public DbSet<UserCondition> UserConditions => Set<UserCondition>();
-    public DbSet<UserMedication> UserMedications => Set<UserCondition>();
+    public DbSet<UserMedication> UserMedications => Set<UserMedication>();
     public DbSet<HealthRecord> HealthRecords => Set<HealthRecord>();
     public DbSet<Alert> Alerts => Set<Alert>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
