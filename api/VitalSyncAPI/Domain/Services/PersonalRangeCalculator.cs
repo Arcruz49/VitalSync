@@ -30,6 +30,8 @@ public static class PersonalRangeCalculator
                 3 => CalculateGlucose(conditionIds),
                 // Sono
                 7 => CalculateSleep(profile),
+                // peso
+                5 => CalculateWeightRange(profile),
                 // Padrão — usa os valores do MetricType
                 _ => (metricType.MinNormal ?? 0, metricType.MaxNormal ?? 0, RangeMethod.Default)
             };
@@ -108,5 +110,15 @@ public static class PersonalRangeCalculator
         return profile.HabitualSleepHours < 6
             ? (6, 9, RangeMethod.Default)
             : (7, 9, RangeMethod.Default);
+    }
+
+    private static (double min, double max, RangeMethod method) CalculateWeightRange(UserProfile profile)
+    {
+        var heightM = (double)(profile.HeightCm / 100);
+        return (
+            Math.Round(heightM * heightM * 18.5, 1),
+            Math.Round(heightM * heightM * 24.9, 1),
+            RangeMethod.AgeAdjusted
+        );
     }
 }
