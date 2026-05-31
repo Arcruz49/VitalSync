@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VitalSyncAPI.Application.Interfaces;
 using VitalSyncAPI.Application.Security;
+using VitalSyncAPI.Application.Services;
 using VitalSyncAPI.Application.UseCases;
 using VitalSyncAPI.Domain.Interfaces;
 using VitalSyncAPI.Infrastructure.Data;
@@ -40,6 +41,8 @@ builder.Services.AddScoped<IAddUserConditionUseCase, AddUserConditionUseCase>();
 builder.Services.AddScoped<IUserMedicationRepository, UserMedicationRepository>();
 builder.Services.AddScoped<IAddUserMedicationUseCase, AddUserMedicationUseCase>();
 builder.Services.AddScoped<IGetUserMedicationUseCase, GetUserMedicationUseCase>();
+builder.Services.AddScoped<IPersonalRangeRepository, PersonalRangeRepository>();
+builder.Services.AddScoped<IRecalculatePersonalRangeUseCase, RecalculatePersonalRangeUseCase>();
 builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
