@@ -16,10 +16,10 @@ public class PersonalRangeRepository(Context db) : BaseRepository<PersonalRange>
             .ToListAsync();
     }
 
-    public async Task<PersonalRange?> GetByUserIdAndMetricId(Guid userId, int metricId)
+    public async Task<PersonalRange> GetByUserIdAndMetricId(Guid userId, int metricId)
     {
         return await Query()
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.MetricTypeId == metricId);
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.MetricTypeId == metricId) ?? throw new NotFoundException("Dado não encontrado.");;
     }
 
     public async Task AddPersonalRanges(List<PersonalRange> personalRanges)

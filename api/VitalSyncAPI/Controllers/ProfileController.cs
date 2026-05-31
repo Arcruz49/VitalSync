@@ -15,7 +15,10 @@ public class ProfileController(
     IGetUserConditionUseCase getUserConditionUseCase,
     IAddUserConditionUseCase addUserConditionUseCase,
     IAddUserMedicationUseCase addUserMedicationUseCase,
-    IGetUserMedicationUseCase getUserMedicationUseCase
+    IGetUserMedicationUseCase getUserMedicationUseCase,
+    IRecalculatePersonalRangeUseCase recalculatePersonalRangeUseCase,
+    IGetAllPersonalRangeUseCase getAllPersonalRangeUseCase,
+    IGetPersonalRangeUseCase getPersonalRangeUseCase
     ) : BaseController
 {
 
@@ -68,6 +71,28 @@ public class ProfileController(
     public async Task<IActionResult> AddMedications([FromBody] List<UserMedicationRequest> request)
     {
         await addUserMedicationUseCase.ExecuteAsync(UserId, request);
+        return NoContent();
+    }
+
+    // personal range
+    [HttpGet("personal-range")]
+    public async Task<IActionResult> GetAllPersonalRange()
+    {
+        var result = await getAllPersonalRangeUseCase.ExecuteAsync(UserId);
+        return Ok(result);
+    }
+
+    [HttpGet("personal-range/{metricTypeId}")]
+    public async Task<IActionResult> GetPersonalRange(int metricTypeId)
+    {
+        var result = await getPersonalRangeUseCase.ExecuteAsync(UserId, metricTypeId);
+        return Ok(result);
+    }
+
+    [HttpPost("personal-range/recalculate")]
+    public async Task<IActionResult> RecalculatePersonalRange()
+    {
+        await recalculatePersonalRangeUseCase.ExecuteAsync(UserId);
         return NoContent();
     }
 }
