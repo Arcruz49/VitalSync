@@ -40,6 +40,7 @@ builder.Services.AddScoped<IAddUserConditionUseCase, AddUserConditionUseCase>();
 builder.Services.AddScoped<IUserMedicationRepository, UserMedicationRepository>();
 builder.Services.AddScoped<IAddUserMedicationUseCase, AddUserMedicationUseCase>();
 builder.Services.AddScoped<IGetUserMedicationUseCase, GetUserMedicationUseCase>();
+builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]
