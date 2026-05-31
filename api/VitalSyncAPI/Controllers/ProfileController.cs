@@ -24,7 +24,7 @@ public class ProfileController(
     public async Task<IActionResult> SaveProfile([FromBody] UserProfileRequest request)
     {
         var result = await saveProfileUseCase.ExecuteAsync(UserId, request);
-        return Created($"/profile", result);
+        return Ok(result);
     }
 
     [HttpGet]
