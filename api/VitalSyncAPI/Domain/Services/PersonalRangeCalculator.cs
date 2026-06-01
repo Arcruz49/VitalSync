@@ -36,6 +36,9 @@ public static class PersonalRangeCalculator
                 _ => (metricType.MinNormal ?? 0, metricType.MaxNormal ?? 0, RangeMethod.Default)
             };
 
+            // Não cria range para métricas sem faixa definida
+            if (min == 0 && max == 0) continue;
+
             ranges.Add(new PersonalRange
             {
                 Id = Guid.NewGuid(),

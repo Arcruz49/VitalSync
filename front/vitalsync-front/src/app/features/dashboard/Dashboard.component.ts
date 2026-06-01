@@ -1,7 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
 import { HealthRecordService } from '../../core/services/health-record.service';
 import { MetricTypesService } from '../../core/services/metric-types.service';
@@ -70,7 +71,7 @@ export class DashboardComponent implements OnInit {
     forkJoin({
       records: this.hrService.getAll({}),
       types: this.mtService.getAll(),
-      ranges: this.profileService.getPersonalRanges(),
+      ranges: this.profileService.getPersonalRanges().pipe(catchError(() => of([]))),
     }).subscribe({
       next: ({ records, types, ranges }) => {
         const summary = this.buildSummary(records, types, ranges);

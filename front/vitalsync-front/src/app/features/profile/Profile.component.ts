@@ -1,6 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
@@ -15,7 +14,7 @@ import {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterLink, SidebarComponent, DecimalPipe, FormsModule],
+  imports: [SidebarComponent, DecimalPipe, FormsModule],
   templateUrl: './Profile.component.html',
   styleUrl: './Profile.component.scss',
 })
@@ -24,31 +23,37 @@ export class ProfileComponent implements OnInit {
   private profileService = inject(ProfileService);
 
   loading = signal(true);
-  saving = signal(false);
-  saveError = signal('');
-  successMsg = signal('');
-
   profile = signal<UserProfileResponse | null>(null);
   conditions = signal<UserConditionResponse[]>([]);
   medications = signal<UserMedicationResponse[]>([]);
 
-  // Edit panels open/close
-  editingProfile = false;
+  editingPhysical = false;
+  editingRoutine = false;
   editingConditions = false;
   editingMedications = false;
 
-  // Static data
+  savingPhysical = signal(false);
+  savingRoutine = signal(false);
+  savingConditions = signal(false);
+  savingMedications = signal(false);
+
+  errorPhysical = signal('');
+  errorRoutine = signal('');
+  errorConditions = signal('');
+  errorMedications = signal('');
+  successMsg = signal('');
+
+  pfPhysical: any = {};
+  pfRoutine: any = {};
+  selectedConditions = new Set<number>();
+  selectedMedications = new Set<number>();
+
   allConditions = HEALTH_CONDITIONS;
-  allMedications = MEDICATION_CLASSES;
+  allMedications = MEDICATION_CLASSES.filter(m => m.id > 0);
   activityLevels = ACTIVITY_LEVELS;
   goals = HEALTH_GOALS;
   trainingTypes = TRAINING_TYPES;
   hoursSeated = HOURS_SEATED;
-
-  // Edit forms
-  pf: any = {};
-  selectedConditions = new Set<number>();
-  selectedMedications = new Set<number>();
 
   get initials() {
     return (this.auth.currentUser()?.name ?? '')
@@ -70,76 +75,164 @@ export class ProfileComponent implements OnInit {
 
   load() {
     this.loading.set(true);
-    forkJoin({
-      profile: this.profileService.getProfile(),
-      conditions: this.profileService.getConditions(),
-      medications: this.profileService.getMedications(),
-    }).subscribe({
-      next: ({ profile, conditions, medications }) => {
+    this.profileService.getProfile().subscribe({
+      next: (profile) => {
         this.profile.set(profile);
-        this.conditions.set(conditions);
-        this.medications.set(medications);
-        this.loading.set(false);
+        forkJoin({
+          conditions: this.profileService.getConditions(),
+          medications: this.profileService.getMedications(),
+        }).subscribe({
+          next: ({ conditions, medications }) => {
+            this.conditions.set(conditions);
+            this.medications.set(medications);
+            this.loading.set(false);
+          },
+          error: () => this.loading.set(false),
+        });
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.loading.set(false);
+        this.buildPhysicalForm();
+        this.editingPhysical = true;
+      },
     });
   }
 
-  // ── EDIT PROFILE ─────────────────────────────────────
-  openEditProfile() {
+  // ── SECTION 1: PHYSICAL + GOALS ──────────────────────
+  private buildPhysicalForm() {
     const p = this.profile();
-    if (!p) return;
-    this.pf = {
-      weightKg: p.weightKg,
-      heightCm: p.heightCm,
-      targetWeightKg: p.targetWeightKg ?? null,
-      waistCircumferenceCm: p.waistCircumferenceCm ?? null,
-      goal: HEALTH_GOALS.find(g => g.name === p.goal)?.id ?? 6,
-      activityLevel: ACTIVITY_LEVELS.find(a => a.name === p.activityLevel)?.id ?? 3,
+    this.pfPhysical = {
+      weightKg: p?.weightKg ?? null,
+      heightCm: p?.heightCm ?? null,
+      targetWeightKg: p?.targetWeightKg ?? null,
+      waistCircumferenceCm: p?.waistCircumferenceCm ?? null,
+      activityLevel: p ? (ACTIVITY_LEVELS.find(a => a.name === p.activityLevel)?.id ?? 0) : 0,
+      goal: p ? (HEALTH_GOALS.find(g => g.name === p.goal)?.id ?? 0) : 0,
+    };
+  }
+
+  openEditPhysical() {
+    this.buildPhysicalForm();
+    this.errorPhysical.set('');
+    this.editingPhysical = true;
+  }
+
+  cancelPhysical() {
+    this.editingPhysical = false;
+    this.errorPhysical.set('');
+  }
+
+  savePhysical() {
+    if (!this.pfPhysical.weightKg || !this.pfPhysical.heightCm) {
+      this.errorPhysical.set('Peso e altura são obrigatórios.');
+      return;
+    }
+    if (!this.pfPhysical.activityLevel || !this.pfPhysical.goal) {
+      this.errorPhysical.set('Selecione objetivo e nível de atividade.');
+      return;
+    }
+    this.savingPhysical.set(true);
+    this.errorPhysical.set('');
+
+    const cur = this.profile();
+    this.profileService.saveProfile({
+      weightKg: this.pfPhysical.weightKg,
+      heightCm: this.pfPhysical.heightCm,
+      targetWeightKg: this.pfPhysical.targetWeightKg || undefined,
+      waistCircumferenceCm: this.pfPhysical.waistCircumferenceCm || undefined,
+      activityLevel: this.pfPhysical.activityLevel,
+      goal: this.pfPhysical.goal,
+      trainingFrequencyDays: cur?.trainingFrequencyDays ?? 3,
+      trainingTypes: cur?.trainingTypes ?? [],
+      hoursSeated: cur ? (HOURS_SEATED.find(h => h.label === cur.hoursSeated)?.id ?? 2) : 2,
+      habitualSleepHours: cur?.habitualSleepHours ?? 7,
+      sleepQuality: cur?.sleepQuality ?? 3,
+    }).subscribe({
+      next: (updated) => {
+        this.profile.set(updated);
+        this.editingPhysical = false;
+        this.savingPhysical.set(false);
+        this.flash('Dados físicos atualizados.');
+        this.profileService.recalculateRanges().subscribe();
+      },
+      error: (e) => {
+        this.errorPhysical.set(e.error?.message ?? 'Erro ao salvar.');
+        this.savingPhysical.set(false);
+      },
+    });
+  }
+
+  // ── SECTION 2: ROUTINE ───────────────────────────────
+  private buildRoutineForm() {
+    const p = this.profile()!;
+    this.pfRoutine = {
       trainingFrequencyDays: p.trainingFrequencyDays,
       trainingTypes: [...(p.trainingTypes ?? [])],
       hoursSeated: HOURS_SEATED.find(h => h.label === p.hoursSeated)?.id ?? 2,
       habitualSleepHours: p.habitualSleepHours,
       sleepQuality: p.sleepQuality,
     };
-    this.editingProfile = true;
-    this.saveError.set('');
+  }
+
+  openEditRoutine() {
+    this.buildRoutineForm();
+    this.errorRoutine.set('');
+    this.editingRoutine = true;
+  }
+
+  cancelRoutine() {
+    this.editingRoutine = false;
+    this.errorRoutine.set('');
   }
 
   toggleTraining(t: string) {
-    const i = this.pf.trainingTypes.indexOf(t);
-    if (i >= 0) this.pf.trainingTypes.splice(i, 1);
-    else this.pf.trainingTypes.push(t);
+    const i = this.pfRoutine.trainingTypes.indexOf(t);
+    if (i >= 0) this.pfRoutine.trainingTypes.splice(i, 1);
+    else this.pfRoutine.trainingTypes.push(t);
   }
 
-  saveProfile() {
-    if (!this.pf.weightKg || !this.pf.heightCm) {
-      this.saveError.set('Peso e altura são obrigatórios.');
-      return;
-    }
-    this.saving.set(true);
-    this.saveError.set('');
+  saveRoutine() {
+    this.savingRoutine.set(true);
+    this.errorRoutine.set('');
 
-    this.profileService.saveProfile(this.pf).subscribe({
+    const cur = this.profile()!;
+    this.profileService.saveProfile({
+      weightKg: cur.weightKg,
+      heightCm: cur.heightCm,
+      targetWeightKg: cur.targetWeightKg ?? undefined,
+      waistCircumferenceCm: cur.waistCircumferenceCm ?? undefined,
+      activityLevel: ACTIVITY_LEVELS.find(a => a.name === cur.activityLevel)?.id ?? 3,
+      goal: HEALTH_GOALS.find(g => g.name === cur.goal)?.id ?? 6,
+      trainingFrequencyDays: this.pfRoutine.trainingFrequencyDays,
+      trainingTypes: this.pfRoutine.trainingTypes,
+      hoursSeated: this.pfRoutine.hoursSeated,
+      habitualSleepHours: this.pfRoutine.habitualSleepHours,
+      sleepQuality: this.pfRoutine.sleepQuality,
+    }).subscribe({
       next: (updated) => {
         this.profile.set(updated);
-        this.editingProfile = false;
-        this.saving.set(false);
-        this.flash('Perfil atualizado com sucesso.');
+        this.editingRoutine = false;
+        this.savingRoutine.set(false);
+        this.flash('Rotina de treino atualizada.');
         this.profileService.recalculateRanges().subscribe();
       },
       error: (e) => {
-        this.saveError.set(e.error?.message ?? 'Erro ao salvar. Tente novamente.');
-        this.saving.set(false);
-      }
+        this.errorRoutine.set(e.error?.message ?? 'Erro ao salvar.');
+        this.savingRoutine.set(false);
+      },
     });
   }
 
-  // ── EDIT CONDITIONS ───────────────────────────────────
+  // ── SECTION 3: CONDITIONS ────────────────────────────
   openEditConditions() {
     this.selectedConditions = new Set(this.conditions().map(c => c.conditionId));
+    this.errorConditions.set('');
     this.editingConditions = true;
-    this.saveError.set('');
+  }
+
+  cancelConditions() {
+    this.editingConditions = false;
+    this.errorConditions.set('');
   }
 
   toggleCondition(id: number) {
@@ -148,29 +241,37 @@ export class ProfileComponent implements OnInit {
   }
 
   saveConditions() {
-    this.saving.set(true);
+    this.savingConditions.set(true);
     const list = Array.from(this.selectedConditions).map(id => ({ conditionId: id }));
     this.profileService.saveConditions(list).subscribe({
       next: () => {
         this.profileService.getConditions().subscribe(c => this.conditions.set(c));
         this.editingConditions = false;
-        this.saving.set(false);
+        this.savingConditions.set(false);
         this.flash('Condições atualizadas.');
         this.profileService.recalculateRanges().subscribe();
       },
-      error: () => { this.saveError.set('Erro ao salvar condições.'); this.saving.set(false); }
+      error: () => {
+        this.errorConditions.set('Erro ao salvar condições.');
+        this.savingConditions.set(false);
+      },
     });
   }
 
-  // ── EDIT MEDICATIONS ──────────────────────────────────
+  // ── SECTION 4: MEDICATIONS ───────────────────────────
   openEditMedications() {
-    const NAMES: Record<string, number> = {};
-    MEDICATION_CLASSES.forEach(m => { NAMES[m.name] = m.id; });
+    const nameToId: Record<string, number> = {};
+    MEDICATION_CLASSES.forEach(m => { nameToId[m.name] = m.id; });
     this.selectedMedications = new Set(
-      this.medications().map(m => NAMES[m.medicationClass] ?? 0).filter(id => id > 0)
+      this.medications().map(m => nameToId[m.medicationClass] ?? 0).filter(id => id > 0)
     );
+    this.errorMedications.set('');
     this.editingMedications = true;
-    this.saveError.set('');
+  }
+
+  cancelMedications() {
+    this.editingMedications = false;
+    this.errorMedications.set('');
   }
 
   toggleMed(id: number) {
@@ -179,20 +280,26 @@ export class ProfileComponent implements OnInit {
   }
 
   saveMedications() {
-    this.saving.set(true);
-    const list = Array.from(this.selectedMedications).filter(id => id > 0).map(id => ({ medicationClass: id, notes: '' }));
+    this.savingMedications.set(true);
+    const list = Array.from(this.selectedMedications)
+      .filter(id => id > 0)
+      .map(id => ({ medicationClass: id, notes: '' }));
     this.profileService.saveMedications(list).subscribe({
       next: () => {
         this.profileService.getMedications().subscribe(m => this.medications.set(m));
         this.editingMedications = false;
-        this.saving.set(false);
+        this.savingMedications.set(false);
         this.flash('Medicamentos atualizados.');
         this.profileService.recalculateRanges().subscribe();
       },
-      error: () => { this.saveError.set('Erro ao salvar medicamentos.'); this.saving.set(false); }
+      error: () => {
+        this.errorMedications.set('Erro ao salvar medicamentos.');
+        this.savingMedications.set(false);
+      },
     });
   }
 
+  // ── HELPERS ──────────────────────────────────────────
   bmiClass(bmi: number) {
     if (bmi < 18.5) return 'low';
     if (bmi < 25) return 'normal';

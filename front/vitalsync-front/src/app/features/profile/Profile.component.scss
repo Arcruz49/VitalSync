@@ -357,6 +357,26 @@
 
 .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
 
+// ── ROUTINE VIEW ──────────────────────────────────────
+.routine-view { display: flex; flex-direction: column; gap: 10px; }
+
+.rv-item { display: flex; gap: 12px; align-items: baseline; }
+
+.rv-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); min-width: 110px; flex-shrink: 0;
+}
+
+.rv-value { font-size: 13.5px; color: var(--text-primary); font-weight: 500; }
+.rv-empty { color: var(--text-muted); font-weight: 400; }
+
+// ── SETUP HINT ────────────────────────────────────────
+.setup-hint {
+  font-size: 13px; color: var(--text-muted);
+  background: var(--bg-subtle); border-radius: var(--radius-md);
+  padding: 10px 14px; margin-bottom: 4px;
+}
+
 // ── EMPTY / SKELETON ──────────────────────────────────
 .empty-profile {
   padding: 60px 24px; text-align: center; background: var(--bg-surface);

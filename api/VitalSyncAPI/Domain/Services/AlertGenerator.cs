@@ -41,6 +41,7 @@ public static class AlertGenerator
     private static AlertSeverity CalculateSeverity(decimal value, decimal? minNormal, decimal? maxNormal, bool isAbove)
     {
         var limit = isAbove ? maxNormal!.Value : minNormal!.Value;
+        if (limit == 0) return AlertSeverity.Warning;
         var deviation = Math.Abs((value - limit) / limit * 100);
         return deviation >= 20 ? AlertSeverity.Critical : AlertSeverity.Warning;
     }
