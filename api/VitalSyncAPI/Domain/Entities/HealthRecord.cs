@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VitalSyncAPI.Domain.Enums;
 
 namespace VitalSyncAPI.Domain.Entities;
 
@@ -25,9 +26,11 @@ public class HealthRecord
     [MaxLength(500)]
     public string? Notes { get; set; }
 
+    [Column("source")]
+    public RecordSource Source { get; set; } = RecordSource.Manual;
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
 
     [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;

@@ -65,7 +65,6 @@ public class SaveProfileUseCase(
         }
 
         var metrics = BodyMetricsCalculator.Calculate(user, profile, request.WeightKg);
-        var personalRange = BodyMetricsCalculator.Calculate(user, profile, request.WeightKg);
         await bodyMetricsRepository.CreateMetrics(metrics);
 
         await unitOfWork.SaveChangesAsync();

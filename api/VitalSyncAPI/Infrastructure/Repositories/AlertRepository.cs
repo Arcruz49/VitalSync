@@ -33,4 +33,11 @@ public class AlertRepository(Context db) : IAlertRepository
             .OrderByDescending(x => x.TriggeredAt)
             .ToListAsync();
     }
+
+    public async Task DeleteByHealthRecordId(Guid id)
+    {
+        var alert = await db.Alerts.Where(a => a.HealthRecordId == id).FirstAsync();
+        db.Alerts.Remove(alert);
+    }
+    
 }

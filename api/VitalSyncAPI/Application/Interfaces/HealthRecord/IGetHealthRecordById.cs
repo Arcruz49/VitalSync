@@ -5,5 +5,5 @@ namespace VitalSyncAPI.Application.Interfaces;
 
 public interface IGetHealthRecordById
 {
-    Task<HealthRecordResponse> ExecuteAsync(Guid id);
+    Task<HealthRecordResponse> ExecuteAsync(Guid userId, Guid id);
 }

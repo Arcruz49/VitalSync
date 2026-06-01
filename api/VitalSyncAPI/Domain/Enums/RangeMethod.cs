@@ -1,3 +1,5 @@
+namespace VitalSyncAPI.Domain.Enums;
+
 public enum RangeMethod
 {
     Default = 1, // faixa padrao

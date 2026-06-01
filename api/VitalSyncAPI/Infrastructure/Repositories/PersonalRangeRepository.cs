@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using VitalSyncAPI.Infrastructure.Data;
 using VitalSyncAPI.Domain.Entities;
 using VitalSyncAPI.Domain.Interfaces;
-using VitalSyncAPI.Domain.Exceptions;
 
 namespace VitalSyncAPI.Infrastructure.Repositories;
 
@@ -16,10 +15,11 @@ public class PersonalRangeRepository(Context db) : BaseRepository<PersonalRange>
             .ToListAsync();
     }
 
-    public async Task<PersonalRange> GetByUserIdAndMetricId(Guid userId, int metricId)
+    public async Task<PersonalRange?> GetByUserIdAndMetricId(Guid userId, int metricId)
     {
         return await Query()
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.MetricTypeId == metricId) ?? throw new NotFoundException("Dado não encontrado.");;
+            .Include(x => x.MetricType)
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.MetricTypeId == metricId);
     }
 
     public async Task AddPersonalRanges(List<PersonalRange> personalRanges)

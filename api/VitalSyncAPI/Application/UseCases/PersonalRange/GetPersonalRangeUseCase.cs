@@ -1,10 +1,6 @@
 using VitalSyncAPI.Application.Interfaces;
 using VitalSyncAPI.Domain.Interfaces;
-using VitalSyncAPI.Application.DTOs.Request;
-using VitalSyncAPI.Domain.Entities;
-using System.ComponentModel.DataAnnotations;
 using VitalSyncAPI.Domain.Exceptions;
-using VitalSyncAPI.Domain.Services;
 using VitalSyncAPI.Application.DTOs.Responses;
 
 namespace VitalSyncAPI.Application.UseCases;
@@ -15,7 +11,8 @@ public class GetPersonalRangeUseCase(
 {
     public async Task<PersonalRangeResponse> ExecuteAsync(Guid userId, int metricTypeId)
     {
-        var range = await personalRangeRepository.GetByUserIdAndMetricId(userId, metricTypeId);
+        var range = await personalRangeRepository.GetByUserIdAndMetricId(userId, metricTypeId)
+            ?? throw new NotFoundException("Faixa personalizada não encontrada para esta métrica.");
 
         return new PersonalRangeResponse(
             range.Id,
