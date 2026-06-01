@@ -1,3 +1,5 @@
+using VitalSyncAPI.Application.Models;
+
 namespace VitalSyncAPI.Application.DTOs.Responses;
 
 public record HealthRecordResponse(
@@ -8,5 +10,6 @@ public record HealthRecordResponse(
     decimal Value,
     DateTime MeasuredAt,
     string? Notes,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    AIAnalysisResult? AIAnalysisResult = null
 );

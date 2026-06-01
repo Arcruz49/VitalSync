@@ -5,5 +5,5 @@ namespace VitalSyncAPI.Domain.Interfaces;
 
 public interface IAIAnalysisService
 {
-    Task<string> AnalyzeAsync(UserProfile profile, BodyMetrics metrics, List<HealthRecord> records);
+    Task<AIAnalysisResult> AnalyzeAsync(UserProfile profile, BodyMetrics metrics, List<HealthRecord> records);
 }

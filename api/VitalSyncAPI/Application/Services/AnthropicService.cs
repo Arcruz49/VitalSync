@@ -1,6 +1,8 @@
 using Anthropic.SDK;
 using Anthropic.SDK.Constants;
 using Anthropic.SDK.Messaging;
+using System.Text.Json;
+using VitalSyncAPI.Application.Models;
 using VitalSyncAPI.Domain.Entities;
 using VitalSyncAPI.Domain.Interfaces;
 
@@ -11,7 +13,7 @@ public class AnthropicService(IConfiguration config) : IAIAnalysisService
     private readonly string _insightModel = config["Anthropic:InsightModel"] ?? AnthropicModels.Claude45Haiku;
     private readonly AnthropicClient _client = new(config["Anthropic:ApiKey"]);
 
-    public async Task<string> AnalyzeAsync(UserProfile profile, BodyMetrics metrics, List<HealthRecord> records)
+    public async Task<AIAnalysisResult> AnalyzeAsync(UserProfile profile, BodyMetrics metrics, List<HealthRecord> records)
     {
         var response = await _client.Messages.GetClaudeMessageAsync(
             new MessageParameters
@@ -35,17 +37,31 @@ public class AnthropicService(IConfiguration config) : IAIAnalysisService
             }
         );
 
-        return ((TextContent)response.Content[0]).Text;
+        var json = ((TextContent)response.Content[0]).Text;
+
+        return JsonSerializer.Deserialize<AIAnalysisResult>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        }) ?? new AIAnalysisResult();
     }
 
     private static string BuildPrompt(UserProfile profile, BodyMetrics metrics, List<HealthRecord> records)
     {
-        return $"""
-            Você é um assistente de saúde personalizado. Analise os dados abaixo e gere até 3 insights 
-            específicos, acionáveis e personalizados. Seja direto e prático.
+        var jsonSchema = """
+            {
+                "insights": ["insight 1", "insight 2", "insight 3"],
+                "tips": ["dica 1", "dica 2"],
+                "overallAssessment": "avaliação geral em uma frase",
+                "disclaimer": "Este conteúdo é informativo e não substitui avaliação médica profissional."
+            }
+            """;
 
-            IMPORTANTE: Sempre inclua ao final: "Este conteúdo é informativo e não substitui 
-            avaliação médica profissional."
+        return $"""
+            Você é um assistente de saúde personalizado. Analise os dados abaixo e responda 
+            EXCLUSIVAMENTE com um JSON válido, sem texto adicional, sem markdown, sem ```json.
+
+            O JSON deve seguir exatamente esta estrutura:
+            {jsonSchema}
 
             ## Perfil do usuário
             - Objetivo: {profile.Goal}
@@ -56,7 +72,6 @@ public class AnthropicService(IConfiguration config) : IAIAnalysisService
 
             ## Métricas recentes (últimos 30 dias)
             {BuildMetricsSection(records)}
-
             """;
     }
 

@@ -45,6 +45,7 @@ builder.Services.AddScoped<IPersonalRangeRepository, PersonalRangeRepository>();
 builder.Services.AddScoped<IRecalculatePersonalRangeUseCase, RecalculatePersonalRangeUseCase>();
 builder.Services.AddScoped<IGetAllPersonalRangeUseCase, GetAllPersonalRangeUseCase>();
 builder.Services.AddScoped<IGetPersonalRangeUseCase, GetPersonalRangeUseCase>();
+builder.Services.AddScoped<IAIInsightRepository, AIInsightRepository>();
 builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
