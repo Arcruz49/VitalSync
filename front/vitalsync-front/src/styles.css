@@ -1,3 +1,140 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap');
 
-@import 'tailwindcss';
+/* ── LIGHT MODE ──────────────────────────────────────── */
+:root {
+  --bg-base:    #FAFAF8;
+  --bg-surface: #FFFFFF;
+  --bg-subtle:  #F4F3F0;
+  --sidebar-bg: #111827;
+  --sidebar-text: #9CA3AF;
+  --sidebar-active-text: #FFFFFF;
+  --sidebar-active-bg: rgba(255,255,255,0.08);
+  --accent:       #7C3AED;
+  --accent-hover: #6D28D9;
+  --accent-light: #EDE9FE;
+  --accent-mid:   #DDD6FE;
+  --healthy:      #059669;
+  --healthy-bg:   #D1FAE5;
+  --warning:      #D97706;
+  --warning-bg:   #FEF3C7;
+  --critical:     #DC2626;
+  --critical-bg:  #FEE2E2;
+  --text-primary:   #111827;
+  --text-secondary: #4B5563;
+  --text-muted:     #9CA3AF;
+  --border:         #E5E7EB;
+  --border-subtle:  #F3F4F6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+}
+
+/* ── DARK MODE ───────────────────────────────────────── */
+[data-theme="dark"] {
+  --bg-base:    #0C0C0E;
+  --bg-surface: #18181B;
+  --bg-subtle:  #27272A;
+  --sidebar-bg: #0C0C0E;
+  --sidebar-text: #71717A;
+  --sidebar-active-text: #FAFAFA;
+  --sidebar-active-bg: rgba(124,58,237,0.15);
+  --accent:       #A78BFA;
+  --accent-hover: #8B5CF6;
+  --accent-light: rgba(124,58,237,0.12);
+  --accent-mid:   rgba(124,58,237,0.2);
+  --healthy:      #34D399;
+  --healthy-bg:   rgba(52,211,153,0.12);
+  --warning:      #FCD34D;
+  --warning-bg:   rgba(252,211,77,0.12);
+  --critical:     #F87171;
+  --critical-bg:  rgba(248,113,113,0.12);
+  --text-primary:   #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted:     #52525B;
+  --border:         #27272A;
+  --border-subtle:  #1F1F23;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── RESET ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+/* ── SCROLLBAR ───────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── UTILITY ─────────────────────────────────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-badge.normal  { background: var(--healthy-bg);  color: var(--healthy);  }
+.status-badge.warning { background: var(--warning-bg);  color: var(--warning);  }
+.status-badge.critical{ background: var(--critical-bg); color: var(--critical); }
+.status-badge.normal  .dot { background: var(--healthy); }
+.status-badge.warning .dot { background: var(--warning); animation: pulse 2s infinite; }
+.status-badge.critical .dot { background: var(--critical); animation: pulse 1.5s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .6; transform: scale(1.3); }
+}
+
+.range-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(to right, #EF4444 0%, #F59E0B 25%, #10B981 50%, #F59E0B 75%, #EF4444 100%);
+  position: relative;
+}
+
+.range-bar .marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 2px solid var(--text-primary);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: left 0.4s ease;
+}
+
+[data-theme="dark"] .range-bar .marker {
+  background: var(--bg-surface);
+  border-color: var(--text-primary);
+}

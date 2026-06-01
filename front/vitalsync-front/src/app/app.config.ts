@@ -7,9 +7,13 @@ import { of } from 'rxjs';
 
 import { routes } from './app.routes';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 
-function initAuth(auth: AuthService, platformId: object) {
-  return () => isPlatformBrowser(platformId) ? auth.me() : of(null);
+function initApp(auth: AuthService, theme: ThemeService, platformId: object) {
+  return () => {
+    if (isPlatformBrowser(platformId)) theme.init();
+    return isPlatformBrowser(platformId) ? auth.me() : of(null);
+  };
 }
 
 export const appConfig: ApplicationConfig = {
@@ -20,8 +24,8 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     {
       provide: APP_INITIALIZER,
-      useFactory: initAuth,
-      deps: [AuthService, PLATFORM_ID],
+      useFactory: initApp,
+      deps: [AuthService, ThemeService, PLATFORM_ID],
       multi: true,
     },
   ]

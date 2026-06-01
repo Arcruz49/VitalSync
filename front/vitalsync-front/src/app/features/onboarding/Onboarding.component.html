@@ -1,0 +1,188 @@
+<div class="onboarding">
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar">
+    <div class="progress-fill" [style.width]="(step / 4 * 100) + '%'"></div>
+  </div>
+  <div class="step-label">Etapa {{ step }} de 4 — {{ stepNames[step - 1] }}</div>
+
+  <div class="ob-content">
+
+    <!-- STEP 1: DADOS FÍSICOS -->
+    @if (step === 1) {
+      <div class="step-card" @slideIn>
+        <h1 class="step-title">Sobre você</h1>
+        <p class="step-sub">Usamos para calcular suas metas personalizadas.</p>
+
+        <div class="fields-grid">
+          <div class="field">
+            <label>Peso atual <span class="req">*</span></label>
+            <div class="input-unit">
+              <input type="number" [(ngModel)]="f.weightKg" placeholder="70" step="0.1" />
+              <span class="unit">kg</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Altura <span class="req">*</span></label>
+            <div class="input-unit">
+              <input type="number" [(ngModel)]="f.heightCm" placeholder="170" />
+              <span class="unit">cm</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Peso alvo <span class="opt">opcional</span></label>
+            <div class="input-unit">
+              <input type="number" [(ngModel)]="f.targetWeightKg" placeholder="65" step="0.1" />
+              <span class="unit">kg</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Circunferência abdominal <span class="opt">opcional</span></label>
+            <div class="input-unit">
+              <input type="number" [(ngModel)]="f.waistCircumferenceCm" placeholder="85" />
+              <span class="unit">cm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field field--full">
+          <label>Objetivo principal <span class="req">*</span></label>
+          <div class="goal-grid">
+            @for (g of goals; track g.id) {
+              <div class="goal-card" [class.selected]="f.goal === g.id" (click)="f.goal = g.id">
+                <span class="goal-name">{{ g.name }}</span>
+                <span class="goal-desc">{{ g.description }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="field field--full">
+          <label>Nível de atividade física <span class="req">*</span></label>
+          <div class="activity-row">
+            @for (a of activityLevels; track a.id) {
+              <div class="activity-card" [class.selected]="f.activityLevel === a.id" (click)="f.activityLevel = a.id">
+                {{ a.name }}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- STEP 2: ROTINA -->
+    @if (step === 2) {
+      <div class="step-card" @slideIn>
+        <h1 class="step-title">Como é sua semana?</h1>
+        <p class="step-sub">Usamos isso para calcular seu gasto energético real.</p>
+
+        <div class="field field--full">
+          <label>Dias de treino por semana</label>
+          <div class="day-pills">
+            @for (d of [0,1,2,3,4,5,6,7]; track d) {
+              <div class="day-pill" [class.selected]="f.trainingFrequencyDays === d" (click)="f.trainingFrequencyDays = d">
+                {{ d }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="field field--full">
+          <label>Tipos de treino</label>
+          <div class="chips-wrap">
+            @for (t of trainingTypes; track t) {
+              <span class="chip" [class.selected]="f.trainingTypes.includes(t)" (click)="toggleTraining(t)">{{ t }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="field field--full">
+          <label>Horas sentado por dia</label>
+          <div class="hours-grid">
+            @for (h of hoursSeated; track h.id) {
+              <div class="hours-card" [class.selected]="f.hoursSeated === h.id" (click)="f.hoursSeated = h.id">
+                {{ h.label }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="field field--full">
+          <label>Horas de sono habitual: <strong class="slider-val">{{ f.habitualSleepHours }}h</strong></label>
+          <input type="range" min="4" max="12" step="0.5" [(ngModel)]="f.habitualSleepHours" class="slider" />
+          <div class="slider-labels"><span>4h</span><span>12h</span></div>
+        </div>
+
+        <div class="field field--full">
+          <label>Qualidade do sono</label>
+          <div class="stars">
+            @for (s of [1,2,3,4,5]; track s) {
+              <button class="star" [class.active]="f.sleepQuality >= s" (click)="f.sleepQuality = s">★</button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- STEP 3: CONDIÇÕES -->
+    @if (step === 3) {
+      <div class="step-card" @slideIn>
+        <h1 class="step-title">Histórico de saúde</h1>
+        <p class="step-sub">Personalizamos suas faixas de normalidade com base nisso.</p>
+
+        <div class="conditions-grid">
+          @for (c of conditions; track c.id) {
+            <div class="condition-card" [class.selected]="selectedConditions.has(c.id)" (click)="toggleCondition(c.id)">
+              <span class="cond-name">{{ c.name }}</span>
+              @if (selectedConditions.has(c.id)) {
+                <span class="cond-check">✓</span>
+              }
+            </div>
+          }
+        </div>
+
+        <button class="btn-none" (click)="selectedConditions.clear()">Nenhuma das anteriores</button>
+      </div>
+    }
+
+    <!-- STEP 4: MEDICAMENTOS -->
+    @if (step === 4) {
+      <div class="step-card" @slideIn>
+        <h1 class="step-title">Medicamentos em uso</h1>
+        <p class="step-sub">Alguns medicamentos afetam a interpretação das suas métricas.</p>
+
+        <div class="meds-grid">
+          @for (m of medications; track m.id) {
+            <div class="med-card" [class.selected]="selectedMedications.has(m.id)" (click)="toggleMed(m.id)">
+              <span class="med-name">{{ m.name }}</span>
+              <span class="med-desc">{{ m.description }}</span>
+            </div>
+          }
+        </div>
+
+        <div class="field field--full" style="margin-top:16px">
+          <label>Observações <span class="opt">opcional</span></label>
+          <textarea [(ngModel)]="f.notes" rows="2" placeholder="Alguma informação adicional?"></textarea>
+        </div>
+      </div>
+    }
+
+    <!-- ERROR -->
+    @if (errorMsg) {
+      <div class="error-banner">{{ errorMsg }}</div>
+    }
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      @if (step > 1) {
+        <button class="btn-back" (click)="prev()">Voltar</button>
+      }
+      @if (step < 4) {
+        <button class="btn-next" (click)="next()">Continuar →</button>
+      } @else {
+        <button class="btn-next" (click)="finish()" [disabled]="saving">
+          @if (saving) { <span class="spinner"></span> } @else { Criar meu perfil }
+        </button>
+      }
+    </div>
+  </div>
+</div>

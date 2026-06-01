@@ -10,5 +10,9 @@
   "/health-record": {
     "target": "http://api:8080",
     "changeOrigin": true
+  },
+  "/profile": {
+    "target": "http://api:8080",
+    "changeOrigin": true
   }
 }

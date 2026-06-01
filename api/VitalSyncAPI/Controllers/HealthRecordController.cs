@@ -18,7 +18,7 @@ public class HealthRecordController(
     [HttpGet("{id}")]
     public async Task<IActionResult> GetHealthRecordById(Guid id)
     {
-        var result = await getHealthRecordById.ExecuteAsync(id);
+        var result = await getHealthRecordById.ExecuteAsync(UserId, id);
         return Ok(result);
     }
 

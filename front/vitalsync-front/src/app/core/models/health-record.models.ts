@@ -1,3 +1,10 @@
+export interface AIAnalysisResult {
+  insights: string[];
+  tips: string[];
+  overallAssessment: string;
+  disclaimer: string;
+}
+
 export interface HealthRecordResponse {
   id: string;
   metricTypeId: number;
@@ -7,6 +14,7 @@ export interface HealthRecordResponse {
   measuredAt: string;
   notes: string | null;
   createdAt: string;
+  insight?: AIAnalysisResult | null;
 }
 
 export interface HealthRecordRequest {

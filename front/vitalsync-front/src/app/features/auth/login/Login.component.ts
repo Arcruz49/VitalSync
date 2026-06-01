@@ -1,40 +1,40 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './Login.component.html',
-  styleUrl: './Login.component.scss'
+  styleUrl: './Login.component.scss',
 })
 export class LoginComponent {
+  private auth = inject(AuthService);
+  private themeService = inject(ThemeService);
+  private router = inject(Router);
+
   email = '';
   password = '';
-  rememberMe = false;
   showPassword = false;
   isLoading = signal(false);
   errorMessage = signal('');
 
-  constructor(private authService: AuthService, private router: Router) {}
+  get isDark() { return this.themeService.isDark; }
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
+  toggleTheme() { this.themeService.toggle(); }
 
   onSubmit() {
     if (!this.email || !this.password) return;
-
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.authService.login({ email: this.email, password: this.password }).subscribe({
+    this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: () => this.router.navigateByUrl('/dashboard'),
       error: (err) => {
-        this.errorMessage.set(err.error?.message ?? 'Erro ao fazer login. Tente novamente.');
+        this.errorMessage.set(err.error?.message ?? 'E-mail ou senha incorretos.');
         this.isLoading.set(false);
       }
     });

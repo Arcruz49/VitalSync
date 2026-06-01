@@ -1,79 +1,57 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './Register.component.html',
-  styleUrl: './Register.component.scss'
+  styleUrl: './Register.component.scss',
 })
 export class RegisterComponent {
+  private auth = inject(AuthService);
+  private router = inject(Router);
+
   name = '';
+  lastName = '';
   email = '';
-  password = '';
-  gender = '';
   birthDate = '';
-  acceptTerms = false;
+  gender = '';
+  password = '';
   showPassword = false;
   isLoading = signal(false);
   errorMessage = signal('');
 
-  maxDate = new Date().toISOString().split('T')[0];
-
-  constructor(private authService: AuthService, private router: Router) {}
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-
-  get passwordStrength(): number {
-    const p = this.password;
+  passwordStrength = computed(() => {
+    if (this.password.length === 0) return 0;
     let score = 0;
-    if (p.length >= 8) score++;
-    if (/[A-Z]/.test(p)) score++;
-    if (/[0-9]/.test(p)) score++;
-    if (/[^A-Za-z0-9]/.test(p)) score++;
+    if (this.password.length >= 8) score++;
+    if (/[A-Z]/.test(this.password)) score++;
+    if (/[0-9]/.test(this.password)) score++;
+    if (/[^A-Za-z0-9]/.test(this.password)) score++;
     return score;
-  }
-
-  get passwordStrengthClass(): string {
-    switch (this.passwordStrength) {
-      case 1: return 'weak';
-      case 2: return 'fair';
-      case 3: return 'good';
-      case 4: return 'strong';
-      default: return '';
-    }
-  }
-
-  get passwordStrengthLabel(): string {
-    switch (this.passwordStrength) {
-      case 1: return 'Fraca';
-      case 2: return 'Razoável';
-      case 3: return 'Boa';
-      case 4: return 'Forte';
-      default: return '';
-    }
-  }
+  });
 
   onSubmit() {
-    if (!this.name || !this.email || !this.password || !this.gender || !this.birthDate || !this.acceptTerms) return;
+    const fullName = `${this.name} ${this.lastName}`.trim();
+    if (!fullName || !this.email || !this.password || !this.birthDate || !this.gender) {
+      this.errorMessage.set('Preencha todos os campos obrigatórios.');
+      return;
+    }
 
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.authService.register({
-      name: this.name,
+    this.auth.register({
+      name: fullName,
       email: this.email,
       password: this.password,
       gender: this.gender,
       birthDate: this.birthDate,
     }).subscribe({
-      next: () => this.router.navigateByUrl('/dashboard'),
+      next: () => this.router.navigateByUrl('/onboarding'),
       error: (err) => {
         this.errorMessage.set(err.error?.message ?? 'Erro ao criar conta. Tente novamente.');
         this.isLoading.set(false);

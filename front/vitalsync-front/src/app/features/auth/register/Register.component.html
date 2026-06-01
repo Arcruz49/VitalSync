@@ -1,208 +1,90 @@
-<div class="register-page">
-
-  <!-- LEFT PANEL -->
-  <aside class="hero-panel">
-    <div class="hero-content">
-
-      <div class="brand">
-        <svg class="brand-logo" width="32" height="32" viewBox="0 0 64 64" fill="none">
-          <path d="M32 56 C32 56 8 40 8 24 C8 15 15 8 23 8 C27 8 31 10 32 14 C33 10 37 8 41 8 C49 8 56 15 56 24 C56 40 32 56 32 56 Z"
-                stroke="#0D9488" stroke-width="3.5" stroke-linejoin="round" fill="none"/>
-          <polyline points="14,30 22,30 26,22 32,38 36,26 42,30 50,30"
-                    stroke="#0D9488" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <span>VitalSync</span>
-      </div>
-
-      <div class="hero-text">
-        <h1>Comece sua jornada<br>de saúde<br><em>hoje.</em></h1>
-        <p>Crie sua conta gratuita e tenha todas as suas métricas organizadas em um só lugar.</p>
-      </div>
-
-      <div class="mobile-brand">
-        <svg width="28" height="28" viewBox="0 0 64 64" fill="none">
-          <path d="M32 56 C32 56 8 40 8 24 C8 15 15 8 23 8 C27 8 31 10 32 14 C33 10 37 8 41 8 C49 8 56 15 56 24 C56 40 32 56 32 56 Z"
-                stroke="#0D9488" stroke-width="3.5" stroke-linejoin="round" fill="none"/>
-          <polyline points="14,30 22,30 26,22 32,38 36,26 42,30 50,30"
-                    stroke="#0D9488" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <span>VitalSync</span>
-      </div>
-
-      <div class="hero-image-wrapper">
-        <img
-          src="assets/images/woman.png"
-          alt="Mulher usando o VitalSync"
-          class="hero-image"
-        />
-      </div>
+<div class="auth-layout">
+  <div class="auth-left">
+    <div class="auth-brand">VitalSync.</div>
+    <div class="auth-hero">
+      <span class="auth-label">PLATAFORMA DE SAÚDE</span>
+      <h1 class="auth-headline">Monitore.<br>Entenda.<br>Melhore.</h1>
+      <p class="auth-sub">Análise inteligente dos seus dados de saúde, personalizada para você.</p>
     </div>
-  </aside>
+    <div class="auth-stats">
+      <div class="stat-item"><strong>12</strong> métricas monitoradas</div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><strong>IA</strong> em tempo real</div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><strong>Dados</strong> seguros</div>
+    </div>
+  </div>
 
-  <!-- RIGHT PANEL -->
-  <main class="form-panel">
-    <div class="form-container">
+  <div class="auth-right">
+    <div class="form-box">
+      <p class="form-label">COMECE AGORA</p>
+      <h2 class="form-title">Crie sua conta</h2>
 
-
-
-      <div class="form-header">
-        <h2>Criar conta</h2>
-        <p>Preencha os dados abaixo para começar</p>
-      </div>
-
-      <form class="auth-form" (ngSubmit)="onSubmit()" #registerForm="ngForm">
-
-        <!-- NOME -->
-        <div class="field-group">
-          <label for="name">Nome completo</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="currentColor"/>
-            </svg>
-            <input
-              id="name"
-              type="text"
-              name="name"
-              [(ngModel)]="name"
-              placeholder="Seu nome completo"
-              autocomplete="name"
-              required
-            />
+      <div class="fields">
+        <div class="field-row">
+          <div class="field">
+            <label>Nome</label>
+            <input type="text" [(ngModel)]="name" placeholder="Seu nome" />
+          </div>
+          <div class="field">
+            <label>Sobrenome</label>
+            <input type="text" [(ngModel)]="lastName" placeholder="Sobrenome" />
           </div>
         </div>
 
-        <!-- EMAIL -->
-        <div class="field-group">
-          <label for="email">E-mail</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
-            </svg>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              [(ngModel)]="email"
-              placeholder="seu@email.com"
-              autocomplete="email"
-              required
-            />
-          </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" [(ngModel)]="email" placeholder="seu@email.com" />
         </div>
 
-        <!-- SENHA -->
-        <div class="field-group">
-          <label for="password">Senha</label>
-          <div class="input-wrapper">
-            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="currentColor"/>
-            </svg>
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              name="password"
-              [(ngModel)]="password"
-              placeholder="Mínimo 8 caracteres"
-              autocomplete="new-password"
-              required
-            />
-            <button type="button" class="toggle-password" (click)="togglePassword()">
-              <svg *ngIf="!showPassword" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+        <div class="field-row">
+          <div class="field">
+            <label>Data de nascimento</label>
+            <input type="date" [(ngModel)]="birthDate" />
+          </div>
+          <div class="field">
+            <label>Sexo biológico</label>
+            <div class="select-wrap">
+              <select [(ngModel)]="gender">
+                <option value="">Selecione</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+              </select>
+              <svg class="chevron" width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
-              <svg *ngIf="showPassword" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27z" fill="currentColor"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Senha</label>
+          <div class="pwd-wrap">
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="Mínimo 8 caracteres" />
+            <button type="button" class="eye-btn" (click)="showPassword = !showPassword" tabindex="-1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
               </svg>
             </button>
           </div>
-          <div class="password-strength" *ngIf="password.length > 0">
-            <div class="strength-bar">
-              <div class="strength-fill" [class]="passwordStrengthClass"></div>
-            </div>
-            <span class="strength-label" [class]="passwordStrengthClass">{{ passwordStrengthLabel }}</span>
+          <div class="strength-bar">
+            @for (s of [1,2,3,4]; track s) {
+              <div class="strength-seg" [class.active]="passwordStrength() >= s" [class.s1]="s===1" [class.s2]="s===2" [class.s3]="s===3" [class.s4]="s===4"></div>
+            }
           </div>
         </div>
+      </div>
 
-        <!-- GÊNERO + DATA (row) -->
-        <div class="field-row">
+      @if (errorMessage()) {
+        <div class="error-banner">{{ errorMessage() }}</div>
+      }
 
-          <div class="field-group">
-            <label for="gender">Gênero</label>
-            <div class="input-wrapper select-wrapper">
-              <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/>
-              </svg>
-              <select
-                id="gender"
-                name="gender"
-                [(ngModel)]="gender"
-                required
-              >
-                <option value="" disabled selected>Selecione</option>
-                <option value="M">Masculino</option>
-                <option value="F">Feminino</option>
-                <option value="NB">Não-binário</option>
-                <option value="NI">Prefiro não informar</option>
-              </select>
-              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
-              </svg>
-            </div>
-          </div>
+      <button class="btn-primary" (click)="onSubmit()" [disabled]="isLoading()">
+        @if (isLoading()) { <span class="spinner"></span> } @else { Criar conta }
+      </button>
 
-          <div class="field-group">
-            <label for="birthDate">Data de nascimento</label>
-            <div class="input-wrapper">
-              <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z" fill="currentColor"/>
-              </svg>
-              <input
-                id="birthDate"
-                type="date"
-                name="birthDate"
-                [(ngModel)]="birthDate"
-                [max]="maxDate"
-                required
-              />
-            </div>
-          </div>
-
-        </div>
-
-        <!-- TERMOS -->
-        <label class="checkbox-label terms-label">
-          <input type="checkbox" name="terms" [(ngModel)]="acceptTerms" required />
-          <span class="checkmark"></span>
-          <span>Concordo com os <a href="#" class="terms-link">Termos de Uso</a> e a <a href="#" class="terms-link">Política de Privacidade</a></span>
-        </label>
-
-        <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
-
-        <button type="submit" class="btn-primary" [class.loading]="isLoading()" [disabled]="!acceptTerms || isLoading()">
-          <span *ngIf="!isLoading()">Criar conta</span>
-          <span *ngIf="isLoading()" class="spinner"></span>
-        </button>
-
-        <div class="divider">
-          <span>ou continue com</span>
-        </div>
-
-        <button type="button" class="btn-google">
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-          </svg>
-          Registrar com Google
-        </button>
-
-        <p class="signin-link">
-          Já tem uma conta? <a routerLink="/login">Entrar</a>
-        </p>
-
-      </form>
+      <p class="switch-text">Já tem conta? <a routerLink="/login" class="link-accent">Entrar</a></p>
     </div>
-  </main>
-
+  </div>
 </div>

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using VitalSyncAPI.Infrastructure.Data;
 using VitalSyncAPI.Domain.Entities;
 using VitalSyncAPI.Domain.Interfaces;
+using VitalSyncAPI.Domain.Exceptions;
 
 namespace VitalSyncAPI.Infrastructure.Repositories;
 

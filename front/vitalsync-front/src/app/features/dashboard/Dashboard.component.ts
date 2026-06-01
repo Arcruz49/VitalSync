@@ -1,41 +1,40 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { UpperCasePipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { HealthRecordService } from '../../core/services/health-record.service';
 import { MetricTypesService } from '../../core/services/metric-types.service';
-import { HealthRecordResponse } from '../../core/models/health-record.models';
+import { ProfileService } from '../../core/services/profile.service';
+import { SidebarComponent } from '../../shared/sidebar/Sidebar.component';
+import { HealthRecordResponse, AIAnalysisResult } from '../../core/models/health-record.models';
 import { MetricType } from '../../core/models/metric-type.models';
+import { PersonalRangeResponse } from '../../core/models/profile.models';
 
-interface MetricSummary {
+interface MetricCard {
   metricTypeId: number;
   name: string;
   unit: string;
-  lastValue: number;
-  lastDate: string;
+  displayValue: string;
+  date: string;
+  status: 'normal' | 'warning' | 'critical';
+  statusLabel: string;
   minNormal: number | null;
   maxNormal: number | null;
-  hasAlert: boolean;
-  isCritical: boolean;
-  rangePercent: number;
-  iconEmoji: string;
-  iconBg: string;
+  markerPercent: number;
+  personalRange?: string;
+  trendLabel?: string;
+  trendBad?: boolean;
+  goalLabel?: string | null;
+  progressPercent?: number | null;
 }
 
-const METRIC_ICONS: Record<string, { emoji: string; bg: string }> = {
-  'blood-pressure': { emoji: '🩺', bg: '#FEF2F2' },
-  'droplet':        { emoji: '💧', bg: '#EFF6FF' },
-  'heart-pulse':    { emoji: '❤️', bg: '#FFF1F2' },
-  'scale':          { emoji: '⚖️', bg: '#F0FDF4' },
-  'lungs':          { emoji: '🫁', bg: '#F0FDFA' },
-  'moon':           { emoji: '🌙', bg: '#F5F3FF' },
-  'smile':          { emoji: '😊', bg: '#FFFBEB' },
-};
+const PRIORITY_METRICS = [1, 2, 3, 4, 5, 7, 11, 6, 9, 10, 8, 12];
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SidebarComponent, UpperCasePipe],
   templateUrl: './Dashboard.component.html',
   styleUrl: './Dashboard.component.scss',
 })
@@ -43,96 +42,130 @@ export class DashboardComponent implements OnInit {
   auth = inject(AuthService);
   private hrService = inject(HealthRecordService);
   private mtService = inject(MetricTypesService);
+  private profileService = inject(ProfileService);
   private router = inject(Router);
 
   loading = signal(true);
-  metricSummary = signal<MetricSummary[]>([]);
   sidebarOpen = false;
+  alertCount = signal(0);
+  metricSummary = signal<MetricCard[]>([]);
+  recentActivity = signal<any[]>([]);
+  latestInsight = signal<AIAnalysisResult | null>(null);
 
-  get greeting(): string {
-    const h = new Date().getHours();
-    if (h < 12) return 'Bom dia';
-    if (h < 18) return 'Boa tarde';
-    return 'Boa noite';
+  hero = computed(() => this.metricSummary()[0] ?? null);
+  mediumMetrics = computed(() => this.metricSummary().slice(1, 3));
+  smallMetrics = computed(() => this.metricSummary().slice(3, 6));
+  secondaryMetrics = computed(() => this.metricSummary().slice(6));
+
+  get firstName() { return this.auth.currentUser()?.name?.split(' ')[0] ?? ''; }
+  get initials() {
+    return (this.auth.currentUser()?.name ?? '')
+      .split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase();
   }
-
-  get firstName(): string {
-    return this.auth.currentUser()?.name?.split(' ')[0] ?? '';
-  }
-
-  get userInitials(): string {
-    const name = this.auth.currentUser()?.name ?? '';
-    return name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
+  get today() {
+    return new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
   }
 
   ngOnInit() {
     forkJoin({
       records: this.hrService.getAll({}),
       types: this.mtService.getAll(),
+      ranges: this.profileService.getPersonalRanges(),
     }).subscribe({
-      next: ({ records, types }) => {
-        this.metricSummary.set(this.buildSummary(records, types));
+      next: ({ records, types, ranges }) => {
+        const summary = this.buildSummary(records, types, ranges);
+        this.metricSummary.set(summary);
+        this.alertCount.set(summary.filter(m => m.status !== 'normal').length);
+        this.recentActivity.set(this.buildActivity(records, types, ranges));
+        const insightRecord = [...records].reverse().find(r => r.insight);
+        if (insightRecord?.insight) this.latestInsight.set(insightRecord.insight);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
     });
   }
 
-  private buildSummary(records: HealthRecordResponse[], types: MetricType[]): MetricSummary[] {
+  private buildSummary(records: HealthRecordResponse[], types: MetricType[], ranges: PersonalRangeResponse[]): MetricCard[] {
     const latest = new Map<number, HealthRecordResponse>();
     for (const r of records) {
-      const existing = latest.get(r.metricTypeId);
-      if (!existing || new Date(r.measuredAt) > new Date(existing.measuredAt)) {
-        latest.set(r.metricTypeId, r);
-      }
+      const ex = latest.get(r.metricTypeId);
+      if (!ex || new Date(r.measuredAt) > new Date(ex.measuredAt)) latest.set(r.metricTypeId, r);
     }
 
-    return Array.from(latest.values()).map(r => {
-      const type = types.find(t => t.id === r.metricTypeId);
-      const icon = METRIC_ICONS[type?.icon ?? ''] ?? { emoji: '📊', bg: '#F8FAFC' };
+    const cards: MetricCard[] = [];
+    for (const id of PRIORITY_METRICS) {
+      const r = latest.get(id);
+      if (!r) continue;
+      const type = types.find(t => t.id === id);
+      const range = ranges.find(rg => rg.metricTypeId === id);
+      const min = range?.minNormal ?? type?.minNormal ?? null;
+      const max = range?.maxNormal ?? type?.maxNormal ?? null;
 
-      const hasMin = type?.minNormal !== null && type?.minNormal !== undefined;
-      const hasMax = type?.maxNormal !== null && type?.maxNormal !== undefined;
-      const hasAlert = (hasMax && r.value > type!.maxNormal!) || (hasMin && r.value < type!.minNormal!);
-
-      let isCritical = false;
-      if (hasAlert && type) {
-        const limit = r.value > (type.maxNormal ?? 0) ? type.maxNormal! : type.minNormal!;
-        isCritical = Math.abs((r.value - limit) / limit * 100) >= 20;
-      }
-
-      let rangePercent = 50;
-      if (hasMin && hasMax && type) {
-        const range = type.maxNormal! - type.minNormal!;
-        const padding = range * 0.5;
-        const total = range + padding * 2;
-        rangePercent = Math.min(100, Math.max(0,
-          ((r.value - (type.minNormal! - padding)) / total) * 100
-        ));
-      }
-
-      return {
-        metricTypeId: r.metricTypeId,
+      const status = this.getStatus(r.value, min, max);
+      cards.push({
+        metricTypeId: id,
         name: r.metricTypeName,
         unit: r.unit,
-        lastValue: r.value,
-        lastDate: new Date(r.measuredAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
-        minNormal: type?.minNormal ?? null,
-        maxNormal: type?.maxNormal ?? null,
-        hasAlert,
-        isCritical,
-        rangePercent,
-        iconEmoji: icon.emoji,
-        iconBg: icon.bg,
-      };
+        displayValue: r.value % 1 === 0 ? r.value.toString() : r.value.toFixed(1),
+        date: new Date(r.measuredAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
+        status,
+        statusLabel: status === 'normal' ? 'Normal' : status === 'warning' ? 'Atenção' : 'Crítico',
+        minNormal: min,
+        maxNormal: max,
+        markerPercent: this.getMarker(r.value, min, max),
+        personalRange: range ? `${range.minNormal}–${range.maxNormal} ${r.unit}` : undefined,
+      });
+    }
+
+    // Sort: critical first, then warning, then normal
+    return cards.sort((a, b) => {
+      const order = { critical: 0, warning: 1, normal: 2 };
+      return order[a.status] - order[b.status];
     });
   }
 
-  goToRecords(metricTypeId: number) {
-    this.router.navigate(['/health-records'], { queryParams: { metricTypeId } });
+  private buildActivity(records: HealthRecordResponse[], types: MetricType[], ranges: PersonalRangeResponse[]) {
+    return [...records]
+      .sort((a, b) => new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime())
+      .slice(0, 5)
+      .map(r => {
+        const range = ranges.find(rg => rg.metricTypeId === r.metricTypeId);
+        const type = types.find(t => t.id === r.metricTypeId);
+        const min = range?.minNormal ?? type?.minNormal ?? null;
+        const max = range?.maxNormal ?? type?.maxNormal ?? null;
+        const status = this.getStatus(r.value, min, max);
+        return {
+          id: r.id,
+          metricTypeId: r.metricTypeId,
+          metricTypeName: r.metricTypeName,
+          unit: r.unit,
+          value: r.value % 1 === 0 ? r.value : r.value.toFixed(1),
+          date: new Date(r.measuredAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
+          status,
+          statusLabel: status === 'normal' ? 'Normal' : status === 'warning' ? 'Atenção' : 'Crítico',
+        };
+      });
   }
 
-  logout() {
-    this.auth.logout().subscribe({ next: () => this.router.navigateByUrl('/login') });
+  private getStatus(value: number, min: number | null, max: number | null): 'normal' | 'warning' | 'critical' {
+    if (min === null && max === null) return 'normal';
+    const aboveMax = max !== null && value > max;
+    const belowMin = min !== null && value < min;
+    if (!aboveMax && !belowMin) return 'normal';
+    const limit = aboveMax ? max! : min!;
+    const deviation = Math.abs((value - limit) / limit * 100);
+    return deviation >= 20 ? 'critical' : 'warning';
+  }
+
+  private getMarker(value: number, min: number | null, max: number | null): number {
+    if (min === null || max === null) return 50;
+    const padding = (max - min) * 0.4;
+    const low = min - padding;
+    const high = max + padding;
+    return Math.min(96, Math.max(4, ((value - low) / (high - low)) * 100));
+  }
+
+  goToRecords(id: number) {
+    this.router.navigate(['/health-records'], { queryParams: { metricTypeId: id } });
   }
 }
