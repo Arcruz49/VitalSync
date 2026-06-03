@@ -179,6 +179,13 @@
   gap: 10px;
   flex: 1;
   min-width: 0;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  margin: -4px -6px;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(255,255,255,0.06); }
 }
 
 .avatar {

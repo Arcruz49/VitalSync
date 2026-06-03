@@ -47,6 +47,7 @@ builder.Services.AddScoped<IGetAllPersonalRangeUseCase, GetAllPersonalRangeUseCa
 builder.Services.AddScoped<IGetPersonalRangeUseCase, GetPersonalRangeUseCase>();
 builder.Services.AddScoped<IAIInsightRepository, AIInsightRepository>();
 builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
+builder.Services.AddScoped<IGetAlertsUseCase, GetAlertsUseCase>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]

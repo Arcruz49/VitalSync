@@ -1,239 +1,222 @@
-<div class="page-layout">
-  <app-sidebar [alertCount]="alertCount()" [(mobileOpen)]="sidebarOpen"></app-sidebar>
-
-  <main class="main">
-    <!-- MOBILE TOPBAR -->
-    <header class="topbar">
-      <button class="hamburger" (click)="sidebarOpen = !sidebarOpen">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <span class="topbar-brand">VitalSync.</span>
-      <div class="topbar-avatar">{{ initials }}</div>
-    </header>
-
-    <div class="content">
-      <!-- HEADER -->
-      <div class="page-header">
-        <div>
-          <p class="date-label">{{ today }}</p>
-          <h1 class="greeting">{{ firstName }}</h1>
-          @if (alertCount() > 0) {
-            <p class="alert-hint">
-              <span class="alert-dot"></span>
-              {{ alertCount() }} {{ alertCount() === 1 ? 'métrica precisa' : 'métricas precisam' }} de atenção hoje.
-            </p>
-          } @else {
-            <p class="alert-hint ok">
-              <span class="ok-dot"></span>
-              Todas as métricas estão normais hoje.
-            </p>
-          }
-        </div>
-        <a routerLink="/health-records" class="btn-register">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-          Registrar
-        </a>
-      </div>
-
-      @if (loading()) {
-        <div class="skeleton-hero">
-          <div class="sk-big"></div>
-          <div class="sk-col"><div class="sk-med"></div><div class="sk-med"></div></div>
-          <div class="sk-col"><div class="sk-sm"></div><div class="sk-sm"></div><div class="sk-sm"></div></div>
-        </div>
-      } @else if (metricSummary().length > 0) {
-
-        <!-- HERO METRICS BLOCK -->
-        <div class="metrics-hero">
-
-          <!-- BIG CARD (most critical or first metric) -->
-          <div class="card card-hero" [class.card-warning]="hero().status === 'warning'" [class.card-critical]="hero().status === 'critical'" (click)="goToRecords(hero().metricTypeId)">
-            <div class="card-top">
-              <span class="metric-label">{{ hero().name | uppercase }}</span>
-              <span class="status-badge" [class]="hero().status">
-                <span class="dot"></span>
-                {{ hero().statusLabel }}
-              </span>
-            </div>
-            <div class="hero-value">
-              <span class="val-num">{{ hero().displayValue }}</span>
-              <span class="val-unit">{{ hero().unit }}</span>
-            </div>
-            @if (hero().personalRange) {
-              <p class="range-hint">Faixa pessoal: {{ hero().personalRange }}</p>
-            }
-            @if (hero().minNormal !== null && hero().maxNormal !== null) {
-              <div class="range-bar">
-                <div class="marker" [style.left]="hero().markerPercent + '%'"></div>
-              </div>
-            }
-            <div class="card-footer">
-              <span class="card-date">{{ hero().date }}</span>
-              @if (hero().trendLabel) {
-                <span class="trend" [class.trend-bad]="hero().trendBad">{{ hero().trendLabel }}</span>
-              }
-            </div>
-          </div>
-
-          <!-- MEDIUM COLUMN -->
-          <div class="col-medium">
-            @for (m of mediumMetrics(); track m.metricTypeId) {
-              <div class="card card-med" [class.card-warning]="m.status === 'warning'" [class.card-critical]="m.status === 'critical'" (click)="goToRecords(m.metricTypeId)">
-                <div class="card-top">
-                  <span class="metric-label">{{ m.name | uppercase }}</span>
-                  <span class="status-badge" [class]="m.status">
-                    <span class="dot"></span>{{ m.statusLabel }}
-                  </span>
-                </div>
-                <div class="med-value">
-                  <span class="val-num">{{ m.displayValue }}</span>
-                  <span class="val-unit">{{ m.unit }}</span>
-                </div>
-                @if (m.minNormal !== null && m.maxNormal !== null) {
-                  <div class="range-bar">
-                    <div class="marker" [style.left]="m.markerPercent + '%'"></div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-
-          <!-- SMALL COLUMN -->
-          <div class="col-small">
-            @for (m of smallMetrics(); track m.metricTypeId) {
-              <div class="card card-sm" [class.card-warning]="m.status === 'warning'" [class.card-critical]="m.status === 'critical'" (click)="goToRecords(m.metricTypeId)">
-                <span class="metric-label">{{ m.name | uppercase }}</span>
-                <div class="sm-value">
-                  <span class="val-num sm">{{ m.displayValue }}</span>
-                  <span class="val-unit">{{ m.unit }}</span>
-                </div>
-                @if (m.goalLabel) {
-                  <span class="goal-hint" [class.goal-hint--warn]="m.status !== 'normal'">{{ m.goalLabel }}</span>
-                }
-                @if (m.progressPercent !== null) {
-                  <div class="progress-track">
-                    <div class="progress-fill" [class.progress-warn]="m.status !== 'normal'" [style.width]="m.progressPercent + '%'"></div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- SECONDARY METRICS -->
-        @if (secondaryMetrics().length > 0) {
-          <div class="section-label">DEMAIS MÉTRICAS</div>
-          <div class="secondary-grid">
-            @for (m of secondaryMetrics(); track m.metricTypeId) {
-              <div class="card sec-card" (click)="goToRecords(m.metricTypeId)">
-                <span class="metric-label">{{ m.name | uppercase }}</span>
-                <div class="sec-value">
-                  <span class="val-num sm">{{ m.displayValue }}</span>
-                  <span class="val-unit">{{ m.unit }}</span>
-                </div>
-                <span class="status-badge sm-badge" [class]="m.status">
-                  <span class="dot"></span>{{ m.statusLabel }}
-                </span>
-              </div>
-            }
-          </div>
-        }
-
-        <!-- RECENT ACTIVITY -->
-        @if (recentActivity().length > 0) {
-          <div class="section-label">ATIVIDADE RECENTE</div>
-          <div class="activity-list">
-            @for (a of recentActivity(); track a.id) {
-              <div class="activity-row" (click)="goToRecords(a.metricTypeId)">
-                <span class="act-name">{{ a.metricTypeName }}</span>
-                <span class="act-value">{{ a.value }} <span class="act-unit">{{ a.unit }}</span></span>
-                <span class="status-badge" [class]="a.status"><span class="dot"></span>{{ a.statusLabel }}</span>
-                <span class="act-date">{{ a.date }}</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="act-arrow">
-                  <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-            }
-          </div>
-        }
-
-        <!-- AI INSIGHT CARD -->
-        @if (latestInsight()) {
-          <div class="ai-card">
-            <div class="ai-header">
-              <div class="ai-title-row">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                ANÁLISE INTELIGENTE
-              </div>
-              <span class="ai-badge">IA</span>
-            </div>
-
-            <p class="ai-assessment">{{ latestInsight()!.overallAssessment }}</p>
-
-            <div class="ai-insights-list">
-              @for (ins of latestInsight()!.insights.slice(0, 3); track $index) {
-                <div class="ai-insight-item">
-                  <span class="ai-insight-dot"></span>
-                  <span>{{ ins }}</span>
-                </div>
-              }
-            </div>
-
-            @if (latestInsight()!.tips.length > 0) {
-              <button class="ai-tips-toggle" (click)="tipsOpen = !tipsOpen">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
-                </svg>
-                {{ latestInsight()!.tips.length }} dica{{ latestInsight()!.tips.length > 1 ? 's' : '' }} para você
-                <svg class="ai-tips-chevron" [class.open]="tipsOpen" width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </button>
-              @if (tipsOpen) {
-                <div class="ai-tips-list">
-                  @for (tip of latestInsight()!.tips.slice(0, 2); track $index) {
-                    <div class="ai-tip-item">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
-                      </svg>
-                      <span>{{ tip }}</span>
-                    </div>
-                  }
-                </div>
-              }
-            }
-
-            <div class="ai-footer-row">
-              <p class="ai-footer">{{ latestInsight()!.disclaimer }}</p>
-              <a routerLink="/health-records" class="ai-link">Ver registros</a>
-            </div>
-          </div>
-        }
-
+<div class="content">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <p class="date-label">{{ today }}</p>
+      <h1 class="greeting">{{ firstName }}</h1>
+      @if (alertCount() > 0) {
+        <p class="alert-hint">
+          <span class="alert-dot"></span>
+          {{ alertCount() }} {{ alertCount() === 1 ? 'métrica precisa' : 'métricas precisam' }} de atenção hoje.
+        </p>
       } @else {
-        <div class="empty-state">
-          <div class="empty-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-              <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3>Nenhuma métrica registrada</h3>
-          <p>Adicione seu primeiro registro para ver o resumo aqui.</p>
-          <a routerLink="/health-records" class="btn-register">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            </svg>
-            Adicionar registro
-          </a>
-        </div>
+        <p class="alert-hint ok">
+          <span class="ok-dot"></span>
+          Todas as métricas estão normais hoje.
+        </p>
       }
     </div>
-  </main>
+    <a routerLink="/health-records" class="btn-register">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      Registrar
+    </a>
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton-hero">
+      <div class="sk-big"></div>
+      <div class="sk-col"><div class="sk-med"></div><div class="sk-med"></div></div>
+      <div class="sk-col"><div class="sk-sm"></div><div class="sk-sm"></div><div class="sk-sm"></div></div>
+    </div>
+  } @else if (metricSummary().length > 0) {
+
+    <!-- HERO METRICS BLOCK -->
+    <div class="metrics-hero">
+
+      <!-- BIG CARD -->
+      <div class="card card-hero" [class.card-warning]="hero().status === 'warning'" [class.card-critical]="hero().status === 'critical'" (click)="goToRecords(hero().metricTypeId)">
+        <div class="card-top">
+          <span class="metric-label">{{ hero().name | uppercase }}</span>
+          <span class="status-badge" [class]="hero().status">
+            <span class="dot"></span>
+            {{ hero().statusLabel }}
+          </span>
+        </div>
+        <div class="hero-value">
+          <span class="val-num">{{ hero().displayValue }}</span>
+          <span class="val-unit">{{ hero().unit }}</span>
+        </div>
+        @if (hero().personalRange) {
+          <p class="range-hint">Faixa pessoal: {{ hero().personalRange }}</p>
+        }
+        @if (hero().minNormal !== null && hero().maxNormal !== null) {
+          <div class="range-bar">
+            <div class="marker" [style.left]="hero().markerPercent + '%'"></div>
+          </div>
+        }
+        <div class="card-footer">
+          <span class="card-date">{{ hero().date }}</span>
+          @if (hero().trendLabel) {
+            <span class="trend" [class.trend-bad]="hero().trendBad">{{ hero().trendLabel }}</span>
+          }
+        </div>
+      </div>
+
+      <!-- MEDIUM COLUMN -->
+      <div class="col-medium">
+        @for (m of mediumMetrics(); track m.metricTypeId) {
+          <div class="card card-med" [class.card-warning]="m.status === 'warning'" [class.card-critical]="m.status === 'critical'" (click)="goToRecords(m.metricTypeId)">
+            <div class="card-top">
+              <span class="metric-label">{{ m.name | uppercase }}</span>
+              <span class="status-badge" [class]="m.status">
+                <span class="dot"></span>{{ m.statusLabel }}
+              </span>
+            </div>
+            <div class="med-value">
+              <span class="val-num">{{ m.displayValue }}</span>
+              <span class="val-unit">{{ m.unit }}</span>
+            </div>
+            @if (m.minNormal !== null && m.maxNormal !== null) {
+              <div class="range-bar">
+                <div class="marker" [style.left]="m.markerPercent + '%'"></div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- SMALL COLUMN -->
+      <div class="col-small">
+        @for (m of smallMetrics(); track m.metricTypeId) {
+          <div class="card card-sm" [class.card-warning]="m.status === 'warning'" [class.card-critical]="m.status === 'critical'" (click)="goToRecords(m.metricTypeId)">
+            <span class="metric-label">{{ m.name | uppercase }}</span>
+            <div class="sm-value">
+              <span class="val-num sm">{{ m.displayValue }}</span>
+              <span class="val-unit">{{ m.unit }}</span>
+            </div>
+            @if (m.goalLabel) {
+              <span class="goal-hint" [class.goal-hint--warn]="m.status !== 'normal'">{{ m.goalLabel }}</span>
+            }
+            @if (m.progressPercent !== null) {
+              <div class="progress-track">
+                <div class="progress-fill" [class.progress-warn]="m.status !== 'normal'" [style.width]="m.progressPercent + '%'"></div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- SECONDARY METRICS -->
+    @if (secondaryMetrics().length > 0) {
+      <div class="section-label">DEMAIS MÉTRICAS</div>
+      <div class="secondary-grid">
+        @for (m of secondaryMetrics(); track m.metricTypeId) {
+          <div class="card sec-card" (click)="goToRecords(m.metricTypeId)">
+            <span class="metric-label">{{ m.name | uppercase }}</span>
+            <div class="sec-value">
+              <span class="val-num sm">{{ m.displayValue }}</span>
+              <span class="val-unit">{{ m.unit }}</span>
+            </div>
+            <span class="status-badge sm-badge" [class]="m.status">
+              <span class="dot"></span>{{ m.statusLabel }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- RECENT ACTIVITY -->
+    @if (recentActivity().length > 0) {
+      <div class="section-label">ATIVIDADE RECENTE</div>
+      <div class="activity-list">
+        @for (a of recentActivity(); track a.id) {
+          <div class="activity-row" (click)="goToRecords(a.metricTypeId)">
+            <span class="act-name">{{ a.metricTypeName }}</span>
+            <span class="act-value">{{ a.value }} <span class="act-unit">{{ a.unit }}</span></span>
+            <span class="status-badge" [class]="a.status"><span class="dot"></span>{{ a.statusLabel }}</span>
+            <span class="act-date">{{ a.date }}</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="act-arrow">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- AI INSIGHT CARD -->
+    @if (latestInsight()) {
+      <div class="ai-card">
+        <div class="ai-header">
+          <div class="ai-title-row">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            ANÁLISE INTELIGENTE
+          </div>
+          <span class="ai-badge">IA</span>
+        </div>
+
+        <p class="ai-assessment">{{ latestInsight()!.overallAssessment }}</p>
+
+        <div class="ai-insights-list">
+          @for (ins of latestInsight()!.insights.slice(0, 3); track $index) {
+            <div class="ai-insight-item">
+              <span class="ai-insight-dot"></span>
+              <span>{{ ins }}</span>
+            </div>
+          }
+        </div>
+
+        @if (latestInsight()!.tips.length > 0) {
+          <button class="ai-tips-toggle" (click)="tipsOpen = !tipsOpen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
+            </svg>
+            {{ latestInsight()!.tips.length }} dica{{ latestInsight()!.tips.length > 1 ? 's' : '' }} para você
+            <svg class="ai-tips-chevron" [class.open]="tipsOpen" width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+          @if (tipsOpen) {
+            <div class="ai-tips-list">
+              @for (tip of latestInsight()!.tips.slice(0, 2); track $index) {
+                <div class="ai-tip-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                  <span>{{ tip }}</span>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <div class="ai-footer-row">
+          <p class="ai-footer">{{ latestInsight()!.disclaimer }}</p>
+          <a routerLink="/health-records" class="ai-link">Ver registros</a>
+        </div>
+      </div>
+    }
+
+  } @else {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Nenhuma métrica registrada</h3>
+      <p>Adicione seu primeiro registro para ver o resumo aqui.</p>
+      <a routerLink="/health-records" class="btn-register">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        Adicionar registro
+      </a>
+    </div>
+  }
 </div>

@@ -5,7 +5,6 @@ import { RouterLink, ActivatedRoute } from '@angular/router';
 import { HealthRecordService } from '../../core/services/health-record.service';
 import { MetricTypesService } from '../../core/services/metric-types.service';
 import { ProfileService } from '../../core/services/profile.service';
-import { SidebarComponent } from '../../shared/sidebar/Sidebar.component';
 import { HealthRecordResponse } from '../../core/models/health-record.models';
 import { MetricType } from '../../core/models/metric-type.models';
 import { PersonalRangeResponse } from '../../core/models/profile.models';
@@ -28,7 +27,7 @@ const METRIC_COLORS: Record<number, { color: string; bg: string }> = {
 @Component({
   selector: 'app-health-records',
   standalone: true,
-  imports: [FormsModule, RouterLink, SidebarComponent],
+  imports: [FormsModule, RouterLink],
   templateUrl: './HealthRecords.component.html',
   styleUrl: './HealthRecords.component.scss',
 })
@@ -46,7 +45,6 @@ export class HealthRecordsComponent implements OnInit {
   error = signal('');
   editingId = signal<string | null>(null);
   showForm = false;
-  sidebarOpen = false;
   expandedInsights = new Set<string>();
 
   filterMetricTypeId = '';

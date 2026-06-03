@@ -7,7 +7,6 @@ import { AuthService } from '../../core/services/auth.service';
 import { HealthRecordService } from '../../core/services/health-record.service';
 import { MetricTypesService } from '../../core/services/metric-types.service';
 import { ProfileService } from '../../core/services/profile.service';
-import { SidebarComponent } from '../../shared/sidebar/Sidebar.component';
 import { HealthRecordResponse, AIAnalysisResult } from '../../core/models/health-record.models';
 import { MetricType } from '../../core/models/metric-type.models';
 import { PersonalRangeResponse } from '../../core/models/profile.models';
@@ -35,7 +34,7 @@ const PRIORITY_METRICS = [1, 2, 3, 4, 5, 7, 11, 6, 9, 10, 8, 12];
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, SidebarComponent, UpperCasePipe],
+  imports: [RouterLink, UpperCasePipe],
   templateUrl: './Dashboard.component.html',
   styleUrl: './Dashboard.component.scss',
 })
@@ -47,7 +46,6 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
 
   loading = signal(true);
-  sidebarOpen = false;
   alertCount = signal(0);
   metricSummary = signal<MetricCard[]>([]);
   recentActivity = signal<any[]>([]);

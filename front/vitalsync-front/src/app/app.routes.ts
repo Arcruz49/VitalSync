@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { AuthLayoutComponent } from './shared/auth-layout/AuthLayout.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,19 +18,31 @@ export const routes: Routes = [
     loadComponent: () => import('./features/onboarding/Onboarding.component').then(m => m.OnboardingComponent)
   },
   {
-    path: 'dashboard',
+    path: '',
+    component: AuthLayoutComponent,
     canActivate: [authGuard],
-    loadComponent: () => import('./features/dashboard/Dashboard.component').then(m => m.DashboardComponent)
-  },
-  {
-    path: 'health-records',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/health-records/HealthRecords.component').then(m => m.HealthRecordsComponent)
-  },
-  {
-    path: 'profile',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/profile/Profile.component').then(m => m.ProfileComponent)
+    children: [
+      {
+        path: 'dashboard',
+        data: { title: 'VitalSync.' },
+        loadComponent: () => import('./features/dashboard/Dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'health-records',
+        data: { title: 'Registros' },
+        loadComponent: () => import('./features/health-records/HealthRecords.component').then(m => m.HealthRecordsComponent)
+      },
+      {
+        path: 'profile',
+        data: { title: 'Perfil' },
+        loadComponent: () => import('./features/profile/Profile.component').then(m => m.ProfileComponent)
+      },
+      {
+        path: 'alerts',
+        data: { title: 'Alertas' },
+        loadComponent: () => import('./features/alerts/Alerts.component').then(m => m.AlertsComponent)
+      },
+    ]
   },
   { path: '**', redirectTo: 'login' }
 ];

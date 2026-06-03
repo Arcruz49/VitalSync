@@ -1,426 +1,410 @@
-<div class="page-layout">
-  <app-sidebar [(mobileOpen)]="sidebarOpen"></app-sidebar>
+<div class="content">
+  @if (successMsg()) {
+    <div class="success-banner">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      {{ successMsg() }}
+    </div>
+  }
 
-  <main class="main">
-    <header class="topbar">
-      <button class="hamburger" (click)="sidebarOpen = !sidebarOpen">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
-      <span class="topbar-brand">Perfil</span>
-      <div style="width:32px"></div>
-    </header>
+  @if (loading()) {
+    <div class="skeleton-page">
+      <div class="sk-block" style="height:80px"></div>
+      <div class="sk-block" style="height:220px"></div>
+      <div class="sk-block" style="height:160px"></div>
+      <div class="sk-block" style="height:140px"></div>
+    </div>
+  } @else {
 
-    <div class="content">
-      @if (successMsg()) {
-        <div class="success-banner">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          {{ successMsg() }}
+    <!-- IDENTITY -->
+    <div class="identity-card">
+      <div class="id-avatar">{{ initials }}</div>
+      <div class="id-info">
+        <h1 class="id-name">{{ auth.currentUser()?.name }}</h1>
+        <p class="id-email">{{ auth.currentUser()?.email }}</p>
+      </div>
+    </div>
+
+    <!-- ── SEÇÃO 1: DADOS FÍSICOS E METAS ────────────── -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-label">DADOS FÍSICOS E METAS</span>
+        @if (profile()) {
+          <button class="btn-section-edit" (click)="editingPhysical ? cancelPhysical() : openEditPhysical()">
+            @if (!editingPhysical) {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Editar
+            } @else {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Fechar
+            }
+          </button>
+        }
+      </div>
+
+      <!-- View: métricas calculadas -->
+      @if (!editingPhysical && profile()) {
+        <div class="goals-grid">
+          <div class="goal-metric">
+            <span class="gm-label">IMC</span>
+            <span class="gm-value">{{ profile()!.bmi | number:'1.1-1' }}</span>
+            <span class="gm-unit" [class]="'badge-' + bmiClass(profile()!.bmi)">{{ bmiLabel(profile()!.bmi) }}</span>
+          </div>
+          <div class="goal-metric">
+            <span class="gm-label">TDEE</span>
+            <span class="gm-value">{{ profile()!.tdee | number:'1.0-0' }}</span>
+            <span class="gm-unit">kcal/dia</span>
+          </div>
+          <div class="goal-metric">
+            <span class="gm-label">META CALÓRICA</span>
+            <span class="gm-value">{{ profile()!.calorieGoal | number:'1.0-0' }}</span>
+            <span class="gm-unit">kcal/dia</span>
+          </div>
+          <div class="goal-metric">
+            <span class="gm-label">PESO IDEAL</span>
+            <span class="gm-value">{{ profile()!.idealWeightMinKg }}–{{ profile()!.idealWeightMaxKg }}</span>
+            <span class="gm-unit">kg</span>
+          </div>
+          <div class="goal-metric">
+            <span class="gm-label">PROTEÍNA DIÁRIA</span>
+            <span class="gm-value">{{ profile()!.proteinGoalG | number:'1.0-0' }}</span>
+            <span class="gm-unit">g/dia</span>
+          </div>
+          <div class="goal-metric">
+            <span class="gm-label">ALTURA / PESO</span>
+            <span class="gm-value">{{ profile()!.heightCm }}cm</span>
+            <span class="gm-unit">{{ profile()!.weightKg }}kg atual</span>
+          </div>
         </div>
       }
 
-      @if (loading()) {
-        <div class="skeleton-page">
-          <div class="sk-block" style="height:80px"></div>
-          <div class="sk-block" style="height:220px"></div>
-          <div class="sk-block" style="height:160px"></div>
-          <div class="sk-block" style="height:140px"></div>
-        </div>
-      } @else {
+      <!-- Edit: dados físicos + objetivos -->
+      @if (editingPhysical) {
+        <div class="edit-panel">
+          @if (!profile()) {
+            <p class="setup-hint">Configure seus dados físicos para ver métricas e faixas personalizadas.</p>
+          }
 
-        <!-- IDENTITY -->
-        <div class="identity-card">
-          <div class="id-avatar">{{ initials }}</div>
-          <div class="id-info">
-            <h1 class="id-name">{{ auth.currentUser()?.name }}</h1>
-            <p class="id-email">{{ auth.currentUser()?.email }}</p>
+          <div class="edit-grid">
+            <div class="field">
+              <label>Peso atual (kg) <span class="req">*</span></label>
+              <div class="input-unit">
+                <input type="number" [(ngModel)]="pfPhysical.weightKg" step="0.1" placeholder="70" />
+                <span class="unit">kg</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Altura (cm) <span class="req">*</span></label>
+              <div class="input-unit">
+                <input type="number" [(ngModel)]="pfPhysical.heightCm" placeholder="170" />
+                <span class="unit">cm</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Peso alvo <span class="opt">opcional</span></label>
+              <div class="input-unit">
+                <input type="number" [(ngModel)]="pfPhysical.targetWeightKg" step="0.1" placeholder="65" />
+                <span class="unit">kg</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Circ. abdominal <span class="opt">opcional</span></label>
+              <div class="input-unit">
+                <input type="number" [(ngModel)]="pfPhysical.waistCircumferenceCm" placeholder="85" />
+                <span class="unit">cm</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- ── SEÇÃO 1: DADOS FÍSICOS E METAS ────────────── -->
-        <div class="section">
-          <div class="section-header">
-            <span class="section-label">DADOS FÍSICOS E METAS</span>
+          <div class="field field--full">
+            <label>Objetivo principal <span class="req">*</span></label>
+            <div class="goal-grid-sm">
+              @for (g of goals; track g.id) {
+                <div class="goal-card-sm" [class.selected]="pfPhysical.goal === g.id" (click)="pfPhysical.goal = g.id">
+                  <span class="gc-name">{{ g.name }}</span>
+                  <span class="gc-desc">{{ g.description }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="field field--full">
+            <label>Nível de atividade <span class="req">*</span></label>
+            <div class="activity-row">
+              @for (a of activityLevels; track a.id) {
+                <div class="activity-card" [class.selected]="pfPhysical.activityLevel === a.id" (click)="pfPhysical.activityLevel = a.id">
+                  {{ a.name }}
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (errorPhysical()) {
+            <div class="error-banner">{{ errorPhysical() }}</div>
+          }
+
+          <div class="edit-actions">
             @if (profile()) {
-              <button class="btn-section-edit" (click)="editingPhysical ? cancelPhysical() : openEditPhysical()">
-                @if (!editingPhysical) {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Editar
-                } @else {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Fechar
-                }
-              </button>
+              <button class="btn-cancel" (click)="cancelPhysical()">Cancelar</button>
             }
+            <button class="btn-save" (click)="savePhysical()" [disabled]="savingPhysical()">
+              @if (savingPhysical()) { <span class="spinner"></span> } @else { Salvar }
+            </button>
           </div>
+        </div>
+      }
+    </div>
 
-          <!-- View: métricas calculadas -->
-          @if (!editingPhysical && profile()) {
-            <div class="goals-grid">
-              <div class="goal-metric">
-                <span class="gm-label">IMC</span>
-                <span class="gm-value">{{ profile()!.bmi | number:'1.1-1' }}</span>
-                <span class="gm-unit" [class]="'badge-' + bmiClass(profile()!.bmi)">{{ bmiLabel(profile()!.bmi) }}</span>
-              </div>
-              <div class="goal-metric">
-                <span class="gm-label">TDEE</span>
-                <span class="gm-value">{{ profile()!.tdee | number:'1.0-0' }}</span>
-                <span class="gm-unit">kcal/dia</span>
-              </div>
-              <div class="goal-metric">
-                <span class="gm-label">META CALÓRICA</span>
-                <span class="gm-value">{{ profile()!.calorieGoal | number:'1.0-0' }}</span>
-                <span class="gm-unit">kcal/dia</span>
-              </div>
-              <div class="goal-metric">
-                <span class="gm-label">PESO IDEAL</span>
-                <span class="gm-value">{{ profile()!.idealWeightMinKg }}–{{ profile()!.idealWeightMaxKg }}</span>
-                <span class="gm-unit">kg</span>
-              </div>
-              <div class="goal-metric">
-                <span class="gm-label">PROTEÍNA DIÁRIA</span>
-                <span class="gm-value">{{ profile()!.proteinGoalG | number:'1.0-0' }}</span>
-                <span class="gm-unit">g/dia</span>
-              </div>
-              <div class="goal-metric">
-                <span class="gm-label">ALTURA / PESO</span>
-                <span class="gm-value">{{ profile()!.heightCm }}cm</span>
-                <span class="gm-unit">{{ profile()!.weightKg }}kg atual</span>
-              </div>
-            </div>
-          }
+    <!-- ── SEÇÕES DEPENDENTES DO PERFIL ──────────────── -->
+    @if (profile()) {
 
-          <!-- Edit: dados físicos + objetivos -->
-          @if (editingPhysical) {
-            <div class="edit-panel">
-              @if (!profile()) {
-                <p class="setup-hint">Configure seus dados físicos para ver métricas e faixas personalizadas.</p>
-              }
-
-              <div class="edit-grid">
-                <div class="field">
-                  <label>Peso atual (kg) <span class="req">*</span></label>
-                  <div class="input-unit">
-                    <input type="number" [(ngModel)]="pfPhysical.weightKg" step="0.1" placeholder="70" />
-                    <span class="unit">kg</span>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Altura (cm) <span class="req">*</span></label>
-                  <div class="input-unit">
-                    <input type="number" [(ngModel)]="pfPhysical.heightCm" placeholder="170" />
-                    <span class="unit">cm</span>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Peso alvo <span class="opt">opcional</span></label>
-                  <div class="input-unit">
-                    <input type="number" [(ngModel)]="pfPhysical.targetWeightKg" step="0.1" placeholder="65" />
-                    <span class="unit">kg</span>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>Circ. abdominal <span class="opt">opcional</span></label>
-                  <div class="input-unit">
-                    <input type="number" [(ngModel)]="pfPhysical.waistCircumferenceCm" placeholder="85" />
-                    <span class="unit">cm</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field field--full">
-                <label>Objetivo principal <span class="req">*</span></label>
-                <div class="goal-grid-sm">
-                  @for (g of goals; track g.id) {
-                    <div class="goal-card-sm" [class.selected]="pfPhysical.goal === g.id" (click)="pfPhysical.goal = g.id">
-                      <span class="gc-name">{{ g.name }}</span>
-                      <span class="gc-desc">{{ g.description }}</span>
-                    </div>
-                  }
-                </div>
-              </div>
-
-              <div class="field field--full">
-                <label>Nível de atividade <span class="req">*</span></label>
-                <div class="activity-row">
-                  @for (a of activityLevels; track a.id) {
-                    <div class="activity-card" [class.selected]="pfPhysical.activityLevel === a.id" (click)="pfPhysical.activityLevel = a.id">
-                      {{ a.name }}
-                    </div>
-                  }
-                </div>
-              </div>
-
-              @if (errorPhysical()) {
-                <div class="error-banner">{{ errorPhysical() }}</div>
-              }
-
-              <div class="edit-actions">
-                @if (profile()) {
-                  <button class="btn-cancel" (click)="cancelPhysical()">Cancelar</button>
-                }
-                <button class="btn-save" (click)="savePhysical()" [disabled]="savingPhysical()">
-                  @if (savingPhysical()) { <span class="spinner"></span> } @else { Salvar }
-                </button>
+      <!-- ZONAS DE FC -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-label">ZONAS DE FREQUÊNCIA CARDÍACA</span>
+        </div>
+        <div class="zones-list">
+          @for (z of heartRateZones(); track z.zone) {
+            <div class="zone-row" [style.background]="z.bg">
+              <span class="zone-name" [style.color]="z.color">Z{{ z.zone }} — {{ z.label }}</span>
+              <span class="zone-range" [style.color]="z.color">{{ z.min }}–{{ z.max }} bpm</span>
+              <div class="zone-bar-track">
+                <div class="zone-bar-fill" [style.width]="(z.zone * 20) + '%'" [style.background]="z.color"></div>
               </div>
             </div>
           }
         </div>
+      </div>
 
-        <!-- ── SEÇÕES DEPENDENTES DO PERFIL ──────────────── -->
-        @if (profile()) {
-
-          <!-- ZONAS DE FC -->
-          <div class="section">
-            <div class="section-header">
-              <span class="section-label">ZONAS DE FREQUÊNCIA CARDÍACA</span>
-            </div>
-            <div class="zones-list">
-              @for (z of heartRateZones(); track z.zone) {
-                <div class="zone-row" [style.background]="z.bg">
-                  <span class="zone-name" [style.color]="z.color">Z{{ z.zone }} — {{ z.label }}</span>
-                  <span class="zone-range" [style.color]="z.color">{{ z.min }}–{{ z.max }} bpm</span>
-                  <div class="zone-bar-track">
-                    <div class="zone-bar-fill" [style.width]="(z.zone * 20) + '%'" [style.background]="z.color"></div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- ── SEÇÃO 2: ROTINA DE TREINO ──────────────────── -->
-          <div class="section">
-            <div class="section-header">
-              <span class="section-label">ROTINA DE TREINO</span>
-              <button class="btn-section-edit" (click)="editingRoutine ? cancelRoutine() : openEditRoutine()">
-                @if (!editingRoutine) {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Editar
-                } @else {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Fechar
-                }
-              </button>
-            </div>
-
+      <!-- ── SEÇÃO 2: ROTINA DE TREINO ──────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-label">ROTINA DE TREINO</span>
+          <button class="btn-section-edit" (click)="editingRoutine ? cancelRoutine() : openEditRoutine()">
             @if (!editingRoutine) {
-              <div class="routine-view">
-                <div class="rv-item">
-                  <span class="rv-label">Treinos</span>
-                  <span class="rv-value">{{ profile()!.trainingFrequencyDays }}x por semana</span>
-                </div>
-                <div class="rv-item">
-                  <span class="rv-label">Tipos</span>
-                  <span class="rv-value">
-                    @if (profile()!.trainingTypes?.length) {
-                      {{ profile()!.trainingTypes.join(', ') }}
-                    } @else {
-                      <span class="rv-empty">Não informado</span>
-                    }
-                  </span>
-                </div>
-                <div class="rv-item">
-                  <span class="rv-label">Horas sentado</span>
-                  <span class="rv-value">{{ profile()!.hoursSeated }}</span>
-                </div>
-                <div class="rv-item">
-                  <span class="rv-label">Sono</span>
-                  <span class="rv-value">{{ profile()!.habitualSleepHours }}h &bull; {{ profile()!.sleepQuality }}/5 ★</span>
-                </div>
-              </div>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Editar
+            } @else {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Fechar
             }
+          </button>
+        </div>
 
-            @if (editingRoutine) {
-              <div class="edit-panel">
-                <div class="field field--full">
-                  <label>Dias de treino por semana</label>
-                  <div class="day-pills">
-                    @for (d of [0,1,2,3,4,5,6,7]; track d) {
-                      <div class="day-pill" [class.selected]="pfRoutine.trainingFrequencyDays === d" (click)="pfRoutine.trainingFrequencyDays = d">{{ d }}</div>
-                    }
-                  </div>
-                </div>
-
-                <div class="field field--full">
-                  <label>Tipos de treino</label>
-                  <div class="chips-wrap">
-                    @for (t of trainingTypes; track t) {
-                      <span class="chip" [class.selected]="pfRoutine.trainingTypes.includes(t)" (click)="toggleTraining(t)">{{ t }}</span>
-                    }
-                  </div>
-                </div>
-
-                <div class="field field--full">
-                  <label>Horas sentado por dia</label>
-                  <div class="hours-grid">
-                    @for (h of hoursSeated; track h.id) {
-                      <div class="hours-card" [class.selected]="pfRoutine.hoursSeated === h.id" (click)="pfRoutine.hoursSeated = h.id">{{ h.label }}</div>
-                    }
-                  </div>
-                </div>
-
-                <div class="field field--full">
-                  <label>Horas de sono: <strong class="slider-val">{{ pfRoutine.habitualSleepHours }}h</strong></label>
-                  <input type="range" min="4" max="12" step="0.5" [(ngModel)]="pfRoutine.habitualSleepHours" class="slider" />
-                  <div class="slider-labels"><span>4h</span><span>12h</span></div>
-                </div>
-
-                <div class="field field--full">
-                  <label>Qualidade do sono</label>
-                  <div class="stars">
-                    @for (s of [1,2,3,4,5]; track s) {
-                      <button class="star" [class.active]="pfRoutine.sleepQuality >= s" (click)="pfRoutine.sleepQuality = s">★</button>
-                    }
-                  </div>
-                </div>
-
-                @if (errorRoutine()) {
-                  <div class="error-banner">{{ errorRoutine() }}</div>
-                }
-
-                <div class="edit-actions">
-                  <button class="btn-cancel" (click)="cancelRoutine()">Cancelar</button>
-                  <button class="btn-save" (click)="saveRoutine()" [disabled]="savingRoutine()">
-                    @if (savingRoutine()) { <span class="spinner"></span> } @else { Salvar rotina }
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-
-          <!-- ── SEÇÃO 3: CONDIÇÕES DE SAÚDE ────────────────── -->
-          <div class="section">
-            <div class="section-header">
-              <span class="section-label">CONDIÇÕES DE SAÚDE</span>
-              <button class="btn-section-edit" (click)="editingConditions ? cancelConditions() : openEditConditions()">
-                @if (!editingConditions) {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Editar
+        @if (!editingRoutine) {
+          <div class="routine-view">
+            <div class="rv-item">
+              <span class="rv-label">Treinos</span>
+              <span class="rv-value">{{ profile()!.trainingFrequencyDays }}x por semana</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Tipos</span>
+              <span class="rv-value">
+                @if (profile()!.trainingTypes?.length) {
+                  {{ profile()!.trainingTypes.join(', ') }}
                 } @else {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Fechar
+                  <span class="rv-empty">Não informado</span>
                 }
-              </button>
+              </span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Horas sentado</span>
+              <span class="rv-value">{{ profile()!.hoursSeated }}</span>
+            </div>
+            <div class="rv-item">
+              <span class="rv-label">Sono</span>
+              <span class="rv-value">{{ profile()!.habitualSleepHours }}h &bull; {{ profile()!.sleepQuality }}/5 ★</span>
+            </div>
+          </div>
+        }
+
+        @if (editingRoutine) {
+          <div class="edit-panel">
+            <div class="field field--full">
+              <label>Dias de treino por semana</label>
+              <div class="day-pills">
+                @for (d of [0,1,2,3,4,5,6,7]; track d) {
+                  <div class="day-pill" [class.selected]="pfRoutine.trainingFrequencyDays === d" (click)="pfRoutine.trainingFrequencyDays = d">{{ d }}</div>
+                }
+              </div>
             </div>
 
+            <div class="field field--full">
+              <label>Tipos de treino</label>
+              <div class="chips-wrap">
+                @for (t of trainingTypes; track t) {
+                  <span class="chip" [class.selected]="pfRoutine.trainingTypes.includes(t)" (click)="toggleTraining(t)">{{ t }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="field field--full">
+              <label>Horas sentado por dia</label>
+              <div class="hours-grid">
+                @for (h of hoursSeated; track h.id) {
+                  <div class="hours-card" [class.selected]="pfRoutine.hoursSeated === h.id" (click)="pfRoutine.hoursSeated = h.id">{{ h.label }}</div>
+                }
+              </div>
+            </div>
+
+            <div class="field field--full">
+              <label>Horas de sono: <strong class="slider-val">{{ pfRoutine.habitualSleepHours }}h</strong></label>
+              <input type="range" min="4" max="12" step="0.5" [(ngModel)]="pfRoutine.habitualSleepHours" class="slider" />
+              <div class="slider-labels"><span>4h</span><span>12h</span></div>
+            </div>
+
+            <div class="field field--full">
+              <label>Qualidade do sono</label>
+              <div class="stars">
+                @for (s of [1,2,3,4,5]; track s) {
+                  <button class="star" [class.active]="pfRoutine.sleepQuality >= s" (click)="pfRoutine.sleepQuality = s">★</button>
+                }
+              </div>
+            </div>
+
+            @if (errorRoutine()) {
+              <div class="error-banner">{{ errorRoutine() }}</div>
+            }
+
+            <div class="edit-actions">
+              <button class="btn-cancel" (click)="cancelRoutine()">Cancelar</button>
+              <button class="btn-save" (click)="saveRoutine()" [disabled]="savingRoutine()">
+                @if (savingRoutine()) { <span class="spinner"></span> } @else { Salvar rotina }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ── SEÇÃO 3: CONDIÇÕES DE SAÚDE ────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-label">CONDIÇÕES DE SAÚDE</span>
+          <button class="btn-section-edit" (click)="editingConditions ? cancelConditions() : openEditConditions()">
             @if (!editingConditions) {
-              @if (conditions().length > 0) {
-                <div class="chips">
-                  @for (c of conditions(); track c.conditionId) {
-                    <span class="tag tag--condition">{{ c.conditionName }}</span>
-                  }
-                </div>
-              } @else {
-                <p class="no-data">Nenhuma condição registrada.</p>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Editar
+            } @else {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Fechar
+            }
+          </button>
+        </div>
+
+        @if (!editingConditions) {
+          @if (conditions().length > 0) {
+            <div class="chips">
+              @for (c of conditions(); track c.conditionId) {
+                <span class="tag tag--condition">{{ c.conditionName }}</span>
               }
-            }
+            </div>
+          } @else {
+            <p class="no-data">Nenhuma condição registrada.</p>
+          }
+        }
 
-            @if (editingConditions) {
-              <div class="edit-panel">
-                <div class="conditions-grid">
-                  @for (c of allConditions; track c.id) {
-                    <div class="condition-card" [class.selected]="selectedConditions.has(c.id)" (click)="toggleCondition(c.id)">
-                      <span class="cond-name">{{ c.name }}</span>
-                      @if (selectedConditions.has(c.id)) {
-                        <span class="cond-check">✓</span>
-                      }
-                    </div>
+        @if (editingConditions) {
+          <div class="edit-panel">
+            <div class="conditions-grid">
+              @for (c of allConditions; track c.id) {
+                <div class="condition-card" [class.selected]="selectedConditions.has(c.id)" (click)="toggleCondition(c.id)">
+                  <span class="cond-name">{{ c.name }}</span>
+                  @if (selectedConditions.has(c.id)) {
+                    <span class="cond-check">✓</span>
                   }
                 </div>
-                <button class="btn-none" (click)="selectedConditions.clear()">Nenhuma das anteriores</button>
+              }
+            </div>
+            <button class="btn-none" (click)="selectedConditions.clear()">Nenhuma das anteriores</button>
 
-                @if (errorConditions()) {
-                  <div class="error-banner">{{ errorConditions() }}</div>
-                }
-
-                <div class="edit-actions">
-                  <button class="btn-cancel" (click)="cancelConditions()">Cancelar</button>
-                  <button class="btn-save" (click)="saveConditions()" [disabled]="savingConditions()">
-                    @if (savingConditions()) { <span class="spinner"></span> } @else { Salvar condições }
-                  </button>
-                </div>
-              </div>
+            @if (errorConditions()) {
+              <div class="error-banner">{{ errorConditions() }}</div>
             }
-          </div>
 
-          <!-- ── SEÇÃO 4: MEDICAMENTOS ───────────────────────── -->
-          <div class="section">
-            <div class="section-header">
-              <span class="section-label">MEDICAMENTOS</span>
-              <button class="btn-section-edit" (click)="editingMedications ? cancelMedications() : openEditMedications()">
-                @if (!editingMedications) {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Editar
-                } @else {
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                  Fechar
-                }
+            <div class="edit-actions">
+              <button class="btn-cancel" (click)="cancelConditions()">Cancelar</button>
+              <button class="btn-save" (click)="saveConditions()" [disabled]="savingConditions()">
+                @if (savingConditions()) { <span class="spinner"></span> } @else { Salvar condições }
               </button>
             </div>
-
-            @if (!editingMedications) {
-              @if (medications().length > 0) {
-                <div class="chips">
-                  @for (m of medications(); track m.id) {
-                    <span class="tag tag--med">{{ m.medicationClass }}</span>
-                  }
-                </div>
-              } @else {
-                <p class="no-data">Nenhum medicamento registrado.</p>
-              }
-            }
-
-            @if (editingMedications) {
-              <div class="edit-panel">
-                <div class="meds-grid">
-                  @for (m of allMedications; track m.id) {
-                    <div class="med-card" [class.selected]="selectedMedications.has(m.id)" (click)="toggleMed(m.id)">
-                      <span class="med-name">{{ m.name }}</span>
-                      <span class="med-desc">{{ m.description }}</span>
-                    </div>
-                  }
-                </div>
-
-                @if (errorMedications()) {
-                  <div class="error-banner">{{ errorMedications() }}</div>
-                }
-
-                <div class="edit-actions">
-                  <button class="btn-cancel" (click)="cancelMedications()">Cancelar</button>
-                  <button class="btn-save" (click)="saveMedications()" [disabled]="savingMedications()">
-                    @if (savingMedications()) { <span class="spinner"></span> } @else { Salvar medicamentos }
-                  </button>
-                </div>
-              </div>
-            }
           </div>
+        }
+      </div>
 
-        } <!-- @if (profile()) -->
+      <!-- ── SEÇÃO 4: MEDICAMENTOS ───────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <span class="section-label">MEDICAMENTOS</span>
+          <button class="btn-section-edit" (click)="editingMedications ? cancelMedications() : openEditMedications()">
+            @if (!editingMedications) {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Editar
+            } @else {
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Fechar
+            }
+          </button>
+        </div>
 
-      } <!-- @else (!loading) -->
-    </div>
-  </main>
+        @if (!editingMedications) {
+          @if (medications().length > 0) {
+            <div class="chips">
+              @for (m of medications(); track m.id) {
+                <span class="tag tag--med">{{ m.medicationClass }}</span>
+              }
+            </div>
+          } @else {
+            <p class="no-data">Nenhum medicamento registrado.</p>
+          }
+        }
+
+        @if (editingMedications) {
+          <div class="edit-panel">
+            <div class="meds-grid">
+              @for (m of allMedications; track m.id) {
+                <div class="med-card" [class.selected]="selectedMedications.has(m.id)" (click)="toggleMed(m.id)">
+                  <span class="med-name">{{ m.name }}</span>
+                  <span class="med-desc">{{ m.description }}</span>
+                </div>
+              }
+            </div>
+
+            @if (errorMedications()) {
+              <div class="error-banner">{{ errorMedications() }}</div>
+            }
+
+            <div class="edit-actions">
+              <button class="btn-cancel" (click)="cancelMedications()">Cancelar</button>
+              <button class="btn-save" (click)="saveMedications()" [disabled]="savingMedications()">
+                @if (savingMedications()) { <span class="spinner"></span> } @else { Salvar medicamentos }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+    } <!-- @if (profile()) -->
+
+  } <!-- @else (!loading) -->
 </div>

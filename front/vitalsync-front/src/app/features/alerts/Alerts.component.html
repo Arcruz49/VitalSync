@@ -1,0 +1,69 @@
+<div class="content">
+  @if (loading()) {
+    <div class="loading">Carregando alertas...</div>
+  } @else if (alerts().length === 0) {
+    <div class="empty">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p>Nenhum alerta. Continue monitorando suas métricas!</p>
+    </div>
+  } @else {
+    @if (critical.length > 0) {
+      <section class="alert-section">
+        <h2 class="section-title critical-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Críticos ({{ critical.length }})
+        </h2>
+        <div class="alert-list">
+          @for (alert of critical; track alert.id) {
+            <div class="alert-card critical">
+              <div class="alert-top">
+                <span class="metric-badge">{{ alert.metricTypeName }}</span>
+                <span class="alert-value">{{ alert.value }} {{ alert.unit }}</span>
+                <span class="alert-date">{{ formatDate(alert.triggeredAt) }}</span>
+              </div>
+              <p class="alert-message">{{ alert.message }}</p>
+              <a [routerLink]="['/health-records']" [queryParams]="{metricTypeId: alert.metricTypeId}" class="alert-link">
+                Ver registros →
+              </a>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (warning.length > 0) {
+      <section class="alert-section">
+        <h2 class="section-title warning-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Atenção ({{ warning.length }})
+        </h2>
+        <div class="alert-list">
+          @for (alert of warning; track alert.id) {
+            <div class="alert-card warning">
+              <div class="alert-top">
+                <span class="metric-badge">{{ alert.metricTypeName }}</span>
+                <span class="alert-value">{{ alert.value }} {{ alert.unit }}</span>
+                <span class="alert-date">{{ formatDate(alert.triggeredAt) }}</span>
+              </div>
+              <p class="alert-message">{{ alert.message }}</p>
+              <a [routerLink]="['/health-records']" [queryParams]="{metricTypeId: alert.metricTypeId}" class="alert-link">
+                Ver registros →
+              </a>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

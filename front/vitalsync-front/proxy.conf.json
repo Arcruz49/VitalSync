@@ -14,5 +14,9 @@
   "/profile": {
     "target": "http://api:8080",
     "changeOrigin": true
+  },
+  "/alerts": {
+    "target": "http://api:8080",
+    "changeOrigin": true
   }
 }

@@ -4,7 +4,6 @@ import { DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService } from '../../core/services/profile.service';
-import { SidebarComponent } from '../../shared/sidebar/Sidebar.component';
 import {
   UserProfileResponse, UserConditionResponse, UserMedicationResponse,
   HEALTH_CONDITIONS, MEDICATION_CLASSES, ACTIVITY_LEVELS, HEALTH_GOALS,
@@ -14,7 +13,7 @@ import {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [SidebarComponent, DecimalPipe, FormsModule],
+  imports: [DecimalPipe, FormsModule],
   templateUrl: './Profile.component.html',
   styleUrl: './Profile.component.scss',
 })
@@ -22,7 +21,6 @@ export class ProfileComponent implements OnInit {
   auth = inject(AuthService);
   private profileService = inject(ProfileService);
 
-  sidebarOpen = false;
   loading = signal(true);
   profile = signal<UserProfileResponse | null>(null);
   conditions = signal<UserConditionResponse[]>([]);

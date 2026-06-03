@@ -1,28 +1,5 @@
 :host { display: block; }
 
-.page-layout { display: flex; min-height: 100vh; background: var(--bg-base); }
-.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-
-.topbar {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  height: 56px;
-  background: var(--sidebar-bg);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.hamburger { background: none; border: none; color: #9CA3AF; cursor: pointer; display: flex; align-items: center; padding: 6px; }
-.topbar-brand { font-size: 15px; font-weight: 700; color: white; }
-.fab-topbar {
-  width: 32px; height: 32px; background: var(--accent); color: white;
-  border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-}
-
 .content {
   padding: 28px 36px 64px;
   max-width: 960px;
@@ -366,4 +343,42 @@
   .filter-actions { margin-left: 0; }
   .row-actions { opacity: 1; .action-btn { opacity: 1; } }
   .row-notes, .row-date { font-size: 11px; }
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: #9CA3AF;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover, &.active { background: rgba(255,255,255,0.08); color: white; }
+}
+
+.topbar-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.85; }
 }
