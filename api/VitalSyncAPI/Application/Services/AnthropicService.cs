@@ -37,9 +37,18 @@ public class AnthropicService(IConfiguration config) : IAIAnalysisService
             }
         );
 
-        var json = ((TextContent)response.Content[0]).Text;
+        var raw = ((TextContent)response.Content[0]).Text.Trim();
 
-        return JsonSerializer.Deserialize<AIAnalysisResult>(json, new JsonSerializerOptions
+        // o retorno da ia estava vindo com markdown então precisa validar se possui ``` no json
+        if (raw.StartsWith("```"))
+        {
+            var firstNewline = raw.IndexOf('\n');
+            var lastFence = raw.LastIndexOf("```");
+            if (firstNewline >= 0 && lastFence > firstNewline)
+                raw = raw[(firstNewline + 1)..lastFence].Trim();
+        }
+
+        return JsonSerializer.Deserialize<AIAnalysisResult>(raw, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         }) ?? new AIAnalysisResult();

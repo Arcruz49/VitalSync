@@ -22,6 +22,7 @@ export class ProfileComponent implements OnInit {
   auth = inject(AuthService);
   private profileService = inject(ProfileService);
 
+  sidebarOpen = false;
   loading = signal(true);
   profile = signal<UserProfileResponse | null>(null);
   conditions = signal<UserConditionResponse[]>([]);

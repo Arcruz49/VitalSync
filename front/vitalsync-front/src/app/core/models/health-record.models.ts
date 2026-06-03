@@ -14,7 +14,7 @@ export interface HealthRecordResponse {
   measuredAt: string;
   notes: string | null;
   createdAt: string;
-  insight?: AIAnalysisResult | null;
+  aiAnalysisResult?: AIAnalysisResult | null;
 }
 
 export interface HealthRecordRequest {

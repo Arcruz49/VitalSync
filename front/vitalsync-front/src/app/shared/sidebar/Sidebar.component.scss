@@ -265,5 +265,6 @@
     &.open { transform: translateX(0); }
   }
 
-  .overlay { display: block; }
+  .overlay { display: block; pointer-events: none; }
+  .overlay.visible { pointer-events: auto; }
 }

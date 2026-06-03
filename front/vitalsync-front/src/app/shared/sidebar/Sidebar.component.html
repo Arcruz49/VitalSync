@@ -1,4 +1,4 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.open]="mobileOpen">
   <div class="sidebar-header">
     <span class="brand">VitalSync.</span>
     <button class="theme-toggle" (click)="theme.toggle()" [title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'">
@@ -73,4 +73,4 @@
   </div>
 </aside>
 
-<div class="overlay" [class.visible]="mobileOpen" (click)="mobileOpen = false"></div>
+<div class="overlay" [class.visible]="mobileOpen" (click)="close()"></div>

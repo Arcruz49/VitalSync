@@ -22,6 +22,7 @@ public class UserRepository : IUserRepository{
     {
         return await _db.Users
         .AsNoTracking()
+        .Include(x => x.Profile)
         .FirstOrDefaultAsync(a => a.Id == id)
         ?? throw new NotFoundException("Usuário não encontrado");
     }

@@ -25,13 +25,14 @@ public class HealthRecordsRepository(Context db) : IHealthRecordsRepository{
     }
     public async Task <HealthRecord> GetById(Guid id)
     {
-        return await db.HealthRecords.Where(a => a.Id == id).Include(x => x.MetricType).FirstOrDefaultAsync() ?? throw new NotFoundException("Registro não encontrado");
+        return await db.HealthRecords.Where(a => a.Id == id).Include(x => x.MetricType).Include(x => x.AIInsight).FirstOrDefaultAsync() ?? throw new NotFoundException("Registro não encontrado");
     }
     public async Task<List<HealthRecord>> GetByUserAsync(Guid userId, int? metricTypeId, DateTime? from, DateTime? to)
     {
         var records = db.HealthRecords
             .AsNoTracking()
             .Include(x => x.MetricType)
+            .Include(x => x.AIInsight)
             .Where(x => x.UserId == userId);
 
         if (metricTypeId.HasValue) records = records.Where(x => x.MetricTypeId == metricTypeId.Value);

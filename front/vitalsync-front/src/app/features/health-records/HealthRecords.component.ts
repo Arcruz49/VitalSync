@@ -46,6 +46,7 @@ export class HealthRecordsComponent implements OnInit {
   error = signal('');
   editingId = signal<string | null>(null);
   showForm = false;
+  sidebarOpen = false;
   expandedInsights = new Set<string>();
 
   filterMetricTypeId = '';

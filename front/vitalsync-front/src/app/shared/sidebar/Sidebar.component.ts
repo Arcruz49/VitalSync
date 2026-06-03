@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
@@ -16,7 +16,10 @@ export class SidebarComponent {
   private router = inject(Router);
 
   @Input() alertCount = 0;
-  mobileOpen = false;
+  @Input() mobileOpen = false;
+  @Output() mobileOpenChange = new EventEmitter<boolean>();
+
+  close() { this.mobileOpenChange.emit(false); }
 
   get initials(): string {
     return (this.auth.currentUser()?.name ?? '')

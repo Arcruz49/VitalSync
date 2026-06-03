@@ -37,4 +37,6 @@ public class HealthRecord
 
     [ForeignKey(nameof(MetricTypeId))]
     public MetricType MetricType { get; set; } = null!;
+    public ICollection<AIInsight> AIInsight { get; set; } = [];
+
 }

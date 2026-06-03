@@ -1,5 +1,5 @@
 <div class="page-layout">
-  <app-sidebar [alertCount]="alertCount()"></app-sidebar>
+  <app-sidebar [alertCount]="alertCount()" [(mobileOpen)]="sidebarOpen"></app-sidebar>
 
   <main class="main">
     <!-- MOBILE TOPBAR -->
@@ -173,13 +173,47 @@
               </div>
               <span class="ai-badge">IA</span>
             </div>
+
             <p class="ai-assessment">{{ latestInsight()!.overallAssessment }}</p>
-            <div class="ai-chips">
-              @for (ins of latestInsight()!.insights.slice(0, 2); track $index) {
-                <span class="ai-chip">{{ ins }}</span>
+
+            <div class="ai-insights-list">
+              @for (ins of latestInsight()!.insights.slice(0, 3); track $index) {
+                <div class="ai-insight-item">
+                  <span class="ai-insight-dot"></span>
+                  <span>{{ ins }}</span>
+                </div>
               }
             </div>
-            <p class="ai-footer">Gerado com base nas suas últimas métricas</p>
+
+            @if (latestInsight()!.tips.length > 0) {
+              <button class="ai-tips-toggle" (click)="tipsOpen = !tipsOpen">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="currentColor"/>
+                </svg>
+                {{ latestInsight()!.tips.length }} dica{{ latestInsight()!.tips.length > 1 ? 's' : '' }} para você
+                <svg class="ai-tips-chevron" [class.open]="tipsOpen" width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+              @if (tipsOpen) {
+                <div class="ai-tips-list">
+                  @for (tip of latestInsight()!.tips.slice(0, 2); track $index) {
+                    <div class="ai-tip-item">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                      <span>{{ tip }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            }
+
+            <div class="ai-footer-row">
+              <p class="ai-footer">{{ latestInsight()!.disclaimer }}</p>
+              <a routerLink="/health-records" class="ai-link">Ver registros</a>
+            </div>
           </div>
         }
 

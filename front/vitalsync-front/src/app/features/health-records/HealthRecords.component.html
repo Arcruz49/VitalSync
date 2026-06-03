@@ -1,9 +1,9 @@
 <div class="page-layout">
-  <app-sidebar></app-sidebar>
+  <app-sidebar [(mobileOpen)]="sidebarOpen"></app-sidebar>
 
   <main class="main">
     <header class="topbar">
-      <button class="hamburger">
+      <button class="hamburger" (click)="sidebarOpen = !sidebarOpen">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
@@ -185,7 +185,7 @@
                 </div>
               </div>
 
-              @if (r.insight) {
+              @if (r.aiAnalysisResult) {
                 <div class="row-insight" (click)="toggleInsight(r.id)">
                   <div class="insight-header">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
@@ -197,7 +197,7 @@
                     </svg>
                   </div>
                   @if (expandedInsights.has(r.id)) {
-                    <p class="insight-text">{{ r.insight.overallAssessment }}</p>
+                    <p class="insight-text">{{ r.aiAnalysisResult.overallAssessment }}</p>
                   }
                 </div>
               }

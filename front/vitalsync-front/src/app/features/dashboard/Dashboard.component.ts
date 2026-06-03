@@ -52,6 +52,7 @@ export class DashboardComponent implements OnInit {
   metricSummary = signal<MetricCard[]>([]);
   recentActivity = signal<any[]>([]);
   latestInsight = signal<AIAnalysisResult | null>(null);
+  tipsOpen = false;
 
   hero = computed(() => this.metricSummary()[0] ?? null);
   mediumMetrics = computed(() => this.metricSummary().slice(1, 3));
@@ -78,8 +79,9 @@ export class DashboardComponent implements OnInit {
         this.metricSummary.set(summary);
         this.alertCount.set(summary.filter(m => m.status !== 'normal').length);
         this.recentActivity.set(this.buildActivity(records, types, ranges));
-        const insightRecord = [...records].reverse().find(r => r.insight);
-        if (insightRecord?.insight) this.latestInsight.set(insightRecord.insight);
+        // records já vêm ordenados do mais recente ao mais antigo
+        const withInsight = records.find(r => r.aiAnalysisResult);
+        if (withInsight?.aiAnalysisResult) this.latestInsight.set(withInsight.aiAnalysisResult);
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
