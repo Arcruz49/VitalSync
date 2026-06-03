@@ -11,6 +11,7 @@ obj/
 
 # .NET settings with potential secrets
 appsettings.json
+appsettings.Development.json
 
 # Frontend dependencies & build output
 node_modules/
