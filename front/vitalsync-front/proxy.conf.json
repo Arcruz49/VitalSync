@@ -1,22 +1,7 @@
 {
-  "/auth": {
+  "/api": {
     "target": "http://api:8080",
-    "changeOrigin": true
-  },
-  "/metrics": {
-    "target": "http://api:8080",
-    "changeOrigin": true
-  },
-  "/health-record": {
-    "target": "http://api:8080",
-    "changeOrigin": true
-  },
-  "/profile": {
-    "target": "http://api:8080",
-    "changeOrigin": true
-  },
-  "/alerts": {
-    "target": "http://api:8080",
-    "changeOrigin": true
+    "changeOrigin": true,
+    "pathRewrite": { "^/api": "" }
   }
 }

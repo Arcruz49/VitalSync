@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
@@ -59,18 +59,7 @@ export class ProfileComponent implements OnInit {
       .split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase();
   }
 
-  heartRateZones = computed(() => {
-    const maxHr = 188;
-    return [
-      { zone: 1, label: 'Recuperação',   pct: [0.50, 0.60], color: '#059669', bg: '#F0FDF4' },
-      { zone: 2, label: 'Aeróbica base', pct: [0.60, 0.70], color: '#0D9488', bg: '#F0FDFA' },
-      { zone: 3, label: 'Aeróbica',      pct: [0.70, 0.80], color: '#D97706', bg: '#FFFBEB' },
-      { zone: 4, label: 'Limiar',        pct: [0.80, 0.90], color: '#EA580C', bg: '#FFF7ED' },
-      { zone: 5, label: 'Máximo',        pct: [0.90, 1.00], color: '#DC2626', bg: '#FEF2F2' },
-    ].map(z => ({ ...z, min: Math.round(maxHr * z.pct[0]), max: Math.round(maxHr * z.pct[1]) }));
-  });
-
-  ngOnInit() { this.load(); }
+ngOnInit() { this.load(); }
 
   load() {
     this.loading.set(true);

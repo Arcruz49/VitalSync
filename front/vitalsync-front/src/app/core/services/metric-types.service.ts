@@ -4,7 +4,7 @@ import { MetricType } from '../models/metric-type.models';
 
 @Injectable({ providedIn: 'root' })
 export class MetricTypesService {
-  private readonly base = '/metrics';
+  private readonly base = '/api/metrics';
 
   constructor(private http: HttpClient) {}
 

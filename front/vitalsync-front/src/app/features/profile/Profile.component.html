@@ -164,25 +164,7 @@
     <!-- ── SEÇÕES DEPENDENTES DO PERFIL ──────────────── -->
     @if (profile()) {
 
-      <!-- ZONAS DE FC -->
-      <div class="section">
-        <div class="section-header">
-          <span class="section-label">ZONAS DE FREQUÊNCIA CARDÍACA</span>
-        </div>
-        <div class="zones-list">
-          @for (z of heartRateZones(); track z.zone) {
-            <div class="zone-row" [style.background]="z.bg">
-              <span class="zone-name" [style.color]="z.color">Z{{ z.zone }} — {{ z.label }}</span>
-              <span class="zone-range" [style.color]="z.color">{{ z.min }}–{{ z.max }} bpm</span>
-              <div class="zone-bar-track">
-                <div class="zone-bar-fill" [style.width]="(z.zone * 20) + '%'" [style.background]="z.color"></div>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- ── SEÇÃO 2: ROTINA DE TREINO ──────────────────── -->
+<!-- ── SEÇÃO 2: ROTINA DE TREINO ──────────────────── -->
       <div class="section">
         <div class="section-header">
           <span class="section-label">ROTINA DE TREINO</span>

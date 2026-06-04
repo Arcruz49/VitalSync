@@ -5,7 +5,7 @@ import { LoginRequest, RegisterRequest, AuthResponse } from '../models/auth.mode
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly base = '/auth';
+  private readonly base = '/api/auth';
 
   currentUser = signal<{ name: string; email: string } | null>(null);
 

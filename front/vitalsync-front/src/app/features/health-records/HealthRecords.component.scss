@@ -22,19 +22,20 @@
 .btn-new {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
+  gap: 6px;
+  padding: 8px 16px;
   background: var(--accent);
   color: white;
   border: none;
   border-radius: var(--radius-md);
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: background .2s, transform .15s;
-  &:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  transition: opacity .2s, transform .15s;
+  &:hover { opacity: .85; transform: translateY(-1px); }
 }
 
 // ── FORM ──────────────────────────────────────────────
@@ -223,15 +224,19 @@
 .filter-actions { display: flex; gap: 8px; margin-left: auto; }
 
 .btn-search {
-  height: 36px; padding: 0 16px; background: var(--accent); border: none; border-radius: var(--radius-sm);
-  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: white; cursor: pointer;
-  &:hover { background: var(--accent-hover); }
+  height: 34px; padding: 0 14px;
+  background: var(--accent); border: none; border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.01em; color: white; cursor: pointer;
+  transition: opacity .2s;
+  &:hover { opacity: .85; }
 }
 
 .btn-clear {
-  height: 36px; padding: 0 12px; background: var(--bg-base); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer;
-  &:hover { background: var(--border); }
+  height: 34px; padding: 0 12px;
+  background: transparent; border: none; border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer;
+  transition: color .2s, background .2s;
+  &:hover { color: var(--text-secondary); background: var(--bg-subtle); }
 }
 
 // ── RECORDS ───────────────────────────────────────────
@@ -279,14 +284,15 @@
 .row-actions { display: flex; gap: 5px; }
 
 .action-btn {
-  width: 30px; height: 30px;
+  width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
   border: none; border-radius: var(--radius-sm); cursor: pointer;
+  background: transparent;
   opacity: 0;
-  transition: opacity .15s, background .15s;
+  transition: opacity .15s, background .15s, color .15s;
 
-  &.edit  { background: #EFF6FF; color: #3B82F6; &:hover { background: #DBEAFE; } }
-  &.delete{ background: #FEF2F2; color: var(--critical); &:hover { background: #FEE2E2; } }
+  &.edit   { color: var(--text-muted); &:hover { background: var(--bg-subtle); color: #60A5FA; } }
+  &.delete { color: var(--text-muted); &:hover { background: rgba(220,38,38,.12); color: var(--critical); } }
 }
 
 .row-insight {

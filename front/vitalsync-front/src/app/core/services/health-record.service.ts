@@ -4,7 +4,7 @@ import { HealthRecordRequest, HealthRecordResponse, SearchHealthRecordRequest } 
 
 @Injectable({ providedIn: 'root' })
 export class HealthRecordService {
-  private readonly base = '/health-record';
+  private readonly base = '/api/health-record';
 
   constructor(private http: HttpClient) {}
 

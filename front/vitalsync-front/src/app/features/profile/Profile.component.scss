@@ -113,24 +113,6 @@
 .badge-critical { color: var(--critical) !important; font-weight: 600; }
 .badge-low      { color: #60A5FA !important; font-weight: 600; }
 
-// ── ZONES ─────────────────────────────────────────────
-.zones-list { display: flex; flex-direction: column; gap: 8px; }
-
-.zone-row {
-  display: grid;
-  grid-template-columns: 1fr auto 2fr;
-  align-items: center;
-  gap: 16px;
-  padding: 11px 14px;
-  border-radius: var(--radius-md);
-}
-
-.zone-name  { font-size: 13px; font-weight: 600; }
-.zone-range { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-
-.zone-bar-track { height: 5px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; }
-.zone-bar-fill  { height: 100%; border-radius: 99px; transition: width .4s ease; }
-[data-theme="dark"] .zone-bar-track { background: rgba(255,255,255,0.08); }
 
 // ── CHIPS / TAGS ──────────────────────────────────────
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -394,7 +376,7 @@
   .goals-grid { grid-template-columns: 1fr 1fr; }
   .edit-grid, .goal-grid-sm, .conditions-grid, .meds-grid, .hours-grid { grid-template-columns: 1fr; }
   .activity-row { grid-template-columns: repeat(3, 1fr); }
-  .zone-row { grid-template-columns: 1fr auto; .zone-bar-track { display: none; } }
+
 }
 
 .topbar-actions {

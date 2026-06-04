@@ -7,6 +7,6 @@ export class AlertService {
   constructor(private http: HttpClient) {}
 
   getAll() {
-    return this.http.get<AlertResponse[]>('/alerts', { withCredentials: true });
+    return this.http.get<AlertResponse[]>('/api/alerts', { withCredentials: true });
   }
 }
