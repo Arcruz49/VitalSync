@@ -338,7 +338,7 @@
   .form-inner { grid-template-columns: 1fr; .form-left { display: none; } }
   .form-grid { grid-template-columns: 1fr; }
   .field--wide { grid-column: 1; }
-  .page-header { flex-direction: column; align-items: flex-start; .btn-new { display: none; } }
+  .page-header { flex-direction: column; align-items: flex-start; }
   .filters { flex-direction: column; align-items: stretch; }
   .filter-actions { margin-left: 0; }
   .row-actions { opacity: 1; .action-btn { opacity: 1; } }

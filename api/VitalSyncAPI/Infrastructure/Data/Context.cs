@@ -18,6 +18,7 @@ public class Context : DbContext
     public DbSet<BodyMetrics> BodyMetrics => Set<BodyMetrics>();
     public DbSet<PersonalRange> PersonalRanges => Set<PersonalRange>();
     public DbSet<AIInsight> AIInsights => Set<AIInsight>();
+    public DbSet<NutritionRecord> NutritionRecords => Set<NutritionRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
