@@ -1,7 +1,17 @@
 <aside class="sidebar" [class.open]="mobileOpen">
   <div class="sidebar-header">
     <span class="brand">VitalSync.</span>
-    <button class="theme-toggle" (click)="theme.toggle()" [title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'">
+    <div class="header-actions">
+      <a routerLink="/alerts" routerLinkActive="active" class="header-bell" title="Alertas">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        @if (alertCount > 0) {
+          <span class="header-bell-badge">{{ alertCount > 9 ? '9+' : alertCount }}</span>
+        }
+      </a>
+      <button class="theme-toggle" (click)="theme.toggle()" [title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'">
       <span class="toggle-pill" [class.dark]="theme.isDark()">
         <span class="toggle-icon sun">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -16,6 +26,7 @@
         </span>
       </span>
     </button>
+    </div>
   </div>
 
   <nav class="nav">
@@ -35,6 +46,14 @@
         <path d="M9 12h6M9 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
       Registros
+    </a>
+    <a routerLink="/nutrition" routerLinkActive="active" class="nav-item">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <path d="M18 8h1a4 4 0 010 8h-1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 1v3M10 1v3M14 1v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Nutrição
     </a>
   </nav>
 

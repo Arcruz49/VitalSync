@@ -1,0 +1,595 @@
+.content {
+  padding: 28px 32px;
+  max-width: 900px;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.date-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 70px;
+  text-align: center;
+}
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: background 0.15s;
+
+  &:hover { background: var(--accent-hover); }
+}
+
+/* ── MACRO CARDS ─────────────────────────────────────── */
+.macros-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.macro-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.macro-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.calories-icon { background: #FEF3C7; color: #D97706; }
+.protein-icon  { background: var(--accent-light); color: var(--accent); }
+.carbs-icon    { background: #DBEAFE; color: #2563EB; }
+.fat-icon      { background: #D1FAE5; color: #059669; }
+
+[data-theme="dark"] .calories-icon { background: rgba(217,119,6,0.15); color: #FCD34D; }
+[data-theme="dark"] .carbs-icon    { background: rgba(37,99,235,0.15);  color: #93C5FD; }
+[data-theme="dark"] .fat-icon      { background: rgba(5,150,105,0.15);  color: #34D399; }
+
+.macro-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.macro-name {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.macro-values {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.macro-consumed {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.macro-goal, .macro-unit {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.progress-track {
+  height: 5px;
+  background: var(--bg-subtle);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+
+  &.over   { filter: brightness(0.85); }
+  &.near   { filter: brightness(1.1); }
+}
+
+.calories-fill { background: #F59E0B; }
+.protein-fill  { background: var(--accent); }
+.carbs-fill    { background: #3B82F6; }
+.fat-fill      { background: #10B981; }
+
+.progress-fill.over.calories-fill { background: var(--critical); }
+.progress-fill.over.protein-fill  { background: var(--critical); }
+.progress-fill.over.carbs-fill    { background: var(--critical); }
+.progress-fill.over.fat-fill      { background: var(--critical); }
+
+.macro-pct {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+/* ── NO GOALS HINT ───────────────────────────────────── */
+.no-goals-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  padding: 10px 14px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* ── RECORDS SECTION ─────────────────────────────────── */
+.records-section {
+  margin-top: 28px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 48px 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--text-muted);
+
+  p { font-size: 14px; }
+}
+
+.btn-add-inline {
+  margin-top: 4px;
+  padding: 7px 16px;
+  background: var(--accent-light);
+  color: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s;
+
+  &:hover { background: var(--accent-mid); }
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.record-card {
+  padding: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s;
+
+  &:hover { box-shadow: var(--shadow-md); }
+}
+
+.record-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.meal-badge {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.record-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.record-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.confidence-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+
+  &.high   { background: var(--healthy-bg);  color: var(--healthy);  }
+  &.medium { background: var(--warning-bg);  color: var(--warning);  }
+  &.low    { background: var(--critical-bg); color: var(--critical); }
+}
+
+.delete-btn {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+
+  &:hover { color: var(--critical); background: var(--critical-bg); }
+}
+
+.food-description {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.record-macros {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.macro-pill {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.calories-pill { background: #FEF3C7; color: #92400E; }
+.protein-pill  { background: var(--accent-light); color: var(--accent); }
+.carbs-pill    { background: #DBEAFE; color: #1D4ED8; }
+.fat-pill      { background: #D1FAE5; color: #065F46; }
+
+[data-theme="dark"] .calories-pill { background: rgba(217,119,6,0.15); color: #FCD34D; }
+[data-theme="dark"] .carbs-pill    { background: rgba(37,99,235,0.15);  color: #93C5FD; }
+[data-theme="dark"] .fat-pill      { background: rgba(5,150,105,0.15);  color: #34D399; }
+
+.record-notes {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── LOADING ─────────────────────────────────────────── */
+.loading {
+  padding-top: 8px;
+}
+
+.skeleton-macros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.skeleton-card {
+  height: 100px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* ── MODAL ───────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.modal-close {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+
+  &:hover:not(:disabled) { color: var(--text-primary); background: var(--bg-subtle); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+/* ── IMAGE UPLOAD ────────────────────────────────────── */
+.upload-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 160px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover, &.dragging {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  &.has-image {
+    border-style: solid;
+    border-color: var(--border);
+    min-height: 200px;
+  }
+}
+
+.upload-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 280px;
+}
+
+.file-input {
+  display: none;
+}
+
+.image-preview {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.45);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  .upload-zone:hover & { opacity: 1; }
+}
+
+/* ── FORM FIELDS ─────────────────────────────────────── */
+.modal-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.optional {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.field-select,
+.field-input,
+.field-textarea {
+  height: 40px;
+  padding: 0 12px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13.5px;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.15s;
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  &::placeholder { color: var(--text-muted); }
+}
+
+.field-select { cursor: pointer; }
+
+.field-textarea {
+  height: auto;
+  padding: 8px 12px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* ── SUBMIT ──────────────────────────────────────────── */
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s, opacity 0.15s;
+
+  &:hover:not(:disabled) { background: var(--accent-hover); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .content {
+    padding: 20px 16px;
+  }
+
+  .macros-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .macros-grid {
+    grid-template-columns: 1fr;
+  }
+}

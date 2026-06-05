@@ -42,6 +42,11 @@ export const routes: Routes = [
         data: { title: 'Alertas' },
         loadComponent: () => import('./features/alerts/Alerts.component').then(m => m.AlertsComponent)
       },
+      {
+        path: 'nutrition',
+        data: { title: 'Nutrição' },
+        loadComponent: () => import('./features/nutrition/Nutrition.component').then(m => m.NutritionComponent)
+      },
     ]
   },
   { path: '**', redirectTo: 'login' }

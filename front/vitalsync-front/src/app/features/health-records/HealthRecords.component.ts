@@ -8,6 +8,12 @@ import { ProfileService } from '../../core/services/profile.service';
 import { HealthRecordResponse } from '../../core/models/health-record.models';
 import { MetricType } from '../../core/models/metric-type.models';
 import { PersonalRangeResponse } from '../../core/models/profile.models';
+import {
+  isoToDisplayDateTime,
+  isoToPickerDateTime,
+  pickerDateToISO,
+  pickerDateTimeToISO,
+} from '../../core/utils/date.utils';
 
 const METRIC_COLORS: Record<number, { color: string; bg: string }> = {
   1:  { color: '#EF4444', bg: '#FEE2E2' },
@@ -83,8 +89,8 @@ export class HealthRecordsComponent implements OnInit {
     this.loading.set(true);
     const filters: any = {};
     if (this.filterMetricTypeId) filters.metricTypeId = +this.filterMetricTypeId;
-    if (this.filterFrom) filters.from = new Date(this.filterFrom).toISOString();
-    if (this.filterTo) filters.to = new Date(this.filterTo).toISOString();
+    if (this.filterFrom) { const iso = pickerDateToISO(this.filterFrom); if (iso) filters.from = iso; }
+    if (this.filterTo)   { const iso = pickerDateToISO(this.filterTo);   if (iso) filters.to   = iso; }
 
     this.hrService.getAll(filters).subscribe({
       next: data => { this.records.set(data); this.loading.set(false); },
@@ -108,7 +114,7 @@ export class HealthRecordsComponent implements OnInit {
     const req = {
       metricTypeId: +this.form.metricTypeId,
       value: +this.form.value,
-      measuredAt: new Date(this.form.measuredAt).toISOString(),
+      measuredAt: pickerDateTimeToISO(this.form.measuredAt),
       notes: this.form.notes || null,
     };
 
@@ -125,7 +131,12 @@ export class HealthRecordsComponent implements OnInit {
   startEdit(r: HealthRecordResponse) {
     this.editingId.set(r.id);
     this.showForm = true;
-    this.form = { metricTypeId: r.metricTypeId, value: r.value, measuredAt: r.measuredAt.slice(0, 16), notes: r.notes ?? '' };
+    this.form = {
+      metricTypeId: r.metricTypeId,
+      value: r.value,
+      measuredAt: isoToPickerDateTime(r.measuredAt),
+      notes: r.notes ?? '',
+    };
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -145,7 +156,7 @@ export class HealthRecordsComponent implements OnInit {
   }
 
   formatDate(iso: string) {
-    return new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return isoToDisplayDateTime(iso);
   }
 
   getColor(id: number): string { return (METRIC_COLORS[id] ?? { color: '#6366F1' }).color; }

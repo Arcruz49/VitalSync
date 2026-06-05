@@ -11,8 +11,8 @@ public class GetNutritionSummaryUseCase(
 {
     public async Task<NutritionSummaryResponse> ExecuteAsync(Guid userId, DateTime date)
     {
-        var from = date.Date;
-        var to = date.Date.AddDays(1).AddTicks(-1);
+        var from = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+        var to = DateTime.SpecifyKind(date.Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc);
 
         var records = await nutritionRecordRepository.GetByUserId(userId, from, to);
         var metrics = await bodyMetricsRepository.GetLatestByUserId(userId);

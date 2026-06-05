@@ -1,0 +1,302 @@
+<div class="content">
+
+  <!-- Date nav + add button -->
+  <div class="top-bar">
+    <div class="date-nav">
+      <button class="nav-btn" (click)="changeDate(-1)" title="Dia anterior">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="date-label">{{ dateLabel() }}</span>
+      <button class="nav-btn" (click)="changeDate(1)" [disabled]="isToday()" title="Próximo dia">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <button class="btn-add" (click)="openModal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      Registrar refeição
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="skeleton-macros">
+        @for (_ of [1,2,3,4]; track $index) {
+          <div class="skeleton-card"></div>
+        }
+      </div>
+    </div>
+  } @else {
+
+    <!-- Macro summary -->
+    @if (summary(); as s) {
+      <div class="macros-grid">
+
+        <div class="macro-card">
+          <div class="macro-icon calories-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <!-- Chama principal com silhueta curvada -->
+              <path d="M11 3C9 8.5 6 10.5 6 14.5a6 6 0 0012 0c0-2.5-1.2-5-2.5-6.5C15 10 14 12 14 12S13 7 11 3z"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Núcleo quente interno -->
+              <path d="M12 12c-.6 1.5-1.5 2.5-1.5 3.8a1.5 1.5 0 003 0c0-1.3-1.5-3.8-1.5-3.8z"
+                    fill="currentColor" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="macro-info">
+            <span class="macro-name">Calorias</span>
+            <div class="macro-values">
+              <span class="macro-consumed">{{ s.totalCaloriesKcal | number:'1.0-0' }}</span>
+              @if (s.calorieGoal > 0) {
+                <span class="macro-goal">/ {{ s.calorieGoal | number:'1.0-0' }} kcal</span>
+              } @else {
+                <span class="macro-unit">kcal</span>
+              }
+            </div>
+            @if (s.calorieGoal > 0) {
+              <div class="progress-track">
+                <div class="progress-fill calories-fill {{ progressClass(s.totalCaloriesKcal, s.calorieGoal) }}"
+                     [style.width.%]="progress(s.totalCaloriesKcal, s.calorieGoal)"></div>
+              </div>
+              <span class="macro-pct">{{ progress(s.totalCaloriesKcal, s.calorieGoal) | number:'1.0-0' }}%</span>
+            }
+          </div>
+        </div>
+
+        <div class="macro-card">
+          <div class="macro-icon protein-icon">
+            <svg width="24" height="24" viewBox="0 0 290.625 290.625" fill="currentColor">
+              <path d="M264.595,197.367c-5.658-2.831-7.434-8.663-10.331-19.584c-3.909-14.756-9.248-34.72-31.875-56.353c4.28-6.22,9.366-12.886,15.511-19.908l1.163-1.322v-1.762c0-0.9-0.15-1.683-0.211-2.536L259.753,75h7.434c15.553,0,23.438-7.889,23.438-23.438c0-10.13-7.917-16.167-14.498-18.08c-1.481-6.956-6.858-14.733-18.314-14.733c-15.553,0-23.438,7.889-23.438,23.438V54.31l-20.363,20.362c-2.273,0.098-3.82,0.389-3.994,0.422l-1.392,0.281l-1.003,1.003c-10.317,10.317-20.63,17.194-29.841,21.853c-4.753-1.12-20.128-4.481-32.47-4.481C62.4,93.75,0,162,0,206.25c0,64.875,74.25,65.625,75,65.625h103.125c27.938,0,56.827,0,76.139-4.828c16.87-4.219,31.673-21.675,31.673-37.359C285.938,216.131,277.959,204.052,264.595,197.367z M243.75,58.191V42.188c0-10.383,3.68-14.063,14.063-14.063c8.564,0,9.342,7.2,9.375,9.375v4.688h4.688c2.259,0,9.375,2.822,9.375,9.375c0,10.383-3.68,14.063-14.063,14.063h-11.316l-19.847,19.847c-1.209-2.222-2.667-4.233-4.617-5.827c-1.819-1.491-3.811-2.541-5.817-3.295L243.75,58.191z M213.127,84.113c2.573-0.253,8.438-0.422,12.337,2.78c2.498,2.053,3.9,5.362,4.177,9.853c-32.217,37.364-37.191,65.358-37.387,66.548l-0.066,0.769c0,25.847-21.028,46.875-46.875,46.875c-25.847,0-46.875-21.028-46.875-46.875s21.028-46.875,46.875-46.875C146.714,117.188,179.709,116.808,213.127,84.113z M251.986,257.953c-18.188,4.547-46.491,4.547-73.861,4.547H75c-2.681,0-65.625-0.642-65.625-56.25c0-40.725,60.9-103.125,135.938-103.125c5.227,0,11.198,0.698,16.547,1.542c-9.909,3-16.411,3.145-16.547,3.145c-31.017,0-56.25,25.233-56.25,56.25c0,31.017,25.233,56.25,56.25,56.25c30.863,0,56.002-24.984,56.25-55.791c0.464-2.227,3.652-15.689,15.623-35.119c19.673,19.317,24.281,36.67,28.022,50.789c2.944,11.114,5.489,20.714,15.197,25.566c4.856,2.428,16.158,9.619,16.158,23.93C276.563,241.266,264.848,254.738,251.986,257.953z"/>
+              <path d="M242.269,239.306c-12.305,4.102-31.486,4.444-50.081,4.444v9.375c19.364,0,39.413-0.38,53.044-4.927c10.814-3.6,17.269-12.272,17.269-23.198h-9.375C253.125,231.896,249.272,236.972,242.269,239.306z"/>
+              <rect x="164.063" y="243.75" width="14.063" height="9.375"/>
+              <path d="M107.813,164.063h9.375c0-15.511,12.614-28.125,28.125-28.125v-9.375C124.636,126.563,107.813,143.386,107.813,164.063z"/>
+            </svg>
+          </div>
+          <div class="macro-info">
+            <span class="macro-name">Proteína</span>
+            <div class="macro-values">
+              <span class="macro-consumed">{{ s.totalProteinG | number:'1.0-1' }}</span>
+              @if (s.proteinGoalG > 0) {
+                <span class="macro-goal">/ {{ s.proteinGoalG | number:'1.0-0' }} g</span>
+              } @else {
+                <span class="macro-unit">g</span>
+              }
+            </div>
+            @if (s.proteinGoalG > 0) {
+              <div class="progress-track">
+                <div class="progress-fill protein-fill {{ progressClass(s.totalProteinG, s.proteinGoalG) }}"
+                     [style.width.%]="progress(s.totalProteinG, s.proteinGoalG)"></div>
+              </div>
+              <span class="macro-pct">{{ progress(s.totalProteinG, s.proteinGoalG) | number:'1.0-0' }}%</span>
+            }
+          </div>
+        </div>
+
+        <div class="macro-card">
+          <div class="macro-icon carbs-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L4 13.5h7L9.5 22 20 10.5h-7L13 2z"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="macro-info">
+            <span class="macro-name">Carboidratos</span>
+            <div class="macro-values">
+              <span class="macro-consumed">{{ s.totalCarbsG | number:'1.0-1' }}</span>
+              @if (s.carbsGoalG > 0) {
+                <span class="macro-goal">/ {{ s.carbsGoalG | number:'1.0-0' }} g</span>
+              } @else {
+                <span class="macro-unit">g</span>
+              }
+            </div>
+            @if (s.carbsGoalG > 0) {
+              <div class="progress-track">
+                <div class="progress-fill carbs-fill {{ progressClass(s.totalCarbsG, s.carbsGoalG) }}"
+                     [style.width.%]="progress(s.totalCarbsG, s.carbsGoalG)"></div>
+              </div>
+              <span class="macro-pct">{{ progress(s.totalCarbsG, s.carbsGoalG) | number:'1.0-0' }}%</span>
+            }
+          </div>
+        </div>
+
+        <div class="macro-card">
+          <div class="macro-icon fat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <!-- Gota — mesmo shape do ícone de calorias -->
+              <path d="M12 3C12 3 6 10 6 15a6 6 0 0012 0C18 10 12 3 12 3z"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 13c0 0-2 2.5-2 3.5a2 2 0 004 0c0-1-2-3.5-2-3.5z"
+                    fill="currentColor" opacity="0.45"/>
+            </svg>
+          </div>
+          <div class="macro-info">
+            <span class="macro-name">Gordura</span>
+            <div class="macro-values">
+              <span class="macro-consumed">{{ s.totalFatG | number:'1.0-1' }}</span>
+              @if (s.fatGoalG > 0) {
+                <span class="macro-goal">/ {{ s.fatGoalG | number:'1.0-0' }} g</span>
+              } @else {
+                <span class="macro-unit">g</span>
+              }
+            </div>
+            @if (s.fatGoalG > 0) {
+              <div class="progress-track">
+                <div class="progress-fill fat-fill {{ progressClass(s.totalFatG, s.fatGoalG) }}"
+                     [style.width.%]="progress(s.totalFatG, s.fatGoalG)"></div>
+              </div>
+              <span class="macro-pct">{{ progress(s.totalFatG, s.fatGoalG) | number:'1.0-0' }}%</span>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- No goals hint -->
+      @if (!s.calorieGoal) {
+        <p class="no-goals-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Complete seu perfil para ver o progresso em relação às suas metas.
+        </p>
+      }
+
+      <!-- Records list -->
+      <div class="records-section">
+        <h3 class="section-title">Refeições do dia</h3>
+
+        @if (s.records.length === 0) {
+          <div class="empty">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+              <path d="M18 8h1a4 4 0 010 8h-1" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6 1v3M10 1v3M14 1v3" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <p>Nenhuma refeição registrada.</p>
+            <button class="btn-add-inline" (click)="openModal()">Registrar primeira refeição</button>
+          </div>
+        } @else {
+          <div class="record-list">
+            @for (r of s.records; track r.id) {
+              <div class="record-card">
+                <div class="record-header">
+                  <span class="meal-badge">{{ mealLabel(r.mealType) }}</span>
+                  <div class="record-meta">
+                    <span class="record-time">{{ formatTime(r.measuredAt) }}</span>
+                    <span class="confidence-badge {{ confidenceClass(r.confidence) }}" [title]="confidenceLabel(r.confidence)">
+                      {{ (r.confidence * 100) | number:'1.0-0' }}% IA
+                    </span>
+                    <button class="delete-btn" (click)="deleteRecord(r.id)" title="Excluir registro">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 6V4h6v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <p class="food-description">{{ r.foodDescription }}</p>
+                <div class="record-macros">
+                  <span class="macro-pill calories-pill">{{ r.caloriesKcal | number:'1.0-0' }} kcal</span>
+                  <span class="macro-pill protein-pill">P {{ r.proteinG | number:'1.0-1' }}g</span>
+                  <span class="macro-pill carbs-pill">C {{ r.carbsG | number:'1.0-1' }}g</span>
+                  <span class="macro-pill fat-pill">G {{ r.fatG | number:'1.0-1' }}g</span>
+                </div>
+                @if (r.notes) {
+                  <p class="record-notes">{{ r.notes }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>Registrar refeição</h2>
+        <button class="modal-close" (click)="closeModal()" [disabled]="submitting()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Image upload -->
+      <div class="upload-zone" [class.has-image]="form.imagePreview" [class.dragging]="dragging()"
+           (click)="fileInput.click()" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragleave)="onDragLeave()">
+        @if (form.imagePreview) {
+          <img [src]="form.imagePreview" class="image-preview" alt="Pré-visualização da refeição"/>
+          <div class="image-overlay">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <polyline points="17 8 12 3 7 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="12" y1="3" x2="12" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Trocar imagem
+          </div>
+        } @else {
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="var(--text-muted)" stroke-width="1.5"/>
+            <circle cx="8.5" cy="8.5" r="1.5" stroke="var(--text-muted)" stroke-width="1.5"/>
+            <path d="M21 15l-5-5L5 21" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="upload-label">Clique ou arraste uma foto da refeição</p>
+          <p class="upload-hint">A IA irá identificar os alimentos e calcular os macronutrientes</p>
+        }
+        <input #fileInput type="file" accept="image/*" class="file-input" (change)="onFileChange($event)"/>
+      </div>
+
+      <div class="modal-fields">
+
+        <div class="field-group">
+          <label class="field-label">Tipo de refeição</label>
+          <select class="field-select" [(ngModel)]="form.mealType" name="mealType">
+            @for (m of mealTypes; track m.id) {
+              <option [ngValue]="m.id">{{ m.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Data e hora</label>
+          <input class="field-input" type="datetime-local" [(ngModel)]="form.measuredAt" name="measuredAt" />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Observações <span class="optional">(opcional)</span></label>
+          <textarea class="field-textarea" [(ngModel)]="form.notes" name="notes"
+                    placeholder="Ex: sem sal, porção extra..." rows="2"></textarea>
+        </div>
+
+      </div>
+
+      <button class="btn-submit" (click)="submit()" [disabled]="submitting() || !form.imageBase64">
+        @if (submitting()) {
+          <span class="spinner"></span>
+          Analisando com IA...
+        } @else {
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 0v4m0 14v-4m-7-7H2m20 0h-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Analisar e registrar
+        }
+      </button>
+
+    </div>
+  </div>
+}
