@@ -138,3 +138,10 @@ input, textarea, select { font-family: inherit; }
   background: var(--bg-surface);
   border-color: var(--text-primary);
 }
+
+/* ── VIEW TRANSITIONS (theme toggle ripple) ──────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

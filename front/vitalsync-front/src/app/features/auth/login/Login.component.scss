@@ -104,9 +104,10 @@
 }
 
 .theme-toggle-float {
-  position: absolute;
+  position: fixed;
   top: 20px;
   right: 20px;
+  z-index: 100;
 }
 
 .theme-pill {
@@ -278,6 +279,7 @@
   margin-bottom: 20px;
 
   &:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
+  &:active:not(:disabled) { transform: scale(0.98); }
   &:disabled { opacity: 0.7; cursor: not-allowed; }
 }
 
@@ -323,6 +325,7 @@
 .link-accent {
   color: var(--accent);
   font-weight: 600;
+  cursor: pointer;
   &:hover { text-decoration: underline; }
 }
 
@@ -332,4 +335,34 @@
   .auth-layout { grid-template-columns: 1fr; }
   .auth-left { display: none; }
   .auth-right { padding: 24px 20px; align-items: flex-start; padding-top: 60px; }
+}
+
+// ── PANEL ANIMATIONS ──────────────────────────────────
+.auth-left {
+  animation: panelFromLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.auth-right {
+  animation: panelFromRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+.auth-layout.exiting {
+  .auth-left { animation: panelToRight 0.4s cubic-bezier(0.55, 0, 1, 0.45) both; }
+  .auth-right { animation: panelToLeft 0.4s cubic-bezier(0.55, 0, 1, 0.45) both; }
+}
+
+@keyframes panelFromLeft {
+  from { transform: translateX(-100vw); }
+  to   { transform: translateX(0); }
+}
+@keyframes panelFromRight {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(0); }
+}
+@keyframes panelToRight {
+  from { transform: translateX(0); }
+  to   { transform: translateX(110vw); }
+}
+@keyframes panelToLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-110vw); }
 }

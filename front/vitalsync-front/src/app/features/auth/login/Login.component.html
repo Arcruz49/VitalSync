@@ -1,4 +1,4 @@
-<div class="auth-layout">
+<div class="auth-layout" [class.exiting]="isExiting">
   <!-- LEFT PANEL -->
   <div class="auth-left">
     <div class="auth-brand">VitalSync.</div>
@@ -23,7 +23,7 @@
   <!-- RIGHT PANEL -->
   <div class="auth-right">
     <div class="theme-toggle-float">
-      <button class="theme-pill" (click)="toggleTheme()" [title]="isDark() ? 'Modo claro' : 'Modo escuro'">
+      <button class="theme-pill" (click)="toggleTheme($event)" [title]="isDark() ? 'Modo claro' : 'Modo escuro'">
         <span class="tpill" [class.dark]="isDark()">
           <span class="ticon sun">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
@@ -83,7 +83,7 @@
 
       <div class="divider"><span>ou</span></div>
 
-      <p class="switch-text">Não tem conta? <a routerLink="/register" class="link-accent">Criar conta</a></p>
+      <p class="switch-text">Não tem conta? <a (click)="navigateToRegister()" class="link-accent">Criar conta</a></p>
     </div>
   </div>
 </div>

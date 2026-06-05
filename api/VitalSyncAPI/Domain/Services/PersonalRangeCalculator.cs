@@ -101,7 +101,7 @@ public static class PersonalRangeCalculator
             return (80, 130, RangeMethod.ConditionBased);
 
         // Pré-diabetes
-        if (conditionIds.Contains(4))
+        if (conditionIds.Contains(4) || conditionIds.Contains(17))
             return (70, 110, RangeMethod.ConditionBased);
 
         return (70, 99, RangeMethod.Default);

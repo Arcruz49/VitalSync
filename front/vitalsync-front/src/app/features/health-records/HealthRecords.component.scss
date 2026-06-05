@@ -204,18 +204,48 @@
   align-items: center;
   gap: 8px;
 
-  input[type="date"] {
-    height: 36px;
-    padding: 0 10px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: var(--text-primary);
-    background: var(--bg-base);
-    outline: none;
-    transition: border-color .2s;
-    &:focus { border-color: var(--accent); }
+  .date-wrap {
+    position: relative;
+
+    input[type="text"] {
+      height: 36px;
+      padding: 0 32px 0 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--bg-base);
+      outline: none;
+      transition: border-color .2s;
+      width: 130px;
+      cursor: pointer;
+      pointer-events: none;
+      &::placeholder { color: var(--text-muted); }
+    }
+
+    input[type="date"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .date-icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    &:focus-within input[type="text"] { border-color: var(--accent); }
+    &:focus-within .date-icon { color: var(--accent); }
   }
 
   span { color: var(--text-muted); font-size: 12px; }

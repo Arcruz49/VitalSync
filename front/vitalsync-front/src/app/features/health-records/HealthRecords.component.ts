@@ -56,6 +56,14 @@ export class HealthRecordsComponent implements OnInit {
   filterMetricTypeId = '';
   filterFrom = '';
   filterTo = '';
+  filterFromDisplay = '';
+  filterToDisplay = '';
+
+  updateFilterDisplay(which: 'from' | 'to', ymd: string) {
+    const formatted = ymd ? (() => { const [y, m, d] = ymd.split('-'); return `${d}/${m}/${y}`; })() : '';
+    if (which === 'from') this.filterFromDisplay = formatted;
+    else this.filterToDisplay = formatted;
+  }
 
   form: { metricTypeId: any; value: any; measuredAt: string; notes: string } =
     { metricTypeId: '', value: '', measuredAt: '', notes: '' };
@@ -100,6 +108,7 @@ export class HealthRecordsComponent implements OnInit {
 
   clearFilters() {
     this.filterMetricTypeId = ''; this.filterFrom = ''; this.filterTo = '';
+    this.filterFromDisplay = ''; this.filterToDisplay = '';
     this.load();
   }
 

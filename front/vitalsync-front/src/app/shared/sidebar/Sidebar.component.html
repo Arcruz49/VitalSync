@@ -11,7 +11,7 @@
           <span class="header-bell-badge">{{ alertCount > 9 ? '9+' : alertCount }}</span>
         }
       </a>
-      <button class="theme-toggle" (click)="theme.toggle()" [title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'">
+      <button class="theme-toggle" (click)="toggleTheme($event)" [title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'">
       <span class="toggle-pill" [class.dark]="theme.isDark()">
         <span class="toggle-icon sun">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none">

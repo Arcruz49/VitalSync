@@ -21,6 +21,25 @@ export class SidebarComponent {
 
   close() { this.mobileOpenChange.emit(false); }
 
+  toggleTheme(event: MouseEvent) {
+    if (typeof document === 'undefined' || !('startViewTransition' in document)) {
+      this.theme.toggle();
+      return;
+    }
+    const btn = event.currentTarget as HTMLElement;
+    const { left, top, width, height } = btn.getBoundingClientRect();
+    const x = left + width / 2;
+    const y = top + height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const vt = (document as any).startViewTransition(() => this.theme.toggle());
+    vt.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 450, easing: 'ease-out', pseudoElement: '::view-transition-new(root)' }
+      );
+    });
+  }
+
   get initials(): string {
     return (this.auth.currentUser()?.name ?? '')
       .split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase();

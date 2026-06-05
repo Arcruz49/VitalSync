@@ -94,6 +94,7 @@ export const HEALTH_CONDITIONS: HealthCondition[] = [
   { id: 14, name: 'Ansiedade' },
   { id: 15, name: 'Depressão' },
   { id: 16, name: 'Fibromialgia' },
+  { id: 17, name: 'Ovário policístico' },
 ];
 
 export const MEDICATION_CLASSES = [

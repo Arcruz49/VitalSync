@@ -60,7 +60,9 @@ public class Context : DbContext
             new HealthCondition { Id = 13, Name = "Apneia do sono" },
             new HealthCondition { Id = 14, Name = "Ansiedade" },
             new HealthCondition { Id = 15, Name = "Depressão" },
-            new HealthCondition { Id = 16, Name = "Fibromialgia" }
+            new HealthCondition { Id = 16, Name = "Fibromialgia" },
+            new HealthCondition { Id = 17, Name = "Síndrome do Ovário Policístico (SOP)" }
+
         );
     }
 }
