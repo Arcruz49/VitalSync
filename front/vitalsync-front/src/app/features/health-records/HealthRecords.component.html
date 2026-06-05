@@ -207,3 +207,21 @@
     </div>
   }
 </div>
+
+@if (pendingDeleteId()) {
+  <div class="confirm-overlay" (click)="cancelDelete()">
+    <div class="confirm-dialog" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="confirm-title">Excluir registro?</p>
+      <p class="confirm-sub">Esta ação não pode ser desfeita.</p>
+      <div class="confirm-actions">
+        <button class="confirm-cancel" (click)="cancelDelete()">Cancelar</button>
+        <button class="confirm-ok" (click)="confirmDelete()">Excluir</button>
+      </div>
+    </div>
+  </div>
+}

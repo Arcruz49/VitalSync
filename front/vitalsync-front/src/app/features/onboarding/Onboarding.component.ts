@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { trigger, transition, style, animate, group, query } from '@angular/animations';
 import { ProfileService } from '../../core/services/profile.service';
 import {
   HEALTH_CONDITIONS, MEDICATION_CLASSES, ACTIVITY_LEVELS, HEALTH_GOALS,
@@ -14,6 +15,34 @@ import {
   imports: [FormsModule],
   templateUrl: './Onboarding.component.html',
   styleUrl: './Onboarding.component.scss',
+  animations: [
+    trigger('stepTransition', [
+      transition(':increment', [
+        group([
+          query(':leave', [
+            style({ position: 'absolute', top: 0, left: 0, right: 0 }),
+            animate('180ms ease-in', style({ opacity: 0, transform: 'translateX(-32px)' }))
+          ], { optional: true }),
+          query(':enter', [
+            style({ opacity: 0, transform: 'translateX(40px)' }),
+            animate('350ms 60ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'translateX(0)' }))
+          ], { optional: true }),
+        ])
+      ]),
+      transition(':decrement', [
+        group([
+          query(':leave', [
+            style({ position: 'absolute', top: 0, left: 0, right: 0 }),
+            animate('180ms ease-in', style({ opacity: 0, transform: 'translateX(32px)' }))
+          ], { optional: true }),
+          query(':enter', [
+            style({ opacity: 0, transform: 'translateX(-40px)' }),
+            animate('350ms 60ms cubic-bezier(0.16, 1, 0.3, 1)', style({ opacity: 1, transform: 'translateX(0)' }))
+          ], { optional: true }),
+        ])
+      ]),
+    ])
+  ]
 })
 export class OnboardingComponent {
   private profileService = inject(ProfileService);
@@ -61,8 +90,16 @@ export class OnboardingComponent {
   }
 
   toggleMed(id: number) {
-    if (this.selectedMedications.has(id)) this.selectedMedications.delete(id);
-    else this.selectedMedications.add(id);
+    if (this.selectedMedications.has(id)) {
+      this.selectedMedications.delete(id);
+      return;
+    }
+    if (id === 0) {
+      this.selectedMedications.clear();
+    } else {
+      this.selectedMedications.delete(0);
+    }
+    this.selectedMedications.add(id);
   }
 
   next() {

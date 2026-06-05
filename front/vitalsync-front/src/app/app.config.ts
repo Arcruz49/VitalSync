@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { isPlatformBrowser } from '@angular/common';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 import { routes } from './app.routes';
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptors([errorInterceptor])),
     provideClientHydration(withEventReplay()),
+    provideAnimations(),
     {
       provide: APP_INITIALIZER,
       useFactory: initApp,

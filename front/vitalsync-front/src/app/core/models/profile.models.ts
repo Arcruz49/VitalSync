@@ -98,31 +98,31 @@ export const HEALTH_CONDITIONS: HealthCondition[] = [
 ];
 
 export const MEDICATION_CLASSES = [
-  { id: 0, name: 'Nenhum', description: 'Não uso medicamentos regularmente' },
-  { id: 1, name: 'Beta-bloqueadores', description: 'Reduz frequência cardíaca em repouso' },
-  { id: 2, name: 'Anti-hipertensivos', description: 'Controla pressão arterial' },
-  { id: 3, name: 'Insulina / Antidiabéticos', description: 'Controla glicemia' },
-  { id: 4, name: 'Corticoides', description: 'Pode elevar glicemia e pressão' },
-  { id: 5, name: 'Antidepressivos / Ansiolíticos', description: 'Impacta humor e sono' },
-  { id: 6, name: 'Hormônios tireoidianos', description: 'Afeta metabolismo e FC' },
-  { id: 7, name: 'Diuréticos', description: 'Afeta peso e pressão' },
+  { id: 0, apiKey: 'None',                       name: 'Nenhum',                       description: 'Não uso medicamentos regularmente' },
+  { id: 1, apiKey: 'BetaBlockers',               name: 'Beta-bloqueadores',             description: 'Reduz frequência cardíaca em repouso' },
+  { id: 2, apiKey: 'Antihypertensives',          name: 'Anti-hipertensivos',            description: 'Controla pressão arterial' },
+  { id: 3, apiKey: 'InsulinAntidiabetics',       name: 'Insulina / Antidiabéticos',     description: 'Controla glicemia' },
+  { id: 4, apiKey: 'Corticosteroids',            name: 'Corticoides',                   description: 'Pode elevar glicemia e pressão' },
+  { id: 5, apiKey: 'AntidepressantsAnxiolytics', name: 'Antidepressivos / Ansiolíticos', description: 'Impacta humor e sono' },
+  { id: 6, apiKey: 'ThyroidHormones',            name: 'Hormônios tireoidianos',        description: 'Afeta metabolismo e FC' },
+  { id: 7, apiKey: 'Diuretics',                  name: 'Diuréticos',                    description: 'Afeta peso e pressão' },
 ];
 
 export const ACTIVITY_LEVELS = [
-  { id: 1, name: 'Sedentário', description: 'Pouca ou nenhuma atividade' },
-  { id: 2, name: 'Leve', description: 'Exercício leve 1–3 dias/semana' },
-  { id: 3, name: 'Moderado', description: 'Exercício moderado 3–5 dias/semana' },
-  { id: 4, name: 'Ativo', description: 'Exercício intenso 6–7 dias/semana' },
-  { id: 5, name: 'Intenso', description: 'Atleta ou trabalho físico pesado' },
+  { id: 1, apiKey: 'Sedentary',        name: 'Sedentário', description: 'Pouca ou nenhuma atividade' },
+  { id: 2, apiKey: 'LightlyActive',    name: 'Leve',       description: 'Exercício leve 1–3 dias/semana' },
+  { id: 3, apiKey: 'ModeratelyActive', name: 'Moderado',   description: 'Exercício moderado 3–5 dias/semana' },
+  { id: 4, apiKey: 'VeryActive',       name: 'Ativo',      description: 'Exercício intenso 6–7 dias/semana' },
+  { id: 5, apiKey: 'ExtremelyActive',  name: 'Intenso',    description: 'Atleta ou trabalho físico pesado' },
 ];
 
 export const HEALTH_GOALS = [
-  { id: 1, name: 'Perda de peso', description: 'Reduzir gordura corporal' },
-  { id: 2, name: 'Ganho de massa', description: 'Aumentar músculo' },
-  { id: 3, name: 'Manutenção', description: 'Manter peso atual' },
-  { id: 4, name: 'Condicionamento', description: 'Melhorar performance' },
-  { id: 5, name: 'Condição crônica', description: 'Controlar doença' },
-  { id: 6, name: 'Saúde geral', description: 'Melhorar bem-estar' },
+  { id: 1, apiKey: 'WeightLoss',              name: 'Perda de peso',    description: 'Reduzir gordura corporal' },
+  { id: 2, apiKey: 'MuscleGain',              name: 'Ganho de massa',   description: 'Aumentar músculo' },
+  { id: 3, apiKey: 'Maintenance',             name: 'Manutenção',       description: 'Manter peso atual' },
+  { id: 4, apiKey: 'Conditioning',            name: 'Condicionamento',  description: 'Melhorar performance' },
+  { id: 5, apiKey: 'ChronicConditionControl', name: 'Condição crônica', description: 'Controlar doença' },
+  { id: 6, apiKey: 'GeneralHealth',           name: 'Saúde geral',      description: 'Melhorar bem-estar' },
 ];
 
 export const TRAINING_TYPES = [
@@ -130,8 +130,8 @@ export const TRAINING_TYPES = [
 ];
 
 export const HOURS_SEATED = [
-  { id: 1, label: '< 4h' },
-  { id: 2, label: '4–6h' },
-  { id: 3, label: '6–8h' },
-  { id: 4, label: '> 8h' },
+  { id: 1, apiKey: 'LessThan4',    label: '< 4h' },
+  { id: 2, apiKey: 'Between4And6', label: '4–6h' },
+  { id: 3, apiKey: 'Between6And8', label: '6–8h' },
+  { id: 4, apiKey: 'MoreThan8',    label: '> 8h' },
 ];

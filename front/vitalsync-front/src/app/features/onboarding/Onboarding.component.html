@@ -5,11 +5,11 @@
   </div>
   <div class="step-label">Etapa {{ step }} de 4 — {{ stepNames[step - 1] }}</div>
 
-  <div class="ob-content">
+  <div class="ob-content" [@stepTransition]="step">
 
     <!-- STEP 1: DADOS FÍSICOS -->
     @if (step === 1) {
-      <div class="step-card" @slideIn>
+      <div class="step-card">
         <h1 class="step-title">Sobre você</h1>
         <p class="step-sub">Usamos para calcular suas metas personalizadas.</p>
 
@@ -71,7 +71,7 @@
 
     <!-- STEP 2: ROTINA -->
     @if (step === 2) {
-      <div class="step-card" @slideIn>
+      <div class="step-card">
         <h1 class="step-title">Como é sua semana?</h1>
         <p class="step-sub">Usamos isso para calcular seu gasto energético real.</p>
 
@@ -125,7 +125,7 @@
 
     <!-- STEP 3: CONDIÇÕES -->
     @if (step === 3) {
-      <div class="step-card" @slideIn>
+      <div class="step-card">
         <h1 class="step-title">Histórico de saúde</h1>
         <p class="step-sub">Personalizamos suas faixas de normalidade com base nisso.</p>
 
@@ -146,7 +146,7 @@
 
     <!-- STEP 4: MEDICAMENTOS -->
     @if (step === 4) {
-      <div class="step-card" @slideIn>
+      <div class="step-card">
         <h1 class="step-title">Medicamentos em uso</h1>
         <p class="step-sub">Alguns medicamentos afetam a interpretação das suas métricas.</p>
 

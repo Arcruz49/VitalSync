@@ -94,8 +94,8 @@ ngOnInit() { this.load(); }
       heightCm: p?.heightCm ?? null,
       targetWeightKg: p?.targetWeightKg ?? null,
       waistCircumferenceCm: p?.waistCircumferenceCm ?? null,
-      activityLevel: p ? (ACTIVITY_LEVELS.find(a => a.name === p.activityLevel)?.id ?? 0) : 0,
-      goal: p ? (HEALTH_GOALS.find(g => g.name === p.goal)?.id ?? 0) : 0,
+      activityLevel: p ? (ACTIVITY_LEVELS.find(a => a.apiKey === p.activityLevel)?.id ?? 0) : 0,
+      goal: p ? (HEALTH_GOALS.find(g => g.apiKey === p.goal)?.id ?? 0) : 0,
     };
   }
 
@@ -132,7 +132,7 @@ ngOnInit() { this.load(); }
       goal: this.pfPhysical.goal,
       trainingFrequencyDays: cur?.trainingFrequencyDays ?? 3,
       trainingTypes: cur?.trainingTypes ?? [],
-      hoursSeated: cur ? (HOURS_SEATED.find(h => h.label === cur.hoursSeated)?.id ?? 2) : 2,
+      hoursSeated: cur ? (HOURS_SEATED.find(h => h.apiKey === cur.hoursSeated)?.id ?? 2) : 2,
       habitualSleepHours: cur?.habitualSleepHours ?? 7,
       sleepQuality: cur?.sleepQuality ?? 3,
     }).subscribe({
@@ -156,7 +156,7 @@ ngOnInit() { this.load(); }
     this.pfRoutine = {
       trainingFrequencyDays: p.trainingFrequencyDays,
       trainingTypes: [...(p.trainingTypes ?? [])],
-      hoursSeated: HOURS_SEATED.find(h => h.label === p.hoursSeated)?.id ?? 2,
+      hoursSeated: HOURS_SEATED.find(h => h.apiKey === p.hoursSeated)?.id ?? 2,
       habitualSleepHours: p.habitualSleepHours,
       sleepQuality: p.sleepQuality,
     };
@@ -189,8 +189,8 @@ ngOnInit() { this.load(); }
       heightCm: cur.heightCm,
       targetWeightKg: cur.targetWeightKg ?? undefined,
       waistCircumferenceCm: cur.waistCircumferenceCm ?? undefined,
-      activityLevel: ACTIVITY_LEVELS.find(a => a.name === cur.activityLevel)?.id ?? 3,
-      goal: HEALTH_GOALS.find(g => g.name === cur.goal)?.id ?? 6,
+      activityLevel: ACTIVITY_LEVELS.find(a => a.apiKey === cur.activityLevel)?.id ?? 3,
+      goal: HEALTH_GOALS.find(g => g.apiKey === cur.goal)?.id ?? 6,
       trainingFrequencyDays: this.pfRoutine.trainingFrequencyDays,
       trainingTypes: this.pfRoutine.trainingTypes,
       hoursSeated: this.pfRoutine.hoursSeated,
@@ -248,10 +248,10 @@ ngOnInit() { this.load(); }
 
   // ── SECTION 4: MEDICATIONS ───────────────────────────
   openEditMedications() {
-    const nameToId: Record<string, number> = {};
-    MEDICATION_CLASSES.forEach(m => { nameToId[m.name] = m.id; });
+    const keyToId: Record<string, number> = {};
+    MEDICATION_CLASSES.forEach(m => { keyToId[m.apiKey] = m.id; });
     this.selectedMedications = new Set(
-      this.medications().map(m => nameToId[m.medicationClass] ?? 0).filter(id => id > 0)
+      this.medications().map(m => keyToId[m.medicationClass] ?? 0).filter(id => id > 0)
     );
     this.errorMedications.set('');
     this.editingMedications = true;

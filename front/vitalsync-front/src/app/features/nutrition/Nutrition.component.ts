@@ -136,8 +136,14 @@ export class NutritionComponent implements OnInit {
     });
   }
 
-  deleteRecord(id: string) {
-    if (!confirm('Excluir este registro?')) return;
+  pendingDeleteId = signal<string | null>(null);
+
+  deleteRecord(id: string) { this.pendingDeleteId.set(id); }
+  cancelDelete() { this.pendingDeleteId.set(null); }
+  confirmDelete() {
+    const id = this.pendingDeleteId();
+    if (!id) return;
+    this.pendingDeleteId.set(null);
     this.nutritionService.delete(id).subscribe({
       next: () => { this.loadSummary(); this.toast.show('Registro excluído', 'success'); },
     });

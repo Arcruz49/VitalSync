@@ -154,8 +154,14 @@ export class HealthRecordsComponent implements OnInit {
     this.form = { metricTypeId: '', value: '', measuredAt: '', notes: '' };
   }
 
-  remove(id: string) {
-    if (!confirm('Excluir este registro?')) return;
+  pendingDeleteId = signal<string | null>(null);
+
+  remove(id: string) { this.pendingDeleteId.set(id); }
+  cancelDelete() { this.pendingDeleteId.set(null); }
+  confirmDelete() {
+    const id = this.pendingDeleteId();
+    if (!id) return;
+    this.pendingDeleteId.set(null);
     this.hrService.delete(id).subscribe({ next: () => this.load() });
   }
 
