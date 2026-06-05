@@ -1,0 +1,219 @@
+# VitalSync
+
+A personal health monitoring platform that combines metric tracking, AI-powered insights, and nutrition analysis in a single application.
+
+---
+
+## Overview
+
+VitalSync allows users to log health metrics such as blood pressure, glucose, weight, and heart rate, and receive instant AI-generated analysis after each entry. The platform calculates personalized normal ranges based on the user's profile, health conditions, and medications, and raises alerts when readings fall outside those ranges. A dedicated nutrition module lets users photograph meals and automatically receive a macronutrient breakdown powered by a vision AI model.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| API | ASP.NET Core 10, Entity Framework Core, Npgsql |
+| Database | PostgreSQL |
+| Frontend | Angular 19, Standalone Components, Signals |
+| AI | Anthropic Claude API (health insights + food image analysis) |
+| Auth | JWT via HttpOnly cookie |
+| Infrastructure | Docker, Docker Compose |
+
+---
+
+## Features
+
+**Health Records**
+- Log readings for 12+ metric types (blood pressure, glucose, weight, BMI, SpO2, and more)
+- Automatic alert generation when a reading exceeds the user's personal or default normal range
+- AI-generated insight for each record, powered by the Claude API
+- Filter records by metric type and date range
+
+**Personalized Ranges**
+- Normal ranges are calculated from the user's physical profile, health conditions, and current medications
+- Ranges are recalculated automatically when the profile is updated
+- Falls back to metric-type defaults when no personal range is available
+
+**Nutrition Tracking**
+- Upload a photo of a meal; the AI identifies the food and estimates calories, protein, carbohydrates, and fat
+- Daily macro summary with progress bars relative to goals calculated from the user's profile
+- Navigate between days and review individual meal records with AI confidence scores
+
+**Alerts**
+- Severity levels: Critical and Warning
+- Linked back to the originating health record for context
+
+**Profile**
+- Physical data and goals (weight, height, target weight, activity level)
+- Training routine (frequency, types, seated hours, sleep)
+- Health conditions and medications, each influencing the personalized range calculation
+- Derived metrics: BMI, BMR, TDEE, calorie and macro goals
+
+**Dashboard**
+- Priority-ordered metric cards with trend indicators
+- Recent activity feed
+- AI insight card with expandable recommendations
+
+---
+
+## Project Structure
+
+```
+VitalSync/
+├── docker-compose.yml
+├── .env                          # DB_USER, DB_PASSWORD, JWT_KEY
+├── api/VitalSyncAPI/             # ASP.NET Core 10 Web API
+│   ├── Domain/                   # Entities, interfaces, domain services
+│   ├── Application/              # Use cases, DTOs, service interfaces
+│   ├── Infrastructure/           # EF Core, repositories, UnitOfWork
+│   └── Controllers/              # HTTP endpoints
+└── front/vitalsync-front/        # Angular 19 SPA
+    └── src/app/
+        ├── core/                 # Guards, interceptors, models, services
+        ├── features/             # Page components
+        └── shared/               # Layout shell, sidebar, toast
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- .NET 10 SDK (for running migrations locally)
+
+### Environment
+
+Create a `.env` file at the repository root:
+
+```env
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+JWT_KEY=your_jwt_secret_key
+ANTHROPIC_API_KEY=your_anthropic_key
+```
+
+### Running
+
+```bash
+# Start all services
+docker compose up
+
+# Rebuild the API after code changes
+docker compose up --build api
+
+# Rebuild the frontend after changes outside src/ or public/
+docker compose up --build frontend
+```
+
+The API is available at `http://localhost:8080`. The frontend is served at `http://localhost:4200`.
+
+### Database Migrations
+
+Migrations are applied automatically on API startup. To create a new migration, run locally (not inside the container):
+
+```bash
+cd api/VitalSyncAPI
+export $(cat ../../.env | xargs)
+dotnet ef migrations add <MigrationName>
+```
+
+To reset the database:
+
+```bash
+docker compose down -v && docker compose up db api
+```
+
+---
+
+## API Reference
+
+All authenticated endpoints require the `vitalsync_token` JWT cookie set by the login response.
+
+### Authentication
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/auth/register` | — | Register a new user |
+| POST | `/auth/login` | — | Login and receive JWT cookie |
+| GET | `/auth/me` | Required | Get the authenticated user |
+| POST | `/auth/logout` | Required | Logout and clear cookie |
+
+### Health Records
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/metrics` | Required | List all available metric types |
+| GET | `/health-record` | Required | Get user records (filters: `metricTypeId`, `from`, `to`) |
+| POST | `/health-record` | Required | Create record — triggers alert and AI insight |
+| PUT | `/health-record/{id}` | Required | Update a record |
+| DELETE | `/health-record/{id}` | Required | Delete a record |
+
+### Profile
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/profile` | Required | Get current profile (404 if none) |
+| POST | `/profile` | Required | Create or update profile |
+| GET | `/profile/history` | Required | Profile change history |
+| GET | `/profile/conditions` | Required | User health conditions |
+| POST | `/profile/conditions` | Required | Replace conditions list |
+| GET | `/profile/medications` | Required | User medications |
+| POST | `/profile/medications` | Required | Replace medications list |
+| GET | `/profile/personal-range` | Required | All personal metric ranges |
+| GET | `/profile/personal-range/{metricTypeId}` | Required | Range for one metric |
+| POST | `/profile/personal-range/recalculate` | Required | Recalculate all ranges (204) |
+
+### Alerts
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/alerts` | Required | All user alerts, ordered by date descending |
+
+### Nutrition
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| GET | `/nutrition` | Required | Nutrition records (filters: `from`, `to`) |
+| POST | `/nutrition` | Required | Create record from food image (`imageBase64`) |
+| GET | `/nutrition/{id}` | Required | Get a single record |
+| PUT | `/nutrition/{id}` | Required | Update a record |
+| DELETE | `/nutrition/{id}` | Required | Delete a record |
+| GET | `/nutrition/summary` | Required | Daily summary with totals vs. goals (`date=YYYY-MM-DD`) |
+
+---
+
+## Architecture Notes
+
+**Clean Architecture** is applied on the API side. Dependencies flow inward: Controllers depend on Application, Application depends on Domain, Infrastructure implements the interfaces defined in Domain and Application.
+
+**Domain Services**
+- `PersonalRangeCalculator` — derives normal ranges per metric from the user's profile, conditions, and medications
+- `BodyMetricsCalculator` — computes BMI, BMR, TDEE, and macro goals from physical data
+- `AlertGenerator` — creates an alert when a health record exceeds its applicable range; uses personal range when available, falls back to metric-type defaults
+
+**Frontend**
+- Angular 19 standalone components with the Signals API for reactive state
+- Lazy-loaded feature modules behind an `authGuard`
+- Global HTTP error handling via an Angular interceptor
+- CSS custom properties for the design system with full dark mode support via `data-theme="dark"` on the `<html>` element
+
+---
+
+## VSCode Debugging
+
+A `launch.json` is configured for attaching the C# debugger to the running API container via `vsdbg`.
+
+```
+docker compose up
+# then press F5 in VSCode and select the dotnet VitalSyncAPI.dll process
+```
+
+---
+
+## License
+
+This project is for personal and educational use.
