@@ -95,4 +95,68 @@ public class AnthropicService(IConfiguration config) : IAIAnalysisService
                 $"{g.First().MetricType.Unit} (média: {g.Average(r => r.Value):F1})")
         );
     }
+
+    public async Task<NutritionAnalysisResult> AnalyzeFoodImageAsync(string imageBase64)
+    {
+        var base64Data = imageBase64.Contains(",") 
+            ? imageBase64.Split(",")[1] 
+            : imageBase64;
+
+        var response = await _client.Messages.GetClaudeMessageAsync(
+            new MessageParameters
+            {
+                Model = AnthropicModels.Claude46Sonnet,
+                MaxTokens = 1024,
+                Messages =
+                [
+                    new Message
+                    {
+                        Role = RoleType.User,
+                        Content = new List<ContentBase>
+                        {
+                            new ImageContent
+                            {
+                                Source = new ImageSource
+                                {
+                                    Type = SourceType.base64,
+                                    MediaType = "image/jpeg",
+                                    Data = base64Data
+                                }
+                            },
+                            new TextContent
+                            {
+                                Text = BuildNutritionPrompt()
+                            }
+                        }
+                    }
+                ]
+            }
+        );
+
+        var json = ((TextContent)response.Content[0]).Text;
+        return JsonSerializer.Deserialize<NutritionAnalysisResult>(json, 
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            ?? new NutritionAnalysisResult();
+    }
+
+    private static string BuildNutritionPrompt()
+    {
+        return """
+            Analise a imagem deste prato/alimento e estime os macronutrientes.
+            Responda EXCLUSIVAMENTE com JSON válido, sem markdown, sem texto adicional.
+            
+            {
+                "foodDescription": "descrição do que foi identificado",
+                "caloriesKcal": 0,
+                "proteinG": 0,
+                "carbsG": 0,
+                "fatG": 0,
+                "confidence": 0.0,
+                "disclaimer": "Valores estimados. Podem variar conforme preparo e porção."
+            }
+            
+            confidence deve ser entre 0 e 1.
+            Se não conseguir identificar alimento na imagem, retorne confidence: 0 e zeros nos macros.
+            """;
+    }
 }

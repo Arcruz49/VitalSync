@@ -49,6 +49,12 @@ builder.Services.AddScoped<IAIInsightRepository, AIInsightRepository>();
 builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
 builder.Services.AddScoped<IGetAlertsUseCase, GetAlertsUseCase>();
 builder.Services.AddScoped<INutritionRecordRepository, NutritionRecordRepository>();
+builder.Services.AddScoped<IAddNutritionRecordUseCase, AddNutritionRecordUseCase>();
+builder.Services.AddScoped<IDeleteNutritionRecordUseCase, DeleteNutritionRecordUseCase>();
+builder.Services.AddScoped<IGetAllNutritionRecordUseCase, GetAllNutritionRecordUseCase>();
+builder.Services.AddScoped<IGetNutritionRecordUseCase, GetNutritionRecordUseCase>();
+builder.Services.AddScoped<IUpdateNutritionRecordUseCase, UpdateNutritionRecordUseCase>();
+builder.Services.AddScoped<IGetNutritionSummaryUseCase, GetNutritionSummaryUseCase>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]
