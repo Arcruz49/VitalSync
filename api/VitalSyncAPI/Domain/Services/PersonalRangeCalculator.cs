@@ -109,7 +109,6 @@ public static class PersonalRangeCalculator
 
     private static (double min, double max, RangeMethod method) CalculateSleep(UserProfile profile)
     {
-        // Recomendação varia por idade (via BirthDate no User — aqui usa HabitualSleepHours como base)
         return profile.HabitualSleepHours < 6
             ? (6, 9, RangeMethod.Default)
             : (7, 9, RangeMethod.Default);
