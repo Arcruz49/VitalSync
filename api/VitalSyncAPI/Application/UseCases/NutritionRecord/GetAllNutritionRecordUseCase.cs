@@ -27,6 +27,7 @@ public class GetAllNutritionRecordUseCase(
             x.FatG,
             x.Confidence,
             x.Notes,
+            x.Status.ToString(),
             x.MeasuredAt,
             x.CreatedAt
         )).ToList();

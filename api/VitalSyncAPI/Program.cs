@@ -48,7 +48,6 @@ builder.Services.AddScoped<IRecalculatePersonalRangeUseCase, RecalculatePersonal
 builder.Services.AddScoped<IGetAllPersonalRangeUseCase, GetAllPersonalRangeUseCase>();
 builder.Services.AddScoped<IGetPersonalRangeUseCase, GetPersonalRangeUseCase>();
 builder.Services.AddScoped<IAIInsightRepository, AIInsightRepository>();
-builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
 builder.Services.AddScoped<IGetAlertsUseCase, GetAlertsUseCase>();
 builder.Services.AddScoped<INutritionRecordRepository, NutritionRecordRepository>();
 builder.Services.AddScoped<IAddNutritionRecordUseCase, AddNutritionRecordUseCase>();
@@ -88,6 +87,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<InsightGeneratedConsumer>();
+    x.AddConsumer<NutritionAnalysisCompletedConsumer>();
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
@@ -99,6 +99,8 @@ builder.Services.AddMassTransit(x =>
 
         cfg.Message<VitalSync.Contracts.InsightRequestedEvent>(m => m.SetEntityName("insight-requested-event"));
         cfg.Message<VitalSync.Contracts.InsightGeneratedEvent>(m => m.SetEntityName("insight-generated-event"));
+        cfg.Message<VitalSync.Contracts.NutritionAnalysisRequestedEvent>(m => m.SetEntityName("nutrition-analysis-requested-event"));
+        cfg.Message<VitalSync.Contracts.NutritionAnalysisCompletedEvent>(m => m.SetEntityName("nutrition-analysis-completed-event"));
 
         cfg.ConfigureEndpoints(ctx);
     });

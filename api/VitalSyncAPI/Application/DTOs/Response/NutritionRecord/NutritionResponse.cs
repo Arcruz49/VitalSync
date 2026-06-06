@@ -10,6 +10,7 @@ public record NutritionResponse(
     decimal FatG,
     decimal Confidence,
     string? Notes,
+    string? Status,
     DateTime MeasuredAt,
     DateTime CreatedAt
 );

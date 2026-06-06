@@ -30,6 +30,7 @@ public class GetNutritionRecordUseCase(
             record.FatG,
             record.Confidence,
             record.Notes,
+            record.Status.ToString(),
             record.MeasuredAt,
             record.CreatedAt
         );

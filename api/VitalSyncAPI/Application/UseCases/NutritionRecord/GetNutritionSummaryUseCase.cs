@@ -32,6 +32,7 @@ public class GetNutritionSummaryUseCase(
             x.FatG,
             x.Confidence,
             x.Notes,
+            x.Status.ToString(),
             x.MeasuredAt,
             x.CreatedAt
         )).ToList();

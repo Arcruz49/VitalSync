@@ -46,6 +46,9 @@ public class NutritionRecord
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    [Column("status")]
+    public NutritionStatus Status { get; set; } = NutritionStatus.Pending;
+
     [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;
 }
