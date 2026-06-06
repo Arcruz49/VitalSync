@@ -19,7 +19,6 @@ public class CreateHealthRecordUseCase(
     IBodyMetricsRepository bodyMetricsRepository,
     IUserConditionRepository userConditionRepository,
     IUserMedicationRepository userMedicationRepository,
-    IHealthRecordsRepository healthRecordsRepository,
     IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork,
     ILogger<CreateHealthRecordUseCase> logger
@@ -76,7 +75,7 @@ public class CreateHealthRecordUseCase(
             var metrics = await bodyMetricsRepository.GetLatestByUserId(userId);
             var conditions = await userConditionRepository.GetByUserId(userId);
             var medications = await userMedicationRepository.GetByUserId(userId);
-            var recentRecords = await healthRecordsRepository.GetByUserAsync(
+            var recentRecords = await recordRepository.GetByUserAsync(
                 userId, null,
                 DateTime.UtcNow.AddDays(-30),
                 null);

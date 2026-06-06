@@ -36,7 +36,7 @@ public class RegisterUserUseCase : IRegisterUserUseCase{
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
-            Email = request.Email,
+            Email = email.Value,
             Gender = request.Gender,
             BirthDate = DateTime.SpecifyKind(request.BirthDate, DateTimeKind.Utc),
             CreationDate = DateTime.UtcNow,
