@@ -6,7 +6,9 @@ A personal health monitoring platform that combines metric tracking, AI-powered 
 
 ## Overview
 
-VitalSync allows users to log health metrics such as blood pressure, glucose, weight, and heart rate, and receive instant AI-generated analysis after each entry. The platform calculates personalized normal ranges based on the user's profile, health conditions, and medications, and raises alerts when readings fall outside those ranges. A dedicated nutrition module lets users photograph meals and automatically receive a macronutrient breakdown powered by a vision AI model.
+VitalSync allows users to log health metrics such as blood pressure, glucose, weight, and heart rate, and receive AI-generated analysis after each entry. The platform calculates personalized normal ranges based on the user's profile, health conditions, and medications, and raises alerts when readings fall outside those ranges. A dedicated nutrition module lets users photograph meals and automatically receive a macronutrient breakdown powered by a vision AI model.
+
+AI analysis runs asynchronously: after a health record or nutrition entry is saved, the API publishes an event to RabbitMQ. A dedicated AI microservice consumes the event, calls the Claude API, and publishes the result back. The API then persists the insight or updates the nutrition record — all without blocking the original request.
 
 ---
 
@@ -15,6 +17,8 @@ VitalSync allows users to log health metrics such as blood pressure, glucose, we
 | Layer | Technology |
 |---|---|
 | API | ASP.NET Core 10, Entity Framework Core, Npgsql |
+| AI Service | ASP.NET Core 10, MassTransit, Anthropic SDK |
+| Message Broker | RabbitMQ |
 | Database | PostgreSQL |
 | Frontend | Angular 19, Standalone Components, Signals |
 | AI | Anthropic Claude API (health insights + food image analysis) |
@@ -28,7 +32,7 @@ VitalSync allows users to log health metrics such as blood pressure, glucose, we
 **Health Records**
 - Log readings for 12+ metric types (blood pressure, glucose, weight, BMI, SpO2, and more)
 - Automatic alert generation when a reading exceeds the user's personal or default normal range
-- AI-generated insight for each record, powered by the Claude API
+- AI-generated insight for each record, delivered asynchronously via RabbitMQ
 - Filter records by metric type and date range
 
 **Personalized Ranges**
@@ -38,6 +42,7 @@ VitalSync allows users to log health metrics such as blood pressure, glucose, we
 
 **Nutrition Tracking**
 - Upload a photo of a meal; the AI identifies the food and estimates calories, protein, carbohydrates, and fat
+- Records are created immediately with `Pending` status and updated asynchronously to `Completed` or `Failed`
 - Daily macro summary with progress bars relative to goals calculated from the user's profile
 - Navigate between days and review individual meal records with AI confidence scores
 
@@ -63,12 +68,18 @@ VitalSync allows users to log health metrics such as blood pressure, glucose, we
 ```
 VitalSync/
 ├── docker-compose.yml
-├── .env                          # DB_USER, DB_PASSWORD, JWT_KEY
+├── .env                          # DB_USER, DB_PASSWORD, JWT_KEY, RABBITMQ_USER, RABBITMQ_PASSWORD, ANTHROPIC_API_KEY
 ├── api/VitalSyncAPI/             # ASP.NET Core 10 Web API
 │   ├── Domain/                   # Entities, interfaces, domain services
 │   ├── Application/              # Use cases, DTOs, service interfaces
 │   ├── Infrastructure/           # EF Core, repositories, UnitOfWork
-│   └── Controllers/              # HTTP endpoints
+│   ├── Controllers/              # HTTP endpoints
+│   ├── Consumers/                # MassTransit consumers (InsightGenerated, NutritionAnalysisCompleted)
+│   └── Events/                   # Shared contracts (namespace VitalSync.Contracts)
+├── ai-service/VitalSyncAI/       # ASP.NET Core 10 AI microservice
+│   ├── Consumers/                # MassTransit consumers (InsightRequested, NutritionAnalysisRequested)
+│   ├── Models/                   # Shared contracts (namespace VitalSync.Contracts)
+│   └── Services/                 # AnthropicService (health insights + food image analysis)
 └── front/vitalsync-front/        # Angular 19 SPA
     └── src/app/
         ├── core/                 # Guards, interceptors, models, services
@@ -93,6 +104,8 @@ Create a `.env` file at the repository root:
 DB_USER=your_db_user
 DB_PASSWORD=your_db_password
 JWT_KEY=your_jwt_secret_key
+RABBITMQ_USER=your_rabbitmq_user
+RABBITMQ_PASSWORD=your_rabbitmq_password
 ANTHROPIC_API_KEY=your_anthropic_key
 ```
 
@@ -105,11 +118,18 @@ docker compose up
 # Rebuild the API after code changes
 docker compose up --build api
 
+# Rebuild the AI microservice after code changes
+docker compose up --build ai-service
+
 # Rebuild the frontend after changes outside src/ or public/
 docker compose up --build frontend
 ```
 
-The API is available at `http://localhost:8080`. The frontend is served at `http://localhost:4200`.
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:4200 |
+| API | http://localhost:5000 |
+| RabbitMQ Management | http://localhost:15672 |
 
 ### Database Migrations
 
@@ -148,7 +168,7 @@ All authenticated endpoints require the `vitalsync_token` JWT cookie set by the 
 |--------|-------|------|-------------|
 | GET | `/metrics` | Required | List all available metric types |
 | GET | `/health-record` | Required | Get user records (filters: `metricTypeId`, `from`, `to`) |
-| POST | `/health-record` | Required | Create record — triggers alert and AI insight |
+| POST | `/health-record` | Required | Create record — triggers alert and publishes AI insight request |
 | PUT | `/health-record/{id}` | Required | Update a record |
 | DELETE | `/health-record/{id}` | Required | Delete a record |
 
@@ -178,7 +198,7 @@ All authenticated endpoints require the `vitalsync_token` JWT cookie set by the 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
 | GET | `/nutrition` | Required | Nutrition records (filters: `from`, `to`) |
-| POST | `/nutrition` | Required | Create record from food image (`imageBase64`) |
+| POST | `/nutrition` | Required | Create record — saves as `Pending`, analysis runs asynchronously |
 | GET | `/nutrition/{id}` | Required | Get a single record |
 | PUT | `/nutrition/{id}` | Required | Update a record |
 | DELETE | `/nutrition/{id}` | Required | Delete a record |
@@ -189,6 +209,36 @@ All authenticated endpoints require the `vitalsync_token` JWT cookie set by the 
 ## Architecture Notes
 
 **Clean Architecture** is applied on the API side. Dependencies flow inward: Controllers depend on Application, Application depends on Domain, Infrastructure implements the interfaces defined in Domain and Application.
+
+**Async AI Pipeline**
+
+All AI processing is decoupled from HTTP requests via RabbitMQ. The API publishes an event and returns immediately; the AI microservice consumes, calls Claude, and publishes the result back.
+
+```
+POST /health-record
+  → save record + alert
+  → publish InsightRequestedEvent
+  → return 200 immediately
+
+[RabbitMQ] → AI Service → Claude API → InsightGeneratedEvent → [RabbitMQ]
+  → API consumer saves AIInsight to DB
+```
+
+```
+POST /nutrition
+  → save record (status: Pending)
+  → publish NutritionAnalysisRequestedEvent
+  → return 200 immediately
+
+[RabbitMQ] → AI Service → Claude API (vision) → NutritionAnalysisCompletedEvent → [RabbitMQ]
+  → API consumer updates record (status: Completed or Failed)
+```
+
+**Shared Contracts**
+
+Event types used by both services live under the `VitalSync.Contracts` namespace in both projects. The namespace must match exactly — MassTransit encodes it in the message URN header (`urn:message:VitalSync.Contracts:EventName`) and rejects messages with mismatched types into a `_skipped` queue.
+
+Exchange names are pinned via `cfg.Message<T>(m => m.SetEntityName(...))` in both `Program.cs` files to keep RabbitMQ exchange names stable and readable.
 
 **Domain Services**
 - `PersonalRangeCalculator` — derives normal ranges per metric from the user's profile, conditions, and medications
