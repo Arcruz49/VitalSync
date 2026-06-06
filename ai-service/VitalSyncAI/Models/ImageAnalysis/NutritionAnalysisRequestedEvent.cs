@@ -4,5 +4,6 @@ public record NutritionAnalysisRequestedEvent(
     Guid NutritionRecordId,
     Guid UserId,
     string ImageBase64,
-    string MealType
+    string MealType,
+    string Notes
 );

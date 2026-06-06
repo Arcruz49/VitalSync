@@ -94,7 +94,7 @@ public class AnthropicService(IConfiguration config)
             $"- {m.MetricName}: último valor {m.LastValue} {m.Unit} (média: {m.Average:F1})"));
     }
 
-    public async Task<NutritionAnalysisResult> AnalyzeFoodImageAsync(string imageBase64)
+    public async Task<NutritionAnalysisResult> AnalyzeFoodImageAsync(string imageBase64, string notes)
     {
         var base64Data = imageBase64.Contains(",")
             ? imageBase64.Split(",")[1]
@@ -141,6 +141,8 @@ public class AnthropicService(IConfiguration config)
 
                                     O JSON deve seguir exatamente esta estrutura:
                                     {jsonSchema}
+
+                                    {(!string.IsNullOrWhiteSpace(notes) ? $"Informações adicionais fornecidas pelo usuário: {notes}" : "")}
 
                                     confidence deve ser entre 0 e 1.
                                     Se não conseguir identificar alimento na imagem, retorne confidence: 0 e zeros nos macros.

@@ -41,7 +41,8 @@ public class AddNutritionRecordUseCase(
             record.Id,
             userId,
             request.ImageBase64,
-            request.MealType.ToString()
+            request.MealType.ToString(),
+            request.Notes ?? ""
         ));
 
         return new NutritionResponse(

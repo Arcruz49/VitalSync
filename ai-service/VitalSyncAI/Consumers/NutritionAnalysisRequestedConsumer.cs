@@ -19,7 +19,7 @@ public class NutritionAnalysisRequestedConsumer(
 
         try
         {
-            var result = await anthropicService.AnalyzeFoodImageAsync(request.ImageBase64);
+            var result = await anthropicService.AnalyzeFoodImageAsync(request.ImageBase64, request.Notes);
 
             await publishEndpoint.Publish(new NutritionAnalysisCompletedEvent(
                 request.NutritionRecordId,
