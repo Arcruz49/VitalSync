@@ -1,3 +1,4 @@
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using VitalSyncAPI.Application.Interfaces;
 using VitalSyncAPI.Application.Security;
 using VitalSyncAPI.Application.Services;
 using VitalSyncAPI.Application.UseCases;
+using VitalSyncAPI.Consumers;
 using VitalSyncAPI.Domain.Interfaces;
 using VitalSyncAPI.Infrastructure.Data;
 using VitalSyncAPI.Infrastructure.Middlewares;
@@ -82,6 +84,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<InsightGeneratedConsumer>();
+
+    x.UsingRabbitMq((ctx, cfg) =>
+    {
+        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", h =>
+        {
+            h.Username(builder.Configuration["RabbitMQ:User"] ?? "guest");
+            h.Password(builder.Configuration["RabbitMQ:Password"] ?? "guest");
+        });
+
+        cfg.Message<VitalSync.Contracts.InsightRequestedEvent>(m => m.SetEntityName("insight-requested-event"));
+        cfg.Message<VitalSync.Contracts.InsightGeneratedEvent>(m => m.SetEntityName("insight-generated-event"));
+
+        cfg.ConfigureEndpoints(ctx);
+    });
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();

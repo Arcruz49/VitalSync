@@ -1,12 +1,12 @@
+using MassTransit;
 using VitalSyncAPI.Application.DTOs.Request;
-using VitalSyncAPI.Domain.Entities;
-using VitalSyncAPI.Application.Interfaces;
-using VitalSyncAPI.Domain.Interfaces;
 using VitalSyncAPI.Application.DTOs.Responses;
+using VitalSyncAPI.Application.Interfaces;
+using VitalSyncAPI.Domain.Entities;
 using VitalSyncAPI.Domain.Enums;
+using VitalSyncAPI.Domain.Interfaces;
 using VitalSyncAPI.Domain.Services;
-using VitalSyncAPI.Application.Models;
-using System.Text.Json;
+using VitalSync.Contracts;
 
 namespace VitalSyncAPI.Application.UseCases;
 
@@ -15,11 +15,15 @@ public class CreateHealthRecordUseCase(
     IAlertRepository alertRepository,
     IMetricTypesRepository metricTypesRepository,
     IPersonalRangeRepository personalRangeRepository,
-    IAIInsightRepository aiInsightRepository,
-    IUserRepository userRepository,
+    IUserProfileRepository userProfileRepository,
     IBodyMetricsRepository bodyMetricsRepository,
-    IAIAnalysisService aiAnalysisService,
-    IUnitOfWork unitOfWork) : ICreateHealthRecordUseCase
+    IUserConditionRepository userConditionRepository,
+    IUserMedicationRepository userMedicationRepository,
+    IHealthRecordsRepository healthRecordsRepository,
+    IPublishEndpoint publishEndpoint,
+    IUnitOfWork unitOfWork,
+    ILogger<CreateHealthRecordUseCase> logger
+) : ICreateHealthRecordUseCase
 {
     public async Task<HealthRecordResponse> ExecuteAsync(Guid userId, HealthRecordRequest request)
     {
@@ -49,32 +53,7 @@ public class CreateHealthRecordUseCase(
 
         await unitOfWork.SaveChangesAsync();
 
-        // busca contexto e gera insight
-        var user = await userRepository.GetUserById(userId);
-        var metrics = await bodyMetricsRepository.GetLatestByUserId(userId);
-        var recentRecords = await recordRepository.GetByUserAsync(userId, null, DateTime.UtcNow.AddDays(-30), null);
-
-        AIAnalysisResult? analysisResult = null;
-
-        if (user.Profile is not null && metrics is not null)
-        {
-            analysisResult = await aiAnalysisService.AnalyzeAsync(user.Profile, metrics, recentRecords);
-
-            var insight = new AIInsight
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                HealthRecordId = record.Id,
-                Insights = JsonSerializer.Serialize(analysisResult.Insights),
-                Tips = JsonSerializer.Serialize(analysisResult.Tips),
-                OverallAssessment = analysisResult.OverallAssessment,
-                Disclaimer = analysisResult.Disclaimer,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await aiInsightRepository.AddAsync(insight);
-            await unitOfWork.SaveChangesAsync();
-        }
+        await PublishInsightRequestAsync(userId, record, metricType);
 
         return new HealthRecordResponse(
             record.Id,
@@ -85,7 +64,56 @@ public class CreateHealthRecordUseCase(
             record.MeasuredAt,
             record.Notes,
             record.CreatedAt,
-            analysisResult
+            null
         );
+    }
+
+    private async Task PublishInsightRequestAsync(Guid userId, HealthRecord record, Domain.Entities.MetricType metricType)
+    {
+        try
+        {
+            var profile = await userProfileRepository.GetByUserId(userId);
+            var metrics = await bodyMetricsRepository.GetLatestByUserId(userId);
+            var conditions = await userConditionRepository.GetByUserId(userId);
+            var medications = await userMedicationRepository.GetByUserId(userId);
+            var recentRecords = await healthRecordsRepository.GetByUserAsync(
+                userId, null,
+                DateTime.UtcNow.AddDays(-30),
+                null);
+
+            if (profile is null || metrics is null) return;
+
+            var recentMetrics = recentRecords
+                .GroupBy(r => r.MetricType.Name)
+                .Select(g => new MetricSummary(
+                    g.Key,
+                    g.First().MetricType.Unit,
+                    g.OrderByDescending(r => r.MeasuredAt).First().Value,
+                    g.Average(r => r.Value)
+                )).ToList();
+
+            await publishEndpoint.Publish(new InsightRequestedEvent(
+                record.Id,
+                userId,
+                metricType.Name,
+                metricType.Unit,
+                record.Value,
+                record.MeasuredAt,
+                profile.Goal.ToString(),
+                profile.ActivityLevel.ToString(),
+                metrics.BMI,
+                metrics.TDEE,
+                metrics.CalorieGoal,
+                conditions.Select(c => c.Condition.Name).ToList(),
+                medications.Select(m => m.MedicationClass.ToString()).ToList(),
+                recentMetrics
+            ));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Erro ao publicar InsightRequestedEvent para HealthRecord {Id}",
+                record.Id);
+        }
     }
 }
