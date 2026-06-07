@@ -58,6 +58,11 @@ builder.Services.AddScoped<IGetNutritionRecordUseCase, GetNutritionRecordUseCase
 builder.Services.AddScoped<IUpdateNutritionRecordUseCase, UpdateNutritionRecordUseCase>();
 builder.Services.AddScoped<IGetNutritionSummaryUseCase, GetNutritionSummaryUseCase>();
 builder.Services.AddScoped<IWeeklyReportRepository, WeeklyReportRepository>();
+builder.Services.AddScoped<IAddWeeklyReportUseCase, AddWeeklyReportUseCase>();
+builder.Services.AddScoped<IGetWeeklyReportsUseCase, GetWeeklyReportsUseCase>();
+builder.Services.AddScoped<IGetWeeklyReportUseCase, GetWeeklyReportUseCase>();
+builder.Services.AddScoped<IGetWeeklyReportsByIdUseCase, GetWeeklyReportsByIdUseCase>();
+builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]
