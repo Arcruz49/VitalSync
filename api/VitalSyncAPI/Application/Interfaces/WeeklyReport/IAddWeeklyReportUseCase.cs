@@ -1,9 +1,10 @@
 using VitalSyncAPI.Application.DTOs.Request;
 using VitalSyncAPI.Application.DTOs.Responses;
+using VitalSyncAPI.Domain.Entities;
 
 namespace VitalSyncAPI.Application.Interfaces;
 
 public interface IAddWeeklyReportUseCase
 {
-    Task<List<WeeklyReportResponse>> ExecuteAsync(Guid userId);
+    Task<WeeklyReportResponse> ExecuteAsync(Guid userId, WeeklyReportRequest request);
 }

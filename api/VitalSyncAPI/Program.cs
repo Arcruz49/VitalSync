@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using VitalSync.Contracts;
 using VitalSyncAPI.Application.Interfaces;
 using VitalSyncAPI.Application.Security;
 using VitalSyncAPI.Application.Services;
@@ -89,7 +90,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<InsightGeneratedConsumer>();
     x.AddConsumer<NutritionAnalysisCompletedConsumer>();
-
+    x.AddConsumer<WeeklyReportGeneratedConsumer>();
     x.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", h =>
@@ -98,10 +99,12 @@ builder.Services.AddMassTransit(x =>
             h.Password(builder.Configuration["RabbitMQ:Password"] ?? "guest");
         });
 
-        cfg.Message<VitalSync.Contracts.InsightRequestedEvent>(m => m.SetEntityName("insight-requested-event"));
-        cfg.Message<VitalSync.Contracts.InsightGeneratedEvent>(m => m.SetEntityName("insight-generated-event"));
-        cfg.Message<VitalSync.Contracts.NutritionAnalysisRequestedEvent>(m => m.SetEntityName("nutrition-analysis-requested-event"));
-        cfg.Message<VitalSync.Contracts.NutritionAnalysisCompletedEvent>(m => m.SetEntityName("nutrition-analysis-completed-event"));
+        cfg.Message<InsightRequestedEvent>(m => m.SetEntityName("insight-requested-event"));
+        cfg.Message<InsightGeneratedEvent>(m => m.SetEntityName("insight-generated-event"));
+        cfg.Message<NutritionAnalysisRequestedEvent>(m => m.SetEntityName("nutrition-analysis-requested-event"));
+        cfg.Message<NutritionAnalysisCompletedEvent>(m => m.SetEntityName("nutrition-analysis-completed-event"));
+        cfg.Message<WeeklyReportRequestedEvent>(m => m.SetEntityName("weekly-report-requested-event"));
+        cfg.Message<WeeklyReportGeneratedEvent>(m => m.SetEntityName("weekly-report-generated-event"));
 
         cfg.ConfigureEndpoints(ctx);
     });

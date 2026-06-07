@@ -164,5 +164,132 @@ public class AnthropicService(IConfiguration config)
             PropertyNameCaseInsensitive = true
         }) ?? new NutritionAnalysisResult();
     }
+        public async Task<WeeklyReportResult> GenerateWeeklyReportAsync(WeeklyReportRequestedEvent request)
+    {
+        var jsonSchema = """
+            {
+                "summary": "resumo geral da semana em 2-3 frases",
+                "metricsAnalysis": [
+                    {
+                        "metricName": "nome da métrica",
+                        "unit": "unidade",
+                        "average": 0,
+                        "min": 0,
+                        "max": 0,
+                        "trend": "improving|stable|worsening",
+                        "analysis": "análise específica desta métrica"
+                    }
+                ],
+                "patterns": ["padrão identificado 1", "padrão identificado 2"],
+                "recommendations": ["recomendação prática 1", "recomendação prática 2", "recomendação prática 3"],
+                "nutritionSummary": "resumo nutricional da semana ou null se não houver dados",
+                "disclaimer": "Este relatório é informativo e não substitui avaliação médica profissional."
+            }
+            """;
+
+        var metricsSection = BuildWeeklyMetricsSection(request.WeekMetrics, request.PreviousWeekMetrics);
+        var nutritionSection = request.MealsLogged > 0
+            ? $"""
+            ## Nutrição da semana
+            - Refeições registradas: {request.MealsLogged}
+            - Calorias totais: {request.TotalCalories:F0} kcal (meta diária: {request.CalorieGoal} kcal)
+            - Proteína total: {request.TotalProtein:F0}g
+            - Carboidratos total: {request.TotalCarbs:F0}g
+            - Gordura total: {request.TotalFat:F0}g
+            """
+            : "## Nutrição\nNenhuma refeição registrada esta semana.";
+
+        var prompt = $"""
+            Você é um assistente de saúde especializado em análise de tendências semanais.
+            Analise os dados abaixo e gere um relatório semanal completo e personalizado.
+            Responda EXCLUSIVAMENTE com JSON válido, sem markdown, sem texto adicional.
+
+            O JSON deve seguir exatamente esta estrutura:
+            {jsonSchema}
+
+            ## Perfil do usuário
+            - Objetivo: {request.Goal}
+            - Nível de atividade: {request.ActivityLevel}
+            - IMC: {request.BMI}
+            - Meta calórica diária: {request.CalorieGoal} kcal
+            - Condições de saúde: {string.Join(", ", request.Conditions.DefaultIfEmpty("Nenhuma"))}
+            - Medicamentos: {string.Join(", ", request.Medications.DefaultIfEmpty("Nenhum"))}
+
+            ## Período analisado
+            - Semana: {request.WeekStart:dd/MM/yyyy} a {request.WeekEnd:dd/MM/yyyy}
+
+            {metricsSection}
+
+            {nutritionSection}
+
+            ## Instruções
+            - Seja específico e cite valores reais dos dados
+            - Compare com a semana anterior quando houver dados
+            - Identifique padrões concretos (ex: pressão alta às finais de semana)
+            - Recomendações devem ser práticas e acionáveis
+            - Tom encorajador mas honesto
+            - Se poucos dados foram registrados, mencione a importância de registrar mais
+            """;
+
+        var response = await _client.Messages.GetClaudeMessageAsync(
+            new MessageParameters
+            {
+                Model = config["Anthropic:ReportModel"] ?? AnthropicModels.Claude46Sonnet,
+                MaxTokens = 2048,
+                Messages =
+                [
+                    new Message
+                    {
+                        Role = RoleType.User,
+                        Content = new List<ContentBase>
+                        {
+                            new TextContent { Text = prompt }
+                        }
+                    }
+                ]
+            }
+        );
+
+        var raw = ((TextContent)response.Content[0]).Text.Trim();
+        var json = raw.StartsWith("```")
+            ? raw[(raw.IndexOf('\n') + 1)..raw.LastIndexOf("```")].Trim()
+            : raw;
+
+        var result = JsonSerializer.Deserialize<WeeklyReportRawResult>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        }) ?? new WeeklyReportRawResult();
+
+        return new WeeklyReportResult
+        {
+            Summary          = result.Summary,
+            MetricsAnalysis  = JsonSerializer.Serialize(result.MetricsAnalysis),
+            Patterns         = JsonSerializer.Serialize(result.Patterns),
+            Recommendations  = JsonSerializer.Serialize(result.Recommendations),
+            NutritionSummary = result.NutritionSummary,
+            Disclaimer       = result.Disclaimer
+        };
+    }
+
+    private static string BuildWeeklyMetricsSection(
+        List<WeeklyMetricData> weekMetrics,
+        List<WeeklyMetricData> prevMetrics)
+    {
+        if (weekMetrics.Count == 0) return "## Métricas\nNenhuma métrica registrada esta semana.";
+
+        var lines = weekMetrics.Select(m =>
+        {
+            var prev = prevMetrics.FirstOrDefault(p => p.MetricName == m.MetricName);
+            var prevInfo = prev is not null
+                ? $" (semana anterior: média {prev.Average} {m.Unit})"
+                : string.Empty;
+
+            return $"- {m.MetricName}: média {m.Average} {m.Unit}, " +
+                $"min {m.Min}, max {m.Max}, " +
+                $"tendência: {m.Trend}, {m.RecordCount} registros{prevInfo}";
+        });
+
+        return $"## Métricas da semana\n{string.Join("\n", lines)}";
+    }
 }
 

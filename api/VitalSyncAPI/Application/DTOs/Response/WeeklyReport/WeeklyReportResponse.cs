@@ -10,6 +10,6 @@ public record WeeklyReportResponse(
     string? NutritionSummary,
     string Disclaimer,
     string Status,
-    DateTime CreatedAt
-    
+    DateTime CreatedAt,
+    List<WeeklyMetricAnalysisResponse>? MetricsAnalysis
 );
