@@ -56,6 +56,7 @@ builder.Services.AddScoped<IGetAllNutritionRecordUseCase, GetAllNutritionRecordU
 builder.Services.AddScoped<IGetNutritionRecordUseCase, GetNutritionRecordUseCase>();
 builder.Services.AddScoped<IUpdateNutritionRecordUseCase, UpdateNutritionRecordUseCase>();
 builder.Services.AddScoped<IGetNutritionSummaryUseCase, GetNutritionSummaryUseCase>();
+builder.Services.AddScoped<IWeeklyReportRepository, WeeklyReportRepository>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]
