@@ -1,3 +1,8 @@
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .content {
   padding: 28px 32px;
   max-width: 900px;
@@ -11,6 +16,7 @@
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
+  animation: fadeUp .4s ease-out both;
 }
 
 .date-nav {
@@ -72,6 +78,7 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 12px;
+  animation: fadeUp .4s ease-out .06s both;
 }
 
 .macro-card {
@@ -186,6 +193,7 @@
 /* ── RECORDS SECTION ─────────────────────────────────── */
 .records-section {
   margin-top: 28px;
+  animation: fadeUp .4s ease-out .12s both;
 }
 
 .section-title {

@@ -32,8 +32,10 @@ public static class PersonalRangeCalculator
                 7 => CalculateSleep(profile),
                 // peso
                 5 => CalculateWeightRange(profile),
-                // Padrão — usa os valores do MetricType
-                _ => (metricType.MinNormal ?? 0, metricType.MaxNormal ?? 0, RangeMethod.Default)
+                // Padrão — só cria range se AMBOS os limites estiverem definidos no MetricType
+                _ => metricType is { MinNormal: not null, MaxNormal: not null }
+                    ? (metricType.MinNormal.Value, metricType.MaxNormal.Value, RangeMethod.Default)
+                    : (0, 0, RangeMethod.Default)
             };
 
             // Não cria range para métricas sem faixa definida

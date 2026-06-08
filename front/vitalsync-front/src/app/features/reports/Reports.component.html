@@ -1,0 +1,222 @@
+<div class="content">
+
+  <!-- Generate Card -->
+  <div class="generate-card">
+    <div class="generate-header">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" class="generate-icon">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <polyline points="10 9 9 9 8 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h1 class="generate-title">Relatório Semanal</h1>
+        <p class="generate-subtitle">Análise completa da sua semana de saúde</p>
+      </div>
+    </div>
+
+    <div class="generate-controls">
+      <div class="week-picker">
+        <label for="weekInput">Semana a partir de</label>
+        <input
+          id="weekInput"
+          type="date"
+          [value]="selectedWeekStart()"
+          (change)="onWeekChange($event)"
+        />
+      </div>
+
+      <button
+        class="btn-generate"
+        [disabled]="generateButtonDisabled()"
+        [class.is-pending]="isPendingWeek() || generating()"
+        [class.is-done]="currentWeekReport()?.status === 'Completed'"
+        (click)="generate()"
+      >
+        @if (generating() || isPendingWeek()) {
+          <span class="spinner"></span>
+        } @else if (currentWeekReport()?.status === 'Completed') {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        } @else {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        }
+        {{ generateButtonText() }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="loading">Carregando relatórios...</div>
+  }
+
+  <!-- Empty State -->
+  @else if (reports().length === 0) {
+    <div class="empty">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="14 2 14 8 20 8" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="16" y1="13" x2="8" y2="13" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="16" y1="17" x2="8" y2="17" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <h3>Nenhum relatório gerado</h3>
+      <p>Gere seu primeiro relatório para ver uma análise completa da sua semana de saúde.</p>
+      <button class="btn-accent" (click)="generate()">Gerar meu primeiro relatório</button>
+    </div>
+  }
+
+  <!-- Reports List -->
+  @else {
+    <div class="reports-list">
+      @for (report of reports(); track report.id) {
+        <div
+          class="report-card"
+          [class.pending-card]="report.status === 'Pending'"
+          [class.failed-card]="report.status === 'Failed'"
+        >
+          <!-- Card Header -->
+          <div class="report-header" (click)="report.status === 'Completed' && toggleExpand(report.id)">
+            <div class="report-header-left">
+              <h3 class="report-week">Semana de {{ formatWeekRange(report.weekStart, report.weekEnd) }}</h3>
+              <span [class]="statusClass(report.status)">
+                <span class="dot"></span>
+                {{ statusLabel(report.status) }}
+              </span>
+            </div>
+            @if (report.status === 'Completed') {
+              <span class="chevron" [class.expanded]="expandedId() === report.id">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            }
+          </div>
+
+          <!-- Pending Body -->
+          @if (report.status === 'Pending') {
+            <div class="pending-body">
+              <span class="spinner"></span>
+              <span class="pending-text">Gerando análise com IA...</span>
+            </div>
+          }
+
+          <!-- Failed Body -->
+          @else if (report.status === 'Failed') {
+            <div class="failed-body">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>Falha ao gerar. Tente novamente.</span>
+            </div>
+          }
+
+          <!-- Completed Body -->
+          @else {
+            <p class="report-summary">{{ report.summary }}</p>
+
+            <!-- Trend Badges -->
+            @if (report.metricsAnalysis && report.metricsAnalysis.length > 0) {
+              <div class="trend-badges">
+                @for (m of report.metricsAnalysis; track m.metricName) {
+                  <span class="trend-badge trend-{{ m.trend }}">
+                    {{ trendIcon(m.trend) }} {{ m.metricName }}
+                  </span>
+                }
+              </div>
+            }
+
+            <!-- Expanded Detail -->
+            @if (expandedId() === report.id) {
+              <div class="report-detail">
+
+                @if (report.patterns.length > 0) {
+                  <div class="detail-section">
+                    <h4 class="detail-title">Padrões identificados</h4>
+                    <ul class="pattern-list">
+                      @for (p of report.patterns; track p) {
+                        <li>{{ p }}</li>
+                      }
+                    </ul>
+                  </div>
+                }
+
+                @if (report.recommendations.length > 0) {
+                  <div class="detail-section">
+                    <h4 class="detail-title">Recomendações</h4>
+                    <ol class="recommendation-list">
+                      @for (r of report.recommendations; track r) {
+                        <li>{{ r }}</li>
+                      }
+                    </ol>
+                  </div>
+                }
+
+                @if (report.nutritionSummary) {
+                  <div class="detail-section">
+                    <h4 class="detail-title">Nutrição</h4>
+                    <p class="nutrition-text">{{ report.nutritionSummary }}</p>
+                  </div>
+                }
+
+                @if (report.metricsAnalysis && report.metricsAnalysis.length > 0) {
+                  <div class="detail-section">
+                    <h4 class="detail-title">Métricas da semana</h4>
+                    <div class="metrics-grid">
+                      @for (m of report.metricsAnalysis; track m.metricName) {
+                        <div class="metric-mini-card">
+                          <div class="metric-mini-header">
+                            <span class="metric-mini-name">{{ m.metricName }}</span>
+                            <span class="trend-badge small trend-{{ m.trend }}">{{ trendIcon(m.trend) }}</span>
+                          </div>
+                          <div class="metric-mini-avg">
+                            {{ m.average | number:'1.1-1' }}
+                            <span class="metric-unit">{{ m.unit }}</span>
+                          </div>
+                          <div class="metric-mini-range">
+                            <span>Mín {{ m.min | number:'1.1-1' }}</span>
+                            <span>Máx {{ m.max | number:'1.1-1' }}</span>
+                          </div>
+                          <p class="metric-mini-analysis">{{ m.analysis }}</p>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (report.disclaimer) {
+                  <p class="disclaimer">{{ report.disclaimer }}</p>
+                }
+
+              </div>
+            }
+
+            <button class="expand-btn" (click)="toggleExpand(report.id)">
+              @if (expandedId() === report.id) {
+                Ocultar relatório completo
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 15l-6-6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              } @else {
+                Ver relatório completo
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              }
+            </button>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+</div>

@@ -24,9 +24,10 @@ public class AddWeeklyReportUseCase(
 {
     public async Task<WeeklyReportResponse> ExecuteAsync(Guid userId, WeeklyReportRequest request)
     {
-        var today = DateTime.UtcNow.Date;
-        var weekStart = request.WeekStart?.Date
-            ?? today.AddDays(-(((int)today.DayOfWeek + 6) % 7));
+        var today = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
+        var weekStart = DateTime.SpecifyKind(
+            request.WeekStart?.Date ?? today.AddDays(-(((int)today.DayOfWeek + 6) % 7)),
+            DateTimeKind.Utc);
         var weekEnd = weekStart.AddDays(7).AddTicks(-1);
 
         var existing = await weeklyReportRepository.GetByUserIdAndWeek(userId, weekStart);
@@ -101,11 +102,18 @@ public class AddWeeklyReportUseCase(
             {
                 var ordered = g.OrderBy(r => r.MeasuredAt).ToList();
                 var avg = g.Average(r => r.Value);
-                var firstHalf = ordered.Take(ordered.Count / 2).Average(r => r.Value);
-                var secondHalf = ordered.Skip(ordered.Count / 2).Average(r => r.Value);
-                var trend = secondHalf > firstHalf * 1.05m ? "worsening"
+                var mid = ordered.Count / 2;
+                var firstHalfItems  = ordered.Take(mid);
+                var secondHalfItems = ordered.Skip(mid);
+                var trend = "stable";
+                if (firstHalfItems.Any() && secondHalfItems.Any())
+                {
+                    var firstHalf  = firstHalfItems.Average(r => r.Value);
+                    var secondHalf = secondHalfItems.Average(r => r.Value);
+                    trend = secondHalf > firstHalf * 1.05m ? "worsening"
                           : secondHalf < firstHalf * 0.95m ? "improving"
                           : "stable";
+                }
 
                 return new WeeklyMetricData(
                     g.Key,

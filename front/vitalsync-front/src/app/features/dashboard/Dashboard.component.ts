@@ -100,9 +100,14 @@ export class DashboardComponent implements OnInit {
       const type = types.find(t => t.id === id);
       const range = ranges.find(rg => rg.metricTypeId === id);
       const min = range?.minNormal ?? type?.minNormal ?? null;
-      const max = range?.maxNormal ?? type?.maxNormal ?? null;
+      // maxNormal=0 means the metric has no upper bound (null was stored as 0 in PersonalRange)
+      const rawMax = range?.maxNormal ?? type?.maxNormal ?? null;
+      const max = rawMax === 0 ? null : rawMax;
 
       const status = this.getStatus(r.value, min, max);
+      const rangeLabel = range
+        ? (max !== null ? `${range.minNormal}–${max} ${r.unit}` : `≥ ${range.minNormal} ${r.unit}`)
+        : undefined;
       cards.push({
         metricTypeId: id,
         name: r.metricTypeName,
@@ -114,7 +119,7 @@ export class DashboardComponent implements OnInit {
         minNormal: min,
         maxNormal: max,
         markerPercent: this.getMarker(r.value, min, max),
-        personalRange: range ? `${range.minNormal}–${range.maxNormal} ${r.unit}` : undefined,
+        personalRange: rangeLabel,
       });
     }
 
@@ -133,7 +138,8 @@ export class DashboardComponent implements OnInit {
         const range = ranges.find(rg => rg.metricTypeId === r.metricTypeId);
         const type = types.find(t => t.id === r.metricTypeId);
         const min = range?.minNormal ?? type?.minNormal ?? null;
-        const max = range?.maxNormal ?? type?.maxNormal ?? null;
+        const rawMax = range?.maxNormal ?? type?.maxNormal ?? null;
+        const max = rawMax === 0 ? null : rawMax;
         const status = this.getStatus(r.value, min, max);
         return {
           id: r.id,

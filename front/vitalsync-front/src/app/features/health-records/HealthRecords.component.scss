@@ -1,5 +1,10 @@
 :host { display: block; }
 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .content {
   padding: 28px 36px 64px;
   max-width: 960px;
@@ -14,6 +19,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
+  animation: fadeUp .4s ease-out both;
 }
 
 .page-title { font-size: 1.8rem; font-weight: 800; color: var(--text-primary); letter-spacing: -0.03em; }
@@ -195,6 +201,7 @@
   background: var(--bg-surface);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-lg);
+  animation: fadeUp .4s ease-out .06s both;
 }
 
 .filter-select { flex-shrink: 0; }
@@ -270,7 +277,12 @@
 }
 
 // ── RECORDS ───────────────────────────────────────────
-.records-list { display: flex; flex-direction: column; gap: 8px; }
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeUp .4s ease-out .12s both;
+}
 
 .record-row {
   background: var(--bg-surface);

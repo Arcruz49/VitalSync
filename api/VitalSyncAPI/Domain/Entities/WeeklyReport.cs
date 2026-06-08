@@ -25,13 +25,13 @@ public class WeeklyReport
     public string Summary { get; set; } = string.Empty;
 
     [Column("metrics_analysis", TypeName = "jsonb")]
-    public string MetricsAnalysis { get; set; } = string.Empty;
+    public string MetricsAnalysis { get; set; } = "null";
 
     [Column("patterns", TypeName = "jsonb")]
-    public string Patterns { get; set; } = string.Empty;
+    public string Patterns { get; set; } = "[]";
 
     [Column("recommendations", TypeName = "jsonb")]
-    public string Recommendations { get; set; } = string.Empty;
+    public string Recommendations { get; set; } = "[]";
 
     [Column("nutrition_summary")]
     [MaxLength(500)]

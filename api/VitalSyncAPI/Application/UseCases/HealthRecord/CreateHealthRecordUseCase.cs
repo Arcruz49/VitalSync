@@ -67,7 +67,7 @@ public class CreateHealthRecordUseCase(
         );
     }
 
-    private async Task PublishInsightRequestAsync(Guid userId, HealthRecord record, Domain.Entities.MetricType metricType)
+    private async Task PublishInsightRequestAsync(Guid userId, HealthRecord record, MetricType metricType)
     {
         try
         {

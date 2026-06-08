@@ -47,6 +47,11 @@ export const routes: Routes = [
         data: { title: 'Nutrição' },
         loadComponent: () => import('./features/nutrition/Nutrition.component').then(m => m.NutritionComponent)
       },
+      {
+        path: 'reports',
+        data: { title: 'Relatórios' },
+        loadComponent: () => import('./features/reports/Reports.component').then(m => m.ReportsComponent)
+      },
     ]
   },
   { path: '**', redirectTo: 'login' }

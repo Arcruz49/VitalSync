@@ -9,10 +9,11 @@ public static class AlertGenerator
     {
         if (minNormal is null && maxNormal is null) return null;
 
-        var aboveMax = maxNormal.HasValue && record.Value > maxNormal.Value;
+        var aboveMax = maxNormal.HasValue && maxNormal.Value != 0 && record.Value > maxNormal.Value;
         var belowMin = minNormal.HasValue && record.Value < minNormal.Value;
 
         if (!aboveMax && !belowMin) return null;
+        if (aboveMax && metricType.Id == 11) return null;
 
         var severity = CalculateSeverity(record.Value, minNormal, maxNormal, aboveMax);
         var message = BuildAlertMessage(record.Value, metricType, aboveMax, minNormal, maxNormal);

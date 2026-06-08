@@ -3,7 +3,7 @@ WORKDIR /src
 COPY ["VitalSyncAPI.csproj", "."]
 RUN dotnet restore
 COPY . .
-RUN dotnet publish -c Debug -o /app/publish   # <-- Release vira Debug
+RUN dotnet publish VitalSyncAPI.csproj -c Debug -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
