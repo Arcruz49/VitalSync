@@ -68,13 +68,13 @@ AI analysis runs asynchronously: after a health record or nutrition entry is sav
 ```
 VitalSync/
 ├── docker-compose.yml
-├── .env                          # DB_USER, DB_PASSWORD, JWT_KEY, RABBITMQ_USER, RABBITMQ_PASSWORD, ANTHROPIC_API_KEY
+├── .env                          # secrets — see .env.example for all required keys
 ├── api/VitalSyncAPI/             # ASP.NET Core 10 Web API
 │   ├── Domain/                   # Entities, interfaces, domain services
 │   ├── Application/              # Use cases, DTOs, service interfaces
 │   ├── Infrastructure/           # EF Core, repositories, UnitOfWork
 │   ├── Controllers/              # HTTP endpoints
-│   ├── Consumers/                # MassTransit consumers (InsightGenerated, NutritionAnalysisCompleted)
+│   ├── Consumers/                # MassTransit consumers (InsightGenerated, NutritionAnalysisCompleted, WeeklyReportGenerated)
 │   └── Events/                   # Shared contracts (namespace VitalSync.Contracts)
 ├── ai-service/VitalSyncAI/       # ASP.NET Core 10 AI microservice
 │   ├── Consumers/                # MassTransit consumers (InsightRequested, NutritionAnalysisRequested)
@@ -107,7 +107,11 @@ JWT_KEY=your_jwt_secret_key
 RABBITMQ_USER=your_rabbitmq_user
 RABBITMQ_PASSWORD=your_rabbitmq_password
 ANTHROPIC_API_KEY=your_anthropic_key
+ANTHROPIC_INSIGHT_MODEL=claude-haiku-4-5-20251001
+ANTHROPIC_REPORT_MODEL=claude-sonnet-4-6
 ```
+
+A `.env.example` file is included in the repository with all required keys and default model values.
 
 ### Running
 
@@ -121,7 +125,7 @@ docker compose up --build api
 # Rebuild the AI microservice after code changes
 docker compose up --build ai-service
 
-# Rebuild the frontend after changes outside src/ or public/
+# Rebuild the frontend after any change
 docker compose up --build frontend
 ```
 
@@ -204,6 +208,14 @@ All authenticated endpoints require the `vitalsync_token` JWT cookie set by the 
 | DELETE | `/nutrition/{id}` | Required | Delete a record |
 | GET | `/nutrition/summary` | Required | Daily summary with totals vs. goals (`date=YYYY-MM-DD`) |
 
+### Reports
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| POST | `/reports/generate` | Required | Create weekly report — saves as `Pending`, AI generates asynchronously |
+| GET | `/reports` | Required | List all reports (without `MetricsAnalysis`) |
+| GET | `/reports/{id}` | Required | Get report by ID (with `MetricsAnalysis`) |
+
 ---
 
 ## Architecture Notes
@@ -234,6 +246,16 @@ POST /nutrition
   → API consumer updates record (status: Completed or Failed)
 ```
 
+```
+POST /reports/generate
+  → save report (status: Pending)
+  → publish WeeklyReportRequestedEvent
+  → return 200 immediately
+
+[RabbitMQ] → AI Service → Claude API → WeeklyReportGeneratedEvent → [RabbitMQ]
+  → API consumer updates report (status: Completed or Failed), persists MetricsAnalysis
+```
+
 **Shared Contracts**
 
 Event types used by both services live under the `VitalSync.Contracts` namespace in both projects. The namespace must match exactly — MassTransit encodes it in the message URN header (`urn:message:VitalSync.Contracts:EventName`) and rejects messages with mismatched types into a `_skipped` queue.
@@ -244,6 +266,18 @@ Exchange names are pinned via `cfg.Message<T>(m => m.SetEntityName(...))` in bot
 - `PersonalRangeCalculator` — derives normal ranges per metric from the user's profile, conditions, and medications
 - `BodyMetricsCalculator` — computes BMI, BMR, TDEE, and macro goals from physical data
 - `AlertGenerator` — creates an alert when a health record exceeds its applicable range; uses personal range when available, falls back to metric-type defaults
+
+**Rate Limiting**
+
+Applied via ASP.NET Core's built-in rate limiter, partitioned by user ID for authenticated routes and by IP for public ones:
+
+| Policy | Applies to | Limit |
+|--------|-----------|-------|
+| `global` | All authenticated endpoints | 60 req/min |
+| `ai-limit` | `POST /health-record`, `POST /reports/generate` | 15 req/min |
+| `ai-limit-image` | `POST /nutrition` (image upload) | 5 req/min |
+| `login` | `POST /auth/login` | 8 req/min |
+| `register` | `POST /auth/register` | 3 req/min |
 
 **Frontend**
 - Angular 19 standalone components with the Signals API for reactive state
