@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using VitalSyncAPI.Application.DTOs.Request;
 using VitalSyncAPI.Application.Interfaces;
@@ -19,6 +20,7 @@ public class AuthController : ControllerBase
         _registerUserUseCase = registerUserUseCase;
     }
 
+    [EnableRateLimiting("login")]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -35,6 +37,7 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [EnableRateLimiting("register")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterUserRequest request)
     {

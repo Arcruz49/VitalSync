@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using VitalSyncAPI.Application.DTOs.Request;
 using VitalSyncAPI.Application.Interfaces;
 
@@ -7,6 +8,7 @@ namespace VitalSyncAPI.Controllers;
 
 [ApiController]
 [Authorize]
+[EnableRateLimiting("global")]
 [Route("profile")]
 public class ProfileController(
     ISaveProfileUseCase saveProfileUseCase,

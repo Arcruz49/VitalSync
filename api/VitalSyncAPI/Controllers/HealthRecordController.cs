@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using VitalSyncAPI.Application.DTOs.Request;
 using VitalSyncAPI.Application.Interfaces;
@@ -7,6 +8,7 @@ using VitalSyncAPI.Application.Interfaces;
 namespace VitalSyncAPI.Controllers;
 [ApiController]
 [Authorize]
+[EnableRateLimiting("global")]
 [Route("health-record")]
 public class HealthRecordController(
     ICreateHealthRecordUseCase createHealthRecordUseCase,
@@ -29,6 +31,7 @@ public class HealthRecordController(
         return Ok(result);
     }
 
+    [EnableRateLimiting("ai-limit")]
     [HttpPost]
     public async Task<IActionResult> CreateHealthRecord(HealthRecordRequest request)
     {

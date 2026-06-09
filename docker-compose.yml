@@ -34,7 +34,8 @@ services:
       - RabbitMQ__User=${RABBITMQ_USER}
       - RabbitMQ__Password=${RABBITMQ_PASSWORD}
       - Anthropic__ApiKey=${ANTHROPIC_API_KEY}
-      - Anthropic__InsightModel=claude-haiku-4-5-20251001
+      - Anthropic__InsightModel=${ANTHROPIC_INSIGHT_MODEL}
+      - Anthropic__ReportModel=${ANTHROPIC_REPORT_MODEL}
     depends_on:
       rabbitmq:
         condition: service_healthy
