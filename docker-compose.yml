@@ -76,10 +76,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
-    volumes:
-      - ./front/vitalsync-front/src:/app/src
-      - ./front/vitalsync-front/public:/app/public
-      - ./front/vitalsync-front/proxy.conf.json:/app/proxy.conf.json
+    # volumes:
+    #   - ./front/vitalsync-front/src:/app/src
+    #   - ./front/vitalsync-front/public:/app/public
+    #   - ./front/vitalsync-front/proxy.conf.json:/app/proxy.conf.json
     depends_on:
       - api
 
