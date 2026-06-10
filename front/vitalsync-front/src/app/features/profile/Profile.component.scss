@@ -376,6 +376,42 @@
   animation: shimmer 1.4s infinite;
 }
 
+// ── DANGER ZONE ───────────────────────────────────────
+.section--danger {
+  border-color: rgba(220, 38, 38, 0.25);
+  background: var(--bg-surface);
+}
+
+.danger-label { color: var(--critical) !important; }
+
+.danger-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+
+  &--confirm { color: var(--critical); font-weight: 500; }
+}
+
+.btn-danger {
+  align-self: flex-start;
+  padding: 0 16px; height: 38px;
+  background: transparent;
+  border: 1.5px solid var(--critical);
+  border-radius: var(--radius-md);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  color: var(--critical); cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: background .2s, color .2s;
+
+  &:hover:not(:disabled) { background: var(--critical); color: white; }
+  &:disabled { opacity: .7; cursor: not-allowed; }
+}
+
+.danger-actions {
+  display: flex; gap: 10px; align-items: center;
+}
+
 @keyframes spin    { to { transform: rotate(360deg); } }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 @keyframes fadeIn  { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }

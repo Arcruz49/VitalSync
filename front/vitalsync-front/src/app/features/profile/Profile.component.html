@@ -388,5 +388,27 @@
 
     } <!-- @if (profile()) -->
 
+    <!-- ── ZONA DE PERIGO ────────────────────────────── -->
+    <div class="section section--danger">
+      <div class="section-header">
+        <span class="section-label danger-label">ZONA DE PERIGO</span>
+      </div>
+
+      @if (!confirmingDelete) {
+        <p class="danger-desc">Excluir sua conta remove permanentemente todos os seus dados de saúde, perfil e histórico. Esta ação não pode ser desfeita.</p>
+        <button class="btn-danger" (click)="confirmingDelete = true">Excluir minha conta</button>
+      } @else {
+        <p class="danger-desc danger-desc--confirm">
+          Tem certeza? Todos os seus dados serão apagados permanentemente e não poderão ser recuperados.
+        </p>
+        <div class="danger-actions">
+          <button class="btn-cancel" (click)="confirmingDelete = false" [disabled]="deletingAccount()">Cancelar</button>
+          <button class="btn-danger" (click)="deleteAccount()" [disabled]="deletingAccount()">
+            @if (deletingAccount()) { <span class="spinner"></span> } @else { Confirmar exclusão }
+          </button>
+        </div>
+      }
+    </div>
+
   } <!-- @else (!loading) -->
 </div>

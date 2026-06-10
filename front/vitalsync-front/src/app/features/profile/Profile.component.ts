@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ProfileService } from '../../core/services/profile.service';
 import {
@@ -20,6 +21,7 @@ import {
 export class ProfileComponent implements OnInit {
   auth = inject(AuthService);
   private profileService = inject(ProfileService);
+  private router = inject(Router);
 
   loading = signal(true);
   profile = signal<UserProfileResponse | null>(null);
@@ -41,6 +43,9 @@ export class ProfileComponent implements OnInit {
   errorConditions = signal('');
   errorMedications = signal('');
   successMsg = signal('');
+
+  confirmingDelete = false;
+  deletingAccount = signal(false);
 
   pfPhysical: any = {};
   pfRoutine: any = {};
@@ -301,6 +306,17 @@ ngOnInit() { this.load(); }
     if (bmi < 30) return 'Sobrepeso';
     if (bmi < 35) return 'Obesidade I';
     return 'Obesidade II';
+  }
+
+  deleteAccount() {
+    this.deletingAccount.set(true);
+    this.auth.deleteAccount().subscribe({
+      next: () => this.router.navigateByUrl('/login'),
+      error: () => {
+        this.deletingAccount.set(false);
+        this.confirmingDelete = false;
+      },
+    });
   }
 
   private flash(msg: string) {

@@ -52,7 +52,7 @@
         <div class="field">
           <label>
             Senha
-            <a href="#" class="forgot">Esqueci a senha</a>
+            <a (click)="navigateToForgotPassword()" class="forgot" style="cursor:pointer">Esqueci a senha</a>
           </label>
           <div class="pwd-wrap">
             <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="••••••••" [class.error]="!!errorMessage()" />

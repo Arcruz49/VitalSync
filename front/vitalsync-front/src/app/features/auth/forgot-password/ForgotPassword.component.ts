@@ -5,23 +5,20 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-forgot-password',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './Login.component.html',
-  styleUrl: './Login.component.scss',
+  templateUrl: './ForgotPassword.component.html',
+  styleUrl: './ForgotPassword.component.scss',
 })
-export class LoginComponent {
+export class ForgotPasswordComponent {
   private auth = inject(AuthService);
   private themeService = inject(ThemeService);
   private router = inject(Router);
 
   email = '';
-  password = '';
-  showPassword = false;
   isLoading = signal(false);
-  errorMessage = signal('');
-  isExiting = false;
+  sent = signal(false);
 
   get isDark() { return this.themeService.isDark; }
 
@@ -44,29 +41,23 @@ export class LoginComponent {
     });
   }
 
-  navigateToRegister() {
-    if (this.isExiting) return;
-    this.isExiting = true;
-    setTimeout(() => this.router.navigateByUrl('/register'), 390);
-  }
-
-  navigateToForgotPassword() {
-    if (this.isExiting) return;
-    this.isExiting = true;
-    setTimeout(() => this.router.navigateByUrl('/forgot-password'), 390);
+  navigateToLogin() {
+    this.router.navigateByUrl('/login');
   }
 
   onSubmit() {
-    if (!this.email || !this.password) return;
+    if (!this.email) return;
     this.isLoading.set(true);
-    this.errorMessage.set('');
 
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigateByUrl('/dashboard'),
-      error: (err) => {
-        this.errorMessage.set(err.error?.message ?? 'E-mail ou senha incorretos.');
+    this.auth.forgotPassword(this.email).subscribe({
+      next: () => {
+        this.sent.set(true);
         this.isLoading.set(false);
-      }
+      },
+      error: () => {
+        this.sent.set(true);
+        this.isLoading.set(false);
+      },
     });
   }
 }

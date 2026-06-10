@@ -40,4 +40,24 @@ export class AuthService {
       .post(`${this.base}/logout`, {}, { withCredentials: true })
       .pipe(tap(() => this.currentUser.set(null)));
   }
+
+  forgotPassword(email: string) {
+    return this.http.post(`${this.base}/forgot-password`, null, {
+      params: { email },
+      withCredentials: true,
+      responseType: 'text' as const,
+    });
+  }
+
+  resetPassword(token: string, password: string) {
+    return this.http.post(`${this.base}/reset-password`, { token, password }, {
+      withCredentials: true,
+    });
+  }
+
+  deleteAccount() {
+    return this.http
+      .delete(`${this.base}`, { withCredentials: true })
+      .pipe(tap(() => this.currentUser.set(null)));
+  }
 }

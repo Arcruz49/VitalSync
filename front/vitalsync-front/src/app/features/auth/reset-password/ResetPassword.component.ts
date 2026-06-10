@@ -1,29 +1,35 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-reset-password',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './Login.component.html',
-  styleUrl: './Login.component.scss',
+  templateUrl: './ResetPassword.component.html',
+  styleUrl: './ResetPassword.component.scss',
 })
-export class LoginComponent {
+export class ResetPasswordComponent implements OnInit {
   private auth = inject(AuthService);
   private themeService = inject(ThemeService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  email = '';
+  token = '';
   password = '';
+  confirmPassword = '';
   showPassword = false;
   isLoading = signal(false);
   errorMessage = signal('');
-  isExiting = false;
+  success = signal(false);
 
   get isDark() { return this.themeService.isDark; }
+
+  ngOnInit() {
+    this.token = this.route.snapshot.queryParams['token'] ?? '';
+  }
 
   toggleTheme(event: MouseEvent) {
     if (typeof document === 'undefined' || !('startViewTransition' in document)) {
@@ -44,29 +50,34 @@ export class LoginComponent {
     });
   }
 
-  navigateToRegister() {
-    if (this.isExiting) return;
-    this.isExiting = true;
-    setTimeout(() => this.router.navigateByUrl('/register'), 390);
-  }
-
-  navigateToForgotPassword() {
-    if (this.isExiting) return;
-    this.isExiting = true;
-    setTimeout(() => this.router.navigateByUrl('/forgot-password'), 390);
+  navigateToLogin() {
+    this.router.navigateByUrl('/login');
   }
 
   onSubmit() {
-    if (!this.email || !this.password) return;
+    if (!this.password || !this.confirmPassword) return;
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage.set('As senhas não coincidem.');
+      return;
+    }
+    if (this.password.length < 8) {
+      this.errorMessage.set('A senha deve ter pelo menos 8 caracteres.');
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigateByUrl('/dashboard'),
-      error: (err) => {
-        this.errorMessage.set(err.error?.message ?? 'E-mail ou senha incorretos.');
+    this.auth.resetPassword(this.token, this.password).subscribe({
+      next: () => {
+        this.success.set(true);
         this.isLoading.set(false);
-      }
+        setTimeout(() => this.router.navigateByUrl('/login'), 2500);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message ?? 'Token inválido ou expirado.');
+        this.isLoading.set(false);
+      },
     });
   }
 }
