@@ -1,5 +1,6 @@
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -10,6 +11,7 @@ using VitalSyncAPI.Application.Security;
 using VitalSyncAPI.Application.Services;
 using VitalSyncAPI.Application.UseCases;
 using VitalSyncAPI.Consumers;
+using VitalSyncAPI.Domain.Entities;
 using VitalSyncAPI.Domain.Interfaces;
 using VitalSyncAPI.Infrastructure.Data;
 using VitalSyncAPI.Infrastructure.Middlewares;
@@ -64,6 +66,12 @@ builder.Services.AddScoped<IGetWeeklyReportsUseCase, GetWeeklyReportsUseCase>();
 builder.Services.AddScoped<IGetWeeklyReportUseCase, GetWeeklyReportUseCase>();
 builder.Services.AddScoped<IGetWeeklyReportsByIdUseCase, GetWeeklyReportsByIdUseCase>();
 builder.Services.AddScoped<IAIAnalysisService, AnthropicService>();
+builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ISendEmailForgotPasswordUseCase, SendEmailForgotPasswordUseCase>();
+builder.Services.AddScoped<IResetPasswordUseCase, ResetPasswordUseCase>();
+builder.Services.AddScoped<IDeleteUserDataUseCase, DeleteUserDataUseCase>();
+builder.Services.AddScoped<PasswordHasher<User>>();
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]

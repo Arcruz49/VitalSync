@@ -20,7 +20,7 @@ public class Context : DbContext
     public DbSet<AIInsight> AIInsights => Set<AIInsight>();
     public DbSet<NutritionRecord> NutritionRecords => Set<NutritionRecord>();
     public DbSet<WeeklyReport> WeeklyReports => Set<WeeklyReport>();
-
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

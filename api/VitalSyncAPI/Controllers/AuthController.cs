@@ -9,15 +9,27 @@ namespace VitalSyncAPI.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController : ControllerBase
+public class AuthController : BaseController
 {
     private readonly IAuthenticateUseCase _authenticateUseCase;
     private readonly IRegisterUserUseCase _registerUserUseCase;
+    private readonly ISendEmailForgotPasswordUseCase _sendEmailForgotPasswordUseCase;
+    private readonly IResetPasswordUseCase _resetPasswordUseCase;
+    private readonly IDeleteUserDataUseCase _deleteUserDataUseCase;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthenticateUseCase authenticateUseCase, IRegisterUserUseCase registerUserUseCase)
+    public AuthController(IAuthenticateUseCase authenticateUseCase, IRegisterUserUseCase registerUserUseCase,
+    ISendEmailForgotPasswordUseCase sendEmailForgotPasswordUseCase, ILogger<AuthController> logger, IResetPasswordUseCase resetPasswordUseCase,
+    IDeleteUserDataUseCase deleteUserDataUseCase, IServiceScopeFactory scopeFactory)
     {
         _authenticateUseCase = authenticateUseCase;
         _registerUserUseCase = registerUserUseCase;
+        _sendEmailForgotPasswordUseCase = sendEmailForgotPasswordUseCase;
+        _resetPasswordUseCase = resetPasswordUseCase;
+        _deleteUserDataUseCase = deleteUserDataUseCase;
+        _scopeFactory = scopeFactory;
+        _logger = logger;
     }
 
     [EnableRateLimiting("login")]
@@ -77,5 +89,40 @@ public class AuthController : ControllerBase
         });
 
         return Ok();
+    }
+
+    [HttpPost("forgot-password")]
+    public IActionResult ForgotPassword(string email)
+    {
+        _ = Task.Run(async () =>
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var useCase = scope.ServiceProvider.GetRequiredService<ISendEmailForgotPasswordUseCase>();
+            try
+            {
+                await useCase.ExecuteAsync(email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao processar recuperação de senha para {Email}", email);
+            }
+        });
+
+        return Ok("Se o seu email estiver cadastrado, você receberá um email de recuperação de senha.");
+    }
+    
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ForgotPasswordRequest request)
+    {
+        await _resetPasswordUseCase.ExecuteAsync(request.Token, request.Password);
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpDelete()]
+    public async Task<IActionResult> DeleteUserData()
+    {
+        await _deleteUserDataUseCase.ExecuteAsync(UserId);
+        return NoContent();
     }
 }
