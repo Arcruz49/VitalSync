@@ -41,7 +41,6 @@ public class EmailService(IConfiguration config) : IEmailService
                         <tr>
                             <td style="background:#111827;padding:32px 40px;">
                             <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.02em;">VitalSync.</h1>
-                            <p style="margin:8px 0 0;color:#9CA3AF;font-size:13px;">Plataforma de saúde personalizada</p>
                             </td>
                         </tr>
 
@@ -54,14 +53,20 @@ public class EmailService(IConfiguration config) : IEmailService
                             </p>
 
                             <!-- BUTTON -->
-                            <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+                            <table cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 28px;">
                                 <tr>
-                                <td style="background:#7C3AED;border-radius:10px;">
-                                    <a href="{resetLink}"
-                                    style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;letter-spacing:-0.01em;">
-                                    Redefinir senha
-                                    </a>
-                                </td>
+                                    <td align="center">
+                                        <table cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="background:#7C3AED;border-radius:10px;">
+                                                    <a href="{resetLink}"
+                                                    style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;letter-spacing:-0.01em;">
+                                                        Redefinir senha
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                 </tr>
                             </table>
 
