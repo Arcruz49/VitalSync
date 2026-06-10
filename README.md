@@ -50,6 +50,11 @@ AI analysis runs asynchronously: after a health record or nutrition entry is sav
 - Severity levels: Critical and Warning
 - Linked back to the originating health record for context
 
+**Account Management**
+- Password recovery via email link (token hashed with SHA-256, expires in 15 minutes)
+- Password reset via token from email
+- Account deletion — removes all user data permanently
+
 **Profile**
 - Physical data and goals (weight, height, target weight, activity level)
 - Training routine (frequency, types, seated hours, sleep)
@@ -109,6 +114,14 @@ RABBITMQ_PASSWORD=your_rabbitmq_password
 ANTHROPIC_API_KEY=your_anthropic_key
 ANTHROPIC_INSIGHT_MODEL=claude-haiku-4-5-20251001
 ANTHROPIC_REPORT_MODEL=claude-sonnet-4-6
+
+# Email (used for password recovery)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_USER=your@gmail.com
+EMAIL_PASSWORD=your_app_password   # Gmail App Password — no spaces
+EMAIL_FROM=your@gmail.com
+EMAIL_PORT=587
+APP_BASE_URL=http://localhost:4200  # change to https://yourdomain.com in production
 ```
 
 A `.env.example` file is included in the repository with all required keys and default model values.
@@ -165,6 +178,9 @@ All authenticated endpoints require the `vitalsync_token` JWT cookie set by the 
 | POST | `/auth/login` | — | Login and receive JWT cookie |
 | GET | `/auth/me` | Required | Get the authenticated user |
 | POST | `/auth/logout` | Required | Logout and clear cookie |
+| POST | `/auth/forgot-password` | — | Send password reset email (`?email=`) |
+| POST | `/auth/reset-password` | — | Reset password with token from email |
+| DELETE | `/auth` | Required | Delete account and all user data |
 
 ### Health Records
 
@@ -206,7 +222,7 @@ All authenticated endpoints require the `vitalsync_token` JWT cookie set by the 
 | GET | `/nutrition/{id}` | Required | Get a single record |
 | PUT | `/nutrition/{id}` | Required | Update a record |
 | DELETE | `/nutrition/{id}` | Required | Delete a record |
-| GET | `/nutrition/summary` | Required | Daily summary with totals vs. goals (`date=YYYY-MM-DD`) |
+| GET | `/nutrition/summary` | Required | Daily summary with totals vs. goals (`date=YYYY-MM-DD&timezoneOffsetMinutes=N`) |
 
 ### Reports
 
