@@ -19,6 +19,12 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__User=${RABBITMQ_USER}
       - RabbitMQ__Password=${RABBITMQ_PASSWORD}
+      - Email__Host=${EMAIL_HOST}
+      - Email__User=${EMAIL_USER}
+      - Email__Password=${EMAIL_PASSWORD}
+      - Email__From=${EMAIL_FROM}
+      - Email__Port=${EMAIL_PORT}
+      - App__BaseUrl=${APP_BASE_URL}
     depends_on:
       db:
         condition: service_healthy

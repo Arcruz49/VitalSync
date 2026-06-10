@@ -56,9 +56,9 @@ public class NutritionController(
     }
 
     [HttpGet("summary")]
-    public async Task<IActionResult> GetNutritionSummary([FromQuery] DateTime? date)
+    public async Task<IActionResult> GetNutritionSummary([FromQuery] DateTime? date, [FromQuery] int timezoneOffsetMinutes = 0)
     {
-        var result = await getNutritionSummaryUseCase.ExecuteAsync(UserId, date ?? DateTime.UtcNow.Date);
+        var result = await getNutritionSummaryUseCase.ExecuteAsync(UserId, date ?? DateTime.UtcNow.Date, timezoneOffsetMinutes);
         return Ok(result);
     }
 }

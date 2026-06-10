@@ -56,7 +56,8 @@ export class NutritionComponent implements OnInit {
     if (this.isToday()) return 'Hoje';
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    if (this.selectedDate() === yesterday.toISOString().slice(0, 10)) return 'Ontem';
+    const yISO = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+    if (this.selectedDate() === yISO) return 'Ontem';
     return new Date(this.selectedDate() + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
   }
 
@@ -172,7 +173,11 @@ export class NutritionComponent implements OnInit {
 }
 
 function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 function newForm() {

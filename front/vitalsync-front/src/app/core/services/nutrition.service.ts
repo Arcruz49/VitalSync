@@ -9,7 +9,9 @@ export class NutritionService {
   constructor(private http: HttpClient) {}
 
   getSummary(date: string) {
-    const params = new HttpParams().set('date', date);
+    const params = new HttpParams()
+      .set('date', date)
+      .set('timezoneOffsetMinutes', new Date().getTimezoneOffset().toString());
     return this.http.get<NutritionSummaryResponse>(`${this.base}/summary`, { params, withCredentials: true });
   }
 
