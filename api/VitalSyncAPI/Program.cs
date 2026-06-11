@@ -200,6 +200,32 @@ builder.Services.AddRateLimiter(options =>
         )
     );
 
+    options.AddPolicy("forgot-password", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 2,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }
+        )
+    );
+    
+    options.AddPolicy("reset-password", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 1,
+                Window = TimeSpan.FromMinutes(5),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }
+        )
+    );
+
     options.RejectionStatusCode = 429;
 });
 

@@ -91,6 +91,7 @@ public class AuthController : BaseController
         return Ok();
     }
 
+    [EnableRateLimiting("forgot-password")]
     [HttpPost("forgot-password")]
     public IActionResult ForgotPassword(string email)
     {
@@ -111,6 +112,7 @@ public class AuthController : BaseController
         return Ok("Se o seu email estiver cadastrado, você receberá um email de recuperação de senha.");
     }
     
+    [EnableRateLimiting("reset-password")]
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword(ForgotPasswordRequest request)
     {
