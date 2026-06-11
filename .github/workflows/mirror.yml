@@ -16,4 +16,4 @@ jobs:
       - name: Mirror to GitLab
         run: |
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/arcruz49/vitalsync.git
-          git push gitlab --mirror
+          git push gitlab refs/remotes/origin/master:refs/heads/master --force
