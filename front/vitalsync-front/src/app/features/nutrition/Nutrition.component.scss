@@ -426,12 +426,11 @@
   min-height: 160px;
   border: 2px dashed var(--border);
   border-radius: var(--radius-md);
-  cursor: pointer;
   overflow: hidden;
   margin-bottom: 20px;
   transition: border-color 0.15s, background 0.15s;
 
-  &:hover, &.dragging {
+  &.dragging {
     border-color: var(--accent);
     background: var(--accent-light);
   }
@@ -440,6 +439,7 @@
     border-style: solid;
     border-color: var(--border);
     min-height: 200px;
+    cursor: pointer;
   }
 }
 
@@ -448,6 +448,34 @@
   font-weight: 500;
   color: var(--text-secondary);
   text-align: center;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
 }
 
 .upload-hint {
@@ -480,6 +508,7 @@
   color: white;
   font-size: 13px;
   font-weight: 500;
+  cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s;
 

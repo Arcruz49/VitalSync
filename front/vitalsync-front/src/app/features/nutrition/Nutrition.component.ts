@@ -105,14 +105,34 @@ export class NutritionComponent implements OnInit {
     this.dragging.set(false);
   }
 
-  private loadImage(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      this.form.imagePreview = result;
-      this.form.imageBase64 = result.split(',')[1];
-    };
-    reader.readAsDataURL(file);
+  private async loadImage(file: File): Promise<void> {
+    const base64 = await this.compressImage(file);
+    this.form.imagePreview = `data:image/jpeg;base64,${base64}`;
+    this.form.imageBase64 = base64;
+  }
+
+  private compressImage(file: File, maxWidth = 800, quality = 0.8): Promise<string> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const base64 = canvas.toDataURL('image/jpeg', quality).split(',')[1];
+
+        URL.revokeObjectURL(url);
+        resolve(base64);
+      };
+
+      img.src = url;
+    });
   }
 
   submit() {
