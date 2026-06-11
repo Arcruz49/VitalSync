@@ -1,0 +1,76 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOTNET_VERSION: "10.0"
+  NODE_VERSION: "20"
+
+# API
+build:api:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  script:
+    - cd api/VitalSyncAPI
+    - dotnet restore
+    - dotnet build -c Release --no-restore
+  only:
+    - master
+    - merge_requests
+
+# AI SERVICE
+build:ai-service:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  script:
+    - cd ai-service/VitalSyncAI
+    - dotnet restore
+    - dotnet build -c Release --no-restore
+  only:
+    - master
+    - merge_requests
+
+# FRONT
+build:frontend:
+  stage: build
+  image: node:20-alpine
+  script:
+    - cd front/vitalsync-front
+    - npm ci
+    - npm run build
+  only:
+    - master
+    - merge_requests
+
+# TEST API
+test:api:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  script:
+    - cd api/VitalSyncAPI
+    - dotnet test --no-build -c Release
+  only:
+    - master
+    - merge_requests
+
+# DEPLOY
+deploy:production:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
+  script:
+    - ssh $SERVER_USER@$SERVER_HOST "
+        cd ~/Documents/Projetos/VitalSync &&
+        git pull origin master &&
+        docker compose up --build -d
+      "
+  only:
+    - master
+  environment:
+    name: production
