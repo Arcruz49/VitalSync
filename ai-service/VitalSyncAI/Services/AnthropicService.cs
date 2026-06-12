@@ -234,7 +234,7 @@ public class AnthropicService(IConfiguration config)
                 new MessageParameters
                 {
                     Model = config["Anthropic:ReportModel"] ?? AnthropicModels.Claude46Sonnet,
-                    MaxTokens = 2048,
+                    MaxTokens = 4096,
                     Messages =
                     [
                         new Message
@@ -246,7 +246,7 @@ public class AnthropicService(IConfiguration config)
                             }
                         }
                     ]
-                }), 90);
+                }), 120);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
