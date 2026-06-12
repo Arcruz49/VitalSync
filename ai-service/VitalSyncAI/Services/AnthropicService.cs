@@ -67,9 +67,7 @@ public class AnthropicService(IConfiguration config)
         );
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
-        var json = raw.StartsWith("```")
-            ? raw[(raw.IndexOf('\n') + 1)..raw.LastIndexOf("```")].Trim()
-            : raw;
+        var json = StripMarkdownJson(raw);
 
         var result = JsonSerializer.Deserialize<InsightResult>(json, new JsonSerializerOptions
         {
@@ -155,9 +153,7 @@ public class AnthropicService(IConfiguration config)
         );
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
-        var json = raw.StartsWith("```")
-            ? raw[(raw.IndexOf('\n') + 1)..raw.LastIndexOf("```")].Trim()
-            : raw;
+        var json = StripMarkdownJson(raw);
 
         return JsonSerializer.Deserialize<NutritionAnalysisResult>(json, new JsonSerializerOptions
         {
@@ -251,9 +247,7 @@ public class AnthropicService(IConfiguration config)
         );
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
-        var json = raw.StartsWith("```")
-            ? raw[(raw.IndexOf('\n') + 1)..raw.LastIndexOf("```")].Trim()
-            : raw;
+        var json = StripMarkdownJson(raw);
 
         var result = JsonSerializer.Deserialize<WeeklyReportRawResult>(json, new JsonSerializerOptions
         {
@@ -290,6 +284,14 @@ public class AnthropicService(IConfiguration config)
         });
 
         return $"## Métricas da semana\n{string.Join("\n", lines)}";
+    }
+
+    private static string StripMarkdownJson(string raw)
+    {
+        if (!raw.StartsWith("```")) return raw;
+        var start = raw.IndexOf('\n') + 1;
+        var end = raw.LastIndexOf("```");
+        return end > start ? raw[start..end].Trim() : raw[start..].Trim();
     }
 }
 
