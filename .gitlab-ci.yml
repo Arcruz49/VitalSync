@@ -62,6 +62,7 @@ deploy:production:
   tags:
     - homeserver
   script:
+    - git config --global --add safe.directory /home/arthur.cruz/Documents/Projetos/VitalSync
     - cd /home/arthur.cruz/Documents/Projetos/VitalSync
     - git pull origin master
     - docker compose up --build -d
