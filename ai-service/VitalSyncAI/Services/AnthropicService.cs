@@ -49,23 +49,24 @@ public class AnthropicService(IConfiguration config)
             {BuildMetricsSection(request.RecentMetrics)}
             """;
 
-        var response = await _client.Messages.GetClaudeMessageAsync(
-            new MessageParameters
-            {
-                Model = _model,
-                MaxTokens = 1024,
-                Messages =
-                [
-                    new Message
-                    {
-                        Role = RoleType.User,
-                        Content = new List<ContentBase>
+        var response = await CallWithTimeout(
+            _client.Messages.GetClaudeMessageAsync(
+                new MessageParameters
+                {
+                    Model = _model,
+                    MaxTokens = 1024,
+                    Messages =
+                    [
+                        new Message
                         {
-                            new TextContent { Text = prompt }
+                            Role = RoleType.User,
+                            Content = new List<ContentBase>
+                            {
+                                new TextContent { Text = prompt }
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                }), 60);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
@@ -111,46 +112,47 @@ public class AnthropicService(IConfiguration config)
             }
             """;
 
-        var response = await _client.Messages.GetClaudeMessageAsync(
-            new MessageParameters
-            {
-                Model = config["Anthropic:ReportModel"] ?? AnthropicModels.Claude46Sonnet,
-                MaxTokens = 1024,
-                Messages =
-                [
-                    new Message
-                    {
-                        Role = RoleType.User,
-                        Content = new List<ContentBase>
+        var response = await CallWithTimeout(
+            _client.Messages.GetClaudeMessageAsync(
+                new MessageParameters
+                {
+                    Model = config["Anthropic:ReportModel"] ?? AnthropicModels.Claude46Sonnet,
+                    MaxTokens = 1024,
+                    Messages =
+                    [
+                        new Message
                         {
-                            new ImageContent
+                            Role = RoleType.User,
+                            Content = new List<ContentBase>
                             {
-                                Source = new ImageSource
+                                new ImageContent
                                 {
-                                    Type = SourceType.base64,
-                                    MediaType = "image/jpeg",
-                                    Data = base64Data
+                                    Source = new ImageSource
+                                    {
+                                        Type = SourceType.base64,
+                                        MediaType = "image/jpeg",
+                                        Data = base64Data
+                                    }
+                                },
+                                new TextContent
+                                {
+                                    Text = $"""
+                                        Analise a imagem deste prato/alimento e estime os macronutrientes.
+                                        Responda EXCLUSIVAMENTE com JSON válido, sem markdown, sem texto adicional.
+
+                                        O JSON deve seguir exatamente esta estrutura:
+                                        {jsonSchema}
+
+                                        {(!string.IsNullOrWhiteSpace(notes) ? $"Informações adicionais fornecidas pelo usuário: {notes}" : "")}
+
+                                        confidence deve ser entre 0 e 1.
+                                        Se não conseguir identificar alimento na imagem, retorne confidence: 0 e zeros nos macros.
+                                        """
                                 }
-                            },
-                            new TextContent
-                            {
-                                Text = $"""
-                                    Analise a imagem deste prato/alimento e estime os macronutrientes.
-                                    Responda EXCLUSIVAMENTE com JSON válido, sem markdown, sem texto adicional.
-
-                                    O JSON deve seguir exatamente esta estrutura:
-                                    {jsonSchema}
-
-                                    {(!string.IsNullOrWhiteSpace(notes) ? $"Informações adicionais fornecidas pelo usuário: {notes}" : "")}
-
-                                    confidence deve ser entre 0 e 1.
-                                    Se não conseguir identificar alimento na imagem, retorne confidence: 0 e zeros nos macros.
-                                    """
                             }
                         }
-                    }
-                ]
-            });
+                    ]
+                }), 60);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
@@ -227,23 +229,24 @@ public class AnthropicService(IConfiguration config)
             - Se poucos dados foram registrados, mencione a importância de registrar mais
             """;
 
-        var response = await _client.Messages.GetClaudeMessageAsync(
-            new MessageParameters
-            {
-                Model = config["Anthropic:ReportModel"] ?? AnthropicModels.Claude46Sonnet,
-                MaxTokens = 2048,
-                Messages =
-                [
-                    new Message
-                    {
-                        Role = RoleType.User,
-                        Content = new List<ContentBase>
+        var response = await CallWithTimeout(
+            _client.Messages.GetClaudeMessageAsync(
+                new MessageParameters
+                {
+                    Model = config["Anthropic:ReportModel"] ?? AnthropicModels.Claude46Sonnet,
+                    MaxTokens = 2048,
+                    Messages =
+                    [
+                        new Message
                         {
-                            new TextContent { Text = prompt }
+                            Role = RoleType.User,
+                            Content = new List<ContentBase>
+                            {
+                                new TextContent { Text = prompt }
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                }), 90);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
@@ -283,6 +286,16 @@ public class AnthropicService(IConfiguration config)
         });
 
         return $"## Métricas da semana\n{string.Join("\n", lines)}";
+    }
+
+    private static async Task<MessageResponse> CallWithTimeout(
+        Task<MessageResponse> apiTask,
+        int timeoutSeconds)
+    {
+        var timeout = Task.Delay(TimeSpan.FromSeconds(timeoutSeconds));
+        if (await Task.WhenAny(apiTask, timeout) == timeout)
+            throw new TimeoutException($"Anthropic API não respondeu em {timeoutSeconds}s.");
+        return await apiTask;
     }
 
     private static string StripMarkdownJson(string raw)
