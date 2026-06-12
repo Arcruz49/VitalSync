@@ -35,10 +35,12 @@ build:ai-service:
 build:frontend:
   stage: build
   image: node:20-alpine
+  variables:
+    NG_BUILD_PRERENDER: "false"
   script:
     - cd front/vitalsync-front
     - npm ci
-    - npm run build -- --no-prerender
+    - npx ng build --configuration=production --prerender=false
   only:
     - master
     - merge_requests
