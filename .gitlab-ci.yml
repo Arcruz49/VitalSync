@@ -59,19 +59,12 @@ test:api:
 # DEPLOY
 deploy:production:
   stage: deploy
-  image: alpine:latest
-  before_script:
-    - apk add --no-cache openssh
-    - mkdir -p ~/.ssh
-    - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_ed25519
-    - chmod 600 ~/.ssh/id_ed25519
-    - ssh-keyscan -T 10 -H $SERVER_HOST >> ~/.ssh/known_hosts || echo "keyscan failed"
+  tags:
+    - homeserver
   script:
-    - ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
-        cd ~/Documents/Projetos/VitalSync &&
-        git pull origin master &&
-        docker compose up --build -d
-      "
+    - cd ~/Documents/Projetos/VitalSync
+    - git pull origin master
+    - docker compose up --build -d
   only:
     - master
   environment:
