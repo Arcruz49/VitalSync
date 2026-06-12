@@ -38,7 +38,7 @@ build:frontend:
   script:
     - cd front/vitalsync-front
     - npm ci
-    - npm run build
+    - npm run build -- --no-prerender
   only:
     - master
     - merge_requests
