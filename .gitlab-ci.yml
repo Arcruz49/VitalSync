@@ -40,7 +40,7 @@ build:frontend:
   script:
     - cd front/vitalsync-front
     - npm ci
-    - npx ng build --configuration=production --prerender=false
+    - npx ng build --configuration=production
   only:
     - master
     - merge_requests
