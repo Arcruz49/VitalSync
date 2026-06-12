@@ -21,7 +21,6 @@ public class WeeklyReport
     public DateTime WeekEnd { get; set; }
 
     [Column("summary")]
-    [MaxLength(1000)]
     public string Summary { get; set; } = string.Empty;
 
     [Column("metrics_analysis", TypeName = "jsonb")]
@@ -34,11 +33,9 @@ public class WeeklyReport
     public string Recommendations { get; set; } = "[]";
 
     [Column("nutrition_summary")]
-    [MaxLength(500)]
     public string? NutritionSummary { get; set; }
 
     [Column("disclaimer")]
-    [MaxLength(300)]
     public string Disclaimer { get; set; } = string.Empty;
 
     [Column("status")]
