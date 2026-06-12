@@ -37,4 +37,5 @@ public class ReportsController(
         var result = await getWeeklyReportsByIdUseCase.ExecuteAsync(id, UserId);
         return Ok(result);
     }
+    
 }
