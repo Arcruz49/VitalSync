@@ -47,6 +47,7 @@ public class AnthropicService(IConfiguration config)
             {BuildMetricsSection(request.RecentMetrics)}
             """;
 
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
         var response = await _client.Messages.GetClaudeMessageAsync(
             new MessageParameters
             {
@@ -63,8 +64,7 @@ public class AnthropicService(IConfiguration config)
                         }
                     }
                 ]
-            }
-        );
+            }, cts.Token);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
@@ -110,6 +110,7 @@ public class AnthropicService(IConfiguration config)
             }
             """;
 
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
         var response = await _client.Messages.GetClaudeMessageAsync(
             new MessageParameters
             {
@@ -149,8 +150,7 @@ public class AnthropicService(IConfiguration config)
                         }
                     }
                 ]
-            }
-        );
+            }, cts.Token);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
@@ -227,6 +227,7 @@ public class AnthropicService(IConfiguration config)
             - Se poucos dados foram registrados, mencione a importância de registrar mais
             """;
 
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(90));
         var response = await _client.Messages.GetClaudeMessageAsync(
             new MessageParameters
             {
@@ -243,8 +244,7 @@ public class AnthropicService(IConfiguration config)
                         }
                     }
                 ]
-            }
-        );
+            }, cts.Token);
 
         var raw = ((TextContent)response.Content[0]).Text.Trim();
         var json = StripMarkdownJson(raw);
