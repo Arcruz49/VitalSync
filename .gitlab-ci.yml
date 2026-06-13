@@ -64,7 +64,8 @@ deploy:production:
   script:
     - git config --global --add safe.directory /home/arthur.cruz/Documents/Projetos/VitalSync
     - cd /home/arthur.cruz/Documents/Projetos/VitalSync
-    - git reset --hard origin/master
+    - git fetch https://github.com/Arcruz49/VitalSync.git master
+    - git reset --hard FETCH_HEAD
     - docker compose up --build -d
   only:
     - master
