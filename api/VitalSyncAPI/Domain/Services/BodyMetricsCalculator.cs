@@ -66,13 +66,18 @@ public static class BodyMetricsCalculator
 
     private static double CalculateCalorieGoal(double tdee, HealthGoal goal)
     {
-        return goal switch
+        var calories = goal switch
         {
-            HealthGoal.WeightLoss    => tdee - 500,
-            HealthGoal.MuscleGain   => tdee + 250,
-            HealthGoal.Maintenance  => tdee,
-            _                       => tdee
+            HealthGoal.WeightLoss => tdee * 0.80,
+            HealthGoal.MuscleGain => tdee + 250,
+            HealthGoal.Maintenance => tdee,
+            HealthGoal.Conditioning => tdee * 1.05,
+            HealthGoal.ChronicConditionControl => tdee * 0.85,
+            HealthGoal.GeneralHealth => tdee * 0.90,
+            _ => tdee
         };
+
+        return Math.Max(calories, 1200);
     }
 
     private static (decimal protein, decimal carbs, decimal fat) CalculateMacros(
