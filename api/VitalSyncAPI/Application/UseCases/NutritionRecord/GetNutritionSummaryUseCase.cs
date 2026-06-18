@@ -11,8 +11,6 @@ public class GetNutritionSummaryUseCase(
 {
     public async Task<NutritionSummaryResponse> ExecuteAsync(Guid userId, DateTime date, int timezoneOffsetMinutes = 0)
     {
-        // Convert local midnight to UTC: local 00:00 + offset = UTC equivalent.
-        // JS getTimezoneOffset() is positive for zones behind UTC (e.g. BRT UTC-3 → 180).
         var localMidnightUtc = date.Date.AddMinutes(timezoneOffsetMinutes);
         var from = DateTime.SpecifyKind(localMidnightUtc, DateTimeKind.Utc);
         var to = DateTime.SpecifyKind(localMidnightUtc.AddDays(1).AddTicks(-1), DateTimeKind.Utc);
