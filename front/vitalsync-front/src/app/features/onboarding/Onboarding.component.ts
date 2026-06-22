@@ -131,6 +131,7 @@ export class OnboardingComponent {
       hoursSeated: this.f.hoursSeated,
       habitualSleepHours: this.f.habitualSleepHours,
       sleepQuality: this.f.sleepQuality,
+      profilePic: -1,
     };
 
     const conditions = Array.from(this.selectedConditions).map(id => ({ conditionId: id }));

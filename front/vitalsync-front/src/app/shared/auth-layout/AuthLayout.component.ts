@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet, ActivatedRoute, NavigationE
 import { filter, map } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
 import { AlertService } from '../../core/services/alert.service';
+import { ProfileService } from '../../core/services/profile.service';
 import { SidebarComponent } from '../sidebar/Sidebar.component';
 
 @Component({
@@ -15,6 +16,7 @@ import { SidebarComponent } from '../sidebar/Sidebar.component';
 export class AuthLayoutComponent implements OnInit {
   private auth = inject(AuthService);
   private alertService = inject(AlertService);
+  profileService = inject(ProfileService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -32,6 +34,8 @@ export class AuthLayoutComponent implements OnInit {
       next: alerts => this.alertCount.set(alerts.length),
       error: () => {},
     });
+
+    this.profileService.loadProfilePic();
 
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd),

@@ -15,5 +15,6 @@ public record UserProfileRequest(
     List<string> TrainingTypes,       
     HoursSeated HoursSeated,
     decimal HabitualSleepHours,
-    int SleepQuality                  
+    int SleepQuality,                  
+    ProfilePic ProfilePic                 
 );

@@ -2,6 +2,7 @@ import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ThemeService } from '../../core/services/theme.service';
+import { ProfileService } from '../../core/services/profile.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,6 +14,7 @@ import { ThemeService } from '../../core/services/theme.service';
 export class SidebarComponent {
   auth = inject(AuthService);
   theme = inject(ThemeService);
+  profileService = inject(ProfileService);
   private router = inject(Router);
 
   @Input() alertCount = 0;

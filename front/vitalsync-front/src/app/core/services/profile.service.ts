@@ -1,15 +1,29 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
   UserProfileRequest, UserProfileResponse,
   UserConditionRequest, UserConditionResponse,
   UserMedicationRequest, UserMedicationResponse,
-  PersonalRangeResponse
+  PersonalRangeResponse, PROFILE_PICS
 } from '../models/profile.models';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
+  profilePicSrc = signal<string | null>(null);
+
   constructor(private http: HttpClient) {}
+
+  updatePicFromKey(picKey: string) {
+    const pic = PROFILE_PICS.find(p => p.key === picKey);
+    this.profilePicSrc.set(pic?.src ?? null);
+  }
+
+  loadProfilePic() {
+    this.getProfile().subscribe({
+      next: p => this.updatePicFromKey(p.profilePic),
+      error: () => {},
+    });
+  }
 
   getProfile() {
     return this.http.get<UserProfileResponse>('/api/profile', { withCredentials: true });

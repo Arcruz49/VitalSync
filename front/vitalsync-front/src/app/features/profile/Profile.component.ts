@@ -8,7 +8,7 @@ import { ProfileService } from '../../core/services/profile.service';
 import {
   UserProfileResponse, UserConditionResponse, UserMedicationResponse,
   HEALTH_CONDITIONS, MEDICATION_CLASSES, ACTIVITY_LEVELS, HEALTH_GOALS,
-  TRAINING_TYPES, HOURS_SEATED
+  TRAINING_TYPES, HOURS_SEATED, PROFILE_PICS
 } from '../../core/models/profile.models';
 
 @Component({
@@ -32,11 +32,14 @@ export class ProfileComponent implements OnInit {
   editingRoutine = false;
   editingConditions = false;
   editingMedications = false;
+  showAvatarPicker = false;
+  selectedPicId = -1;
 
   savingPhysical = signal(false);
   savingRoutine = signal(false);
   savingConditions = signal(false);
   savingMedications = signal(false);
+  savingAvatar = signal(false);
 
   errorPhysical = signal('');
   errorRoutine = signal('');
@@ -58,10 +61,21 @@ export class ProfileComponent implements OnInit {
   goals = HEALTH_GOALS;
   trainingTypes = TRAINING_TYPES;
   hoursSeated = HOURS_SEATED;
+  profilePics = PROFILE_PICS;
 
   get initials() {
     return (this.auth.currentUser()?.name ?? '')
       .split(' ').slice(0, 2).map((n: string) => n[0]).join('').toUpperCase();
+  }
+
+  get currentPicSrc() {
+    const p = this.profile();
+    if (!p || p.profilePic === '_') return null;
+    return PROFILE_PICS.find(pic => pic.key === p.profilePic)?.src ?? null;
+  }
+
+  private picKeyToId(key: string): number {
+    return PROFILE_PICS.find(p => p.key === key)?.id ?? -1;
   }
 
 ngOnInit() { this.load(); }
@@ -71,6 +85,7 @@ ngOnInit() { this.load(); }
     this.profileService.getProfile().subscribe({
       next: (profile) => {
         this.profile.set(profile);
+        this.profileService.updatePicFromKey(profile.profilePic);
         forkJoin({
           conditions: this.profileService.getConditions(),
           medications: this.profileService.getMedications(),
@@ -88,6 +103,45 @@ ngOnInit() { this.load(); }
         this.buildPhysicalForm();
         this.editingPhysical = true;
       },
+    });
+  }
+
+  // ── AVATAR PICKER ─────────────────────────────────────
+  openAvatarPicker() {
+    const p = this.profile();
+    this.selectedPicId = p ? this.picKeyToId(p.profilePic) : -1;
+    this.showAvatarPicker = true;
+  }
+
+  cancelAvatarPicker() {
+    this.showAvatarPicker = false;
+  }
+
+  saveAvatar() {
+    const cur = this.profile()!;
+    this.savingAvatar.set(true);
+    this.profileService.saveProfile({
+      weightKg: cur.weightKg,
+      heightCm: cur.heightCm,
+      targetWeightKg: cur.targetWeightKg ?? undefined,
+      waistCircumferenceCm: cur.waistCircumferenceCm ?? undefined,
+      activityLevel: ACTIVITY_LEVELS.find(a => a.apiKey === cur.activityLevel)?.id ?? 3,
+      goal: HEALTH_GOALS.find(g => g.apiKey === cur.goal)?.id ?? 6,
+      trainingFrequencyDays: cur.trainingFrequencyDays,
+      trainingTypes: cur.trainingTypes,
+      hoursSeated: HOURS_SEATED.find(h => h.apiKey === cur.hoursSeated)?.id ?? 2,
+      habitualSleepHours: cur.habitualSleepHours,
+      sleepQuality: cur.sleepQuality,
+      profilePic: this.selectedPicId,
+    }).subscribe({
+      next: (updated) => {
+        this.profile.set(updated);
+        this.profileService.updatePicFromKey(updated.profilePic);
+        this.showAvatarPicker = false;
+        this.savingAvatar.set(false);
+        this.flash('Ícone atualizado.');
+      },
+      error: () => this.savingAvatar.set(false),
     });
   }
 
@@ -140,9 +194,11 @@ ngOnInit() { this.load(); }
       hoursSeated: cur ? (HOURS_SEATED.find(h => h.apiKey === cur.hoursSeated)?.id ?? 2) : 2,
       habitualSleepHours: cur?.habitualSleepHours ?? 7,
       sleepQuality: cur?.sleepQuality ?? 3,
+      profilePic: cur ? this.picKeyToId(cur.profilePic) : -1,
     }).subscribe({
       next: (updated) => {
         this.profile.set(updated);
+        this.profileService.updatePicFromKey(updated.profilePic);
         this.editingPhysical = false;
         this.savingPhysical.set(false);
         this.flash('Dados físicos atualizados.');
@@ -201,9 +257,11 @@ ngOnInit() { this.load(); }
       hoursSeated: this.pfRoutine.hoursSeated,
       habitualSleepHours: this.pfRoutine.habitualSleepHours,
       sleepQuality: this.pfRoutine.sleepQuality,
+      profilePic: this.picKeyToId(cur.profilePic),
     }).subscribe({
       next: (updated) => {
         this.profile.set(updated);
+        this.profileService.updatePicFromKey(updated.profilePic);
         this.editingRoutine = false;
         this.savingRoutine.set(false);
         this.flash('Rotina de treino atualizada.');

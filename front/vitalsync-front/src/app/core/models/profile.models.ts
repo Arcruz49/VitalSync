@@ -11,6 +11,7 @@ export interface UserProfileRequest {
   hoursSeated: number;
   habitualSleepHours: number;
   sleepQuality: number;
+  profilePic: number;
 }
 
 export interface UserProfileResponse {
@@ -26,6 +27,7 @@ export interface UserProfileResponse {
   trainingFrequencyDays: number;
   trainingTypes: string[];
   hoursSeated: string;
+  profilePic: string;
   habitualSleepHours: number;
   sleepQuality: number;
   bmi: number;
@@ -40,6 +42,17 @@ export interface UserProfileResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+export const PROFILE_PICS = [
+  { id: 1, key: 'Bunny',   src: '/profilepic/pp1.png' },
+  { id: 2, key: 'Penguin', src: '/profilepic/pp2.png' },
+  { id: 3, key: 'Shrimp',  src: '/profilepic/pp3.png' },
+  { id: 4, key: 'Mouse',   src: '/profilepic/pp4.png' },
+  { id: 5, key: 'Frog',    src: '/profilepic/pp5.png' },
+  { id: 6, key: 'Beaver',  src: '/profilepic/pp6.png' },
+  { id: 7, key: 'Alien',   src: '/profilepic/pp7.png' },
+  { id: 8, key: 'Ant',     src: '/profilepic/pp8.png' },
+];
 
 export interface HealthCondition {
   id: number;

@@ -53,6 +53,9 @@ public class UserProfile
     [Column("updated_at")]
     public DateTime UpdatedAt { get; set; }
 
+    [Column("profile_pic")]
+    public ProfilePic ProfilePic { get; set; } //  1-8
+
     [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;
 }

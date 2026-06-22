@@ -19,12 +19,59 @@
 
     <!-- IDENTITY -->
     <div class="identity-card">
-      <div class="id-avatar">{{ initials }}</div>
+      <div class="id-avatar-wrap">
+        <div class="id-avatar">
+          @if (currentPicSrc) {
+            <img [src]="currentPicSrc" alt="avatar" class="id-avatar-img" />
+          } @else {
+            {{ initials }}
+          }
+        </div>
+        @if (profile()) {
+          <button class="id-avatar-edit" (click)="showAvatarPicker ? cancelAvatarPicker() : openAvatarPicker()" title="Alterar ícone">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        }
+      </div>
       <div class="id-info">
         <h1 class="id-name">{{ auth.currentUser()?.name }}</h1>
         <p class="id-email">{{ auth.currentUser()?.email }}</p>
       </div>
     </div>
+
+    <!-- AVATAR PICKER -->
+    @if (showAvatarPicker) {
+      <div class="avatar-picker-card">
+        <div class="avatar-picker-header">
+          <span class="section-label">ESCOLHA SEU ÍCONE</span>
+          <button class="btn-section-edit" (click)="cancelAvatarPicker()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Fechar
+          </button>
+        </div>
+        <div class="avatar-grid">
+          <div class="avatar-option" [class.selected]="selectedPicId === -1" (click)="selectedPicId = -1" title="Sem ícone">
+            <div class="avatar-option-initials">{{ initials }}</div>
+          </div>
+          @for (pic of profilePics; track pic.id) {
+            <div class="avatar-option" [class.selected]="selectedPicId === pic.id" (click)="selectedPicId = pic.id" [title]="pic.key">
+              <img [src]="pic.src" [alt]="pic.key" />
+            </div>
+          }
+        </div>
+        <div class="edit-actions">
+          <button class="btn-cancel" (click)="cancelAvatarPicker()">Cancelar</button>
+          <button class="btn-save" (click)="saveAvatar()" [disabled]="savingAvatar()">
+            @if (savingAvatar()) { <span class="spinner"></span> } @else { Salvar ícone }
+          </button>
+        </div>
+      </div>
+    }
 
     <!-- ── SEÇÃO 1: DADOS FÍSICOS E METAS ────────────── -->
     <div class="section">

@@ -36,6 +36,7 @@ public class GetUserProfileUseCase(
             profile.TrainingFrequencyDays,
             JsonSerializer.Deserialize<List<string>>(profile.TrainingTypes) ?? [],
             profile.HoursSeated.ToString(),
+            profile.ProfilePic.ToString(),
             profile.HabitualSleepHours,
             profile.SleepQuality,
             metrics.BMI,

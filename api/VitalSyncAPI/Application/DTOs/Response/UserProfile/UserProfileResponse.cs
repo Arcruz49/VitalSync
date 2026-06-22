@@ -15,6 +15,7 @@ public record UserProfileResponse(
     int TrainingFrequencyDays,
     List<string> TrainingTypes,
     string HoursSeated,
+    string ProfilePic,
     decimal HabitualSleepHours,
     int SleepQuality,
 

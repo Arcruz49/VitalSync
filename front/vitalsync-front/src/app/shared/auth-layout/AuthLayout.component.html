@@ -22,7 +22,11 @@
           }
         </a>
         <a routerLink="/profile" routerLinkActive="active" class="topbar-avatar" title="Meu perfil">
-          {{ initials }}
+          @if (profileService.profilePicSrc()) {
+            <img [src]="profileService.profilePicSrc()!" alt="avatar" class="topbar-avatar-img" />
+          } @else {
+            {{ initials }}
+          }
         </a>
       </div>
     </header>

@@ -68,7 +68,13 @@
 
   <div class="sidebar-footer">
     <a routerLink="/profile" class="user-info" title="Ver perfil">
-      <div class="avatar">{{ initials }}</div>
+      <div class="avatar">
+        @if (profileService.profilePicSrc()) {
+          <img [src]="profileService.profilePicSrc()!" alt="avatar" class="avatar-img" />
+        } @else {
+          {{ initials }}
+        }
+      </div>
       <div class="user-details">
         <span class="user-name">{{ auth.currentUser()?.name }}</span>
         <span class="user-email">{{ auth.currentUser()?.email }}</span>

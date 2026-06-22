@@ -39,6 +39,7 @@ public class SaveProfileUseCase(
                 HoursSeated = request.HoursSeated,
                 HabitualSleepHours = request.HabitualSleepHours,
                 SleepQuality = request.SleepQuality,
+                ProfilePic = request.ProfilePic,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -58,6 +59,7 @@ public class SaveProfileUseCase(
             existingProfile.HoursSeated = request.HoursSeated;
             existingProfile.HabitualSleepHours = request.HabitualSleepHours;
             existingProfile.SleepQuality = request.SleepQuality;
+            existingProfile.ProfilePic = request.ProfilePic;
             existingProfile.UpdatedAt = DateTime.UtcNow;
 
             userProfileRepository.UpdateProfile(existingProfile);
@@ -82,6 +84,7 @@ public class SaveProfileUseCase(
             profile.TrainingFrequencyDays,
             JsonSerializer.Deserialize<List<string>>(profile.TrainingTypes) ?? [],
             profile.HoursSeated.ToString(),
+            profile.ProfilePic.ToString(),
             profile.HabitualSleepHours,
             profile.SleepQuality,
             metrics.BMI,
