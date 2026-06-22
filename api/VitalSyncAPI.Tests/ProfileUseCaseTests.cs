@@ -30,7 +30,8 @@ public class ProfileUseCaseTests
         TrainingTypes:          new List<string> { "Running" },
         HoursSeated:            HoursSeated.Between4And6,
         HabitualSleepHours:     7.5m,
-        SleepQuality:           4
+        SleepQuality:           4,
+        ProfilePic: ProfilePic.Frog
     );
 
     private static UserProfile MakeProfile() => new()
