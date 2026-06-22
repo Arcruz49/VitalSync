@@ -1,12 +1,11 @@
-FROM node:20-alpine
-
+FROM node:20-alpine AS build
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm ci
-
 COPY . .
+RUN npx ng build --configuration=production
 
-EXPOSE 4200
-
-CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
+FROM nginx:alpine
+COPY --from=build /app/dist/vitalsync-front/browser /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
