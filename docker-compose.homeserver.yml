@@ -94,7 +94,7 @@ services:
       context: ./front/vitalsync-front
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "4200:80"
     depends_on:
       - api
 

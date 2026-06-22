@@ -60,6 +60,7 @@ AI analysis runs asynchronously: after a health record or nutrition entry is sav
 - Training routine (frequency, types, seated hours, sleep)
 - Health conditions and medications, each influencing the personalized range calculation
 - Derived metrics: BMI, BMR, TDEE, calorie and macro goals
+- Profile picture — choose from 8 illustrated avatars or use initials; avatar is shown in the sidebar and mobile topbar. Artwork by [@_gellyart](https://www.instagram.com/_gellyart/)
 
 **Dashboard**
 - Priority-ordered metric cards with trend indicators
@@ -280,7 +281,7 @@ Exchange names are pinned via `cfg.Message<T>(m => m.SetEntityName(...))` in bot
 
 **Domain Services**
 - `PersonalRangeCalculator` — derives normal ranges per metric from the user's profile, conditions, and medications
-- `BodyMetricsCalculator` — computes BMI, BMR, TDEE, and macro goals from physical data
+- `BodyMetricsCalculator` — computes BMI, BMR, TDEE, and macro goals from physical data. Calorie goal by goal type: `WeightLoss` → 80% TDEE, `MuscleGain` → TDEE + 250, `Maintenance` → TDEE, `Conditioning` → 105% TDEE, `ChronicConditionControl` → 85% TDEE, `GeneralHealth` → 90% TDEE. Minimum of 1200 kcal always enforced.
 - `AlertGenerator` — creates an alert when a health record exceeds its applicable range; uses personal range when available, falls back to metric-type defaults
 
 **Rate Limiting**
@@ -300,6 +301,7 @@ Applied via ASP.NET Core's built-in rate limiter, partitioned by user ID for aut
 - Lazy-loaded feature modules behind an `authGuard`
 - Global HTTP error handling via an Angular interceptor
 - CSS custom properties for the design system with full dark mode support via `data-theme="dark"` on the `<html>` element
+- Production build served by nginx (multi-stage Docker build); `nginx.conf` must include `try_files $uri $uri/ /index.html` for client-side routing to work
 
 ---
 

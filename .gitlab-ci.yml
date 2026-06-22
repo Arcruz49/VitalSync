@@ -56,8 +56,8 @@ test:api:
     - master
     - merge_requests
 
-# DEPLOY
-deploy:production:
+# DEPLOY HOMESERVER
+deploy:homeserver:
   stage: deploy
   tags:
     - homeserver
@@ -66,8 +66,24 @@ deploy:production:
     - cd /home/arthur.cruz/Documents/Projetos/VitalSync
     - git fetch https://github.com/Arcruz49/VitalSync.git master
     - git reset --hard FETCH_HEAD
+    - docker compose -f docker-compose.yml -f docker-compose.homeserver.yml up --build -d
+  only:
+    - master
+  environment:
+    name: production-home
+
+# DEPLOY VPS
+deploy:vps:
+  stage: deploy
+  tags:
+    - vps
+  script:
+    - git config --global --add safe.directory /opt/vitalsync
+    - cd /opt/vitalsync
+    - git fetch https://github.com/Arcruz49/VitalSync.git master
+    - git reset --hard FETCH_HEAD
     - docker compose up --build -d
   only:
     - master
   environment:
-    name: production
+    name: production-vps
