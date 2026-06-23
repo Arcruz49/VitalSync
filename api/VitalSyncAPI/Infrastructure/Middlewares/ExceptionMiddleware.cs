@@ -43,8 +43,8 @@ public class ExceptionMiddleware
             await HandleExceptionAsync(
                 context,
                 HttpStatusCode.InternalServerError,
-                // "Erro interno no servidor."
-                ex.Message + ex.InnerException + ex.StackTrace
+                "Erro interno no servidor."
+                // ex.Message + ex.InnerException + ex.StackTrace
             );
         }
     }
