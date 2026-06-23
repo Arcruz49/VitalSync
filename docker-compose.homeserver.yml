@@ -48,9 +48,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
@@ -66,8 +63,6 @@ services:
       POSTGRES_DB: vitalsync
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -76,28 +71,14 @@ services:
       timeout: 5s
       retries: 5
 
-  # frontend:
-  #   build:
-  #     context: ./front/vitalsync-front
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "4200:4200"
-  #   # volumes:
-  #   #   - ./front/vitalsync-front/src:/app/src
-  #   #   - ./front/vitalsync-front/public:/app/public
-  #   #   - ./front/vitalsync-front/proxy.conf.json:/app/proxy.conf.json
-  #   depends_on:
-  #     - api
-
   frontend:
     build:
       context: ./front/vitalsync-front
       dockerfile: Dockerfile
     ports:
-      - "4200:80"
+      - "80:80"
     depends_on:
       - api
 
 volumes:
   pgdata:
-  
